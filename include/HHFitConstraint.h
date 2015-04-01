@@ -13,11 +13,10 @@ class HHFitConstraint {
   HHFitConstraint(HHFitObject* fitobject);
   virtual ~HHFitConstraint() {};
 
-  virtual Double_t getChi2()=0;
-  void setFitObject(HHFitObject* fitobject);
+  virtual Double_t getChi2() const = 0;
   
  protected:
-  HHFitObject* m_fitobject;
+  HHFitObject* const m_fitobject;
 
 };
 

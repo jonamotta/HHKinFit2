@@ -7,7 +7,7 @@
 
 #include "Rtypes.h"
 #include <vector>
-#include "HHFitObject.h"
+#include "HHFitObjectE.h"
 #include "HHFitConstraint.h"
 
 class HHKinFit {
@@ -15,15 +15,15 @@ class HHKinFit {
   HHKinFit();
 
   void Fit();
-  Double_t getChi2();
-  std::vector<HHFitObject*> getListOfFitObjects();
-  std::vector<HHFitConstraint*> getListOfConstraints();
+  Double_t getChi2() const;
+  std::vector<HHFitObjectE*> getListOfFitObjects() const;
+  std::vector<HHFitConstraint*> getListOfConstraints() const;
   
-  void addFitObject(HHFitObject* fitobject);
+  void addFitObjectE(HHFitObjectE* fitobject);
   void addConstraint(HHFitConstraint* constraint);
   
  private:
-  std::vector<HHFitObject*> m_fitobjects;
+  std::vector<HHFitObjectE*> m_fitobjects;
   std::vector<HHFitConstraint*> m_constraints;
 
 };

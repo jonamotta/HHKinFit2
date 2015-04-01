@@ -18,20 +18,15 @@ int main(int argc, char* argv[])
 
   HHFitObjectE* tau1 = new HHFitObjectEConstM(TLorentzVector(58,0,0,60));
   HHFitObjectE* tau2 = new HHFitObjectEConstM(TLorentzVector(0,58,0,60));
-  HHFitObjectMET* met = new HHFitObjectMET(TVector2(10,20),TVector2(0,0));
+  HHFitObjectMET* met = new HHFitObjectMET(TVector2(10,20));
   met->setCovMatrix(100,-100,50);
-
-  std::vector<HHFitObject*> higgsparts;
-  higgsparts.push_back(tau1);
-  higgsparts.push_back(tau2);
-  higgsparts.push_back(met);
-  HHFitObject* higgs  = new HHFitObjectComposite(higgsparts);
+  HHFitObject* higgs  = new HHFitObjectComposite(tau1, tau2, met);
 
   HHFitConstraint* invm = new HHFitConstraintEHardM(tau1, tau2, mass);
   HHFitConstraint* balance = new HHFitConstraint4Vector(higgs, true, true, false, false);
 
   HHKinFit* fit = new HHKinFit();
-  fit->addFitObject(tau1);
+  fit->addFitObjectE(tau1);
   fit->addConstraint(invm);
   fit->addConstraint(balance);
 

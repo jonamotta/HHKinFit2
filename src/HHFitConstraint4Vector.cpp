@@ -15,7 +15,7 @@ HHFitConstraint4Vector::HHFitConstraint4Vector(HHFitObject* object, Bool_t px, B
 }
 
 Double_t 
-HHFitConstraint4Vector::getChi2(){
+HHFitConstraint4Vector::getChi2() const{
   int ncomp = 0;
   for (int i=0; i<4; i++) if (m_components[i])  ncomp++;
   TMatrixD cov(ncomp,ncomp);
@@ -45,12 +45,3 @@ HHFitConstraint4Vector::getChi2(){
   }
   return(chi2sum);
 }
-
-void 
-HHFitConstraint4Vector::setUsedComponents(Bool_t px, Bool_t py, Bool_t pz, Bool_t E){
-  m_components[0]=px;
-  m_components[1]=py;
-  m_components[2]=pz;
-  m_components[3]=E;
-}
-

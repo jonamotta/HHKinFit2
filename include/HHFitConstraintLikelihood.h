@@ -12,11 +12,10 @@ class HHFitConstraintLikelihood : public HHFitConstraint {
  public:
   HHFitConstraintLikelihood(HHFitObject* object, TF1* likelihood);
 
-  Double_t getChi2();
-  void setLikelihood(TF1* likelihood);
+  Double_t getChi2() const;
 
  private:
-  TF1* m_likelihood;
+  TF1* const m_likelihood;
 };
 
 #endif /* HHFitConstraintLikelihood_ */

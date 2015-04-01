@@ -7,11 +7,6 @@ HHFitConstraintLikelihood::HHFitConstraintLikelihood(HHFitObject* object, TF1* l
 }
 
 Double_t 
-HHFitConstraintLikelihood::getChi2(){
+HHFitConstraintLikelihood::getChi2() const{
   return(0);
-}
-
-void 
-HHFitConstraintLikelihood::setLikelihood(TF1* likelihood){
-  m_likelihood = likelihood;
 }

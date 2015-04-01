@@ -14,14 +14,14 @@
 
 class HHFitObjectMET : public HHFitObject {
  public:
-  HHFitObjectMET(TVector2 initialvector,TVector2 fitvector);
+  HHFitObjectMET(TVector2 const& initialvector,TVector2 const& fitvector=TVector2(0,0));
   
   void setCovMatrix(Double_t xx, Double_t yy, Double_t xy);
 
-  virtual void print();
-  virtual void printInitial4Vector();
-  virtual void printFit4Vector();
-  virtual void printCovMatrix();
+  virtual void print() const;
+  virtual void printInitial4Vector() const;
+  virtual void printFit4Vector() const;
+  virtual void printCovMatrix() const;
 };
 
 #endif /* HHFitObjectMET_ */

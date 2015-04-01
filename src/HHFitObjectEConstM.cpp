@@ -7,14 +7,14 @@
 #include "exceptions/HHEnergyConstraintException.h"
 
 
-HHFitObjectEConstM::HHFitObjectEConstM(TLorentzVector initial4vector)
+HHFitObjectEConstM::HHFitObjectEConstM(TLorentzVector const& initial4vector)
   :HHFitObjectE(initial4vector){
 
 }
 
 
 TLorentzVector
-HHFitObjectEConstM::constrainEtoMinv(Double_t m, TLorentzVector pset){
+HHFitObjectEConstM::constrainEtoMinv(Double_t m, TLorentzVector const& pset) const{
   TLorentzVector pmod = getFit4Vector();
   TLorentzVector combined = pset + pmod;
 
@@ -75,7 +75,7 @@ HHFitObjectEConstM::constrainEtoMinv(Double_t m, TLorentzVector pset){
 }
 
 TLorentzVector
-HHFitObjectEConstM::changeE(Double_t E){
+HHFitObjectEConstM::changeE(Double_t E) const{
   TLorentzVector temp = this->getFit4Vector();
 
   if(E<temp.M()){
@@ -97,12 +97,12 @@ HHFitObjectEConstM::changeE(Double_t E){
 }
 
 TLorentzVector
-HHFitObjectEConstM::scaleE(Double_t scale){
+HHFitObjectEConstM::scaleE(Double_t scale) const{
   return(this->changeE(scale*this->getFit4Vector().E()));
 }
 
 void
-HHFitObjectEConstM::print(){
+HHFitObjectEConstM::print() const{
   std::cout << "---" << std::endl;
   std::cout <<  "energy component fit object with constant mass:" << std::endl;
   this->printInitial4Vector();

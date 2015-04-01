@@ -13,12 +13,12 @@
 
 class HHFitObjectEConstM : public HHFitObjectE {
  public:
-  HHFitObjectEConstM(TLorentzVector initial4vector);
-  TLorentzVector constrainEtoMinv(Double_t m, TLorentzVector other4vector);
-  TLorentzVector changeE(Double_t E);
-  TLorentzVector scaleE(Double_t scale);
+  HHFitObjectEConstM(TLorentzVector const& initial4vector);
+  TLorentzVector constrainEtoMinv(Double_t m, TLorentzVector const& other4vector) const;
+  TLorentzVector changeE(Double_t E) const;
+  TLorentzVector scaleE(Double_t scale) const;
 
-  void print();
+  void print() const;
 
 };
 

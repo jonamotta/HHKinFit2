@@ -13,10 +13,10 @@
 
 class HHFitObjectEConstBeta : public HHFitObjectE {
  public:
-  HHFitObjectEConstBeta(TLorentzVector initial4vector);
-  TLorentzVector constrainEtoMinv(Double_t m, TLorentzVector other4vector);
+  HHFitObjectEConstBeta(TLorentzVector const& initial4vector);
+  TLorentzVector constrainEtoMinv(Double_t m, TLorentzVector const& other4vector) const;
 
-  void print();
+  void print() const;
 
 };
 

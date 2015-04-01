@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-HHFitObjectE::HHFitObjectE(TLorentzVector initial4vector)
+HHFitObjectE::HHFitObjectE(TLorentzVector const& initial4vector)
   :HHFitObject(initial4vector),
    m_upperLimitE(9999),
    m_lowerLimitE(0){
@@ -20,17 +20,22 @@ HHFitObjectE::scaleEandSave(Double_t E){
 }
 
 void
-HHFitObjectE::constrainEtoMinvandSave(Double_t m, TLorentzVector other4vector){
+HHFitObjectE::constrainEtoMinvandSave(Double_t m, TLorentzVector const& other4vector){
   this->setFit4Vector(constrainEtoMinv(m, other4vector));
 }
 
 Double_t
-HHFitObjectE::getUpperFitLimitE(){
+HHFitObjectE::getE() const{
+  return(m_fit4vector.E());
+}
+
+Double_t
+HHFitObjectE::getUpperFitLimitE() const{
   return(m_upperLimitE);
 }
 
 Double_t
-HHFitObjectE::getLowerFitLimitE(){
+HHFitObjectE::getLowerFitLimitE() const{
   return(m_lowerLimitE);
 }
 
@@ -40,7 +45,7 @@ HHFitObjectE::setUpperFitLimitE(Double_t upperlimit){
 }
 
 void
-HHFitObjectE::setUpperFitLimitE(Double_t minv, TLorentzVector other4vectorMin){
+HHFitObjectE::setUpperFitLimitE(Double_t minv, TLorentzVector const& other4vectorMin){
   this->setUpperFitLimitE(constrainEtoMinv(minv,other4vectorMin).E());
 }
 
@@ -50,12 +55,12 @@ HHFitObjectE::setLowerFitLimitE(Double_t lowerlimit){
 }
 
 void
-HHFitObjectE::setLowerFitLimitE(TLorentzVector lowerlimit){
+HHFitObjectE::setLowerFitLimitE(TLorentzVector const& lowerlimit){
   m_lowerLimitE = lowerlimit.E();
 }
 
 void
-HHFitObjectE::print(){
+HHFitObjectE::print() const{
   std::cout << "---" << std::endl;
   std::cout << "energy component fit object:" << std::endl;
   this->printInitial4Vector();

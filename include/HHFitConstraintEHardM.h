@@ -13,12 +13,11 @@ class HHFitConstraintEHardM : public HHFitConstraint {
  public:
   HHFitConstraintEHardM(HHFitObject* fitobject, HHFitObject* constrainedobject, Double_t mass);
 
-  Double_t getChi2();
-  void setMass(Double_t mass);
+  Double_t getChi2() const;
 
  private:
-  HHFitObject* m_constrainedobject;
-  Double_t m_mass;
+  HHFitObject* const m_constrainedobject;
+  Double_t const m_mass;
   
 };
 

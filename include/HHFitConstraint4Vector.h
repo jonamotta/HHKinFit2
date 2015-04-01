@@ -14,8 +14,7 @@ class HHFitConstraint4Vector : public HHFitConstraint {
  public:
   HHFitConstraint4Vector(HHFitObject* object, Bool_t px, Bool_t py, Bool_t pz, Bool_t E);
 
-  Double_t getChi2();
-  void setUsedComponents(Bool_t px, Bool_t py, Bool_t pz, Bool_t E);
+  Double_t getChi2() const;
 
  private:
   Bool_t m_components[4];

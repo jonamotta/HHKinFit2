@@ -9,15 +9,8 @@ HHFitConstraintEHardM::HHFitConstraintEHardM(HHFitObject* fitobject, HHFitObject
 }
 
 Double_t
-HHFitConstraintEHardM::getChi2(){
+HHFitConstraintEHardM::getChi2() const{
   HHFitObjectE* new4momentum2 = static_cast<HHFitObjectE*>(m_constrainedobject);
   new4momentum2->constrainEtoMinvandSave(m_mass, m_fitobject->getFit4Vector());
   return(0);
 }
-
-void 
-HHFitConstraintEHardM::setMass(Double_t mass){
-  m_mass=mass;
-}
-
-

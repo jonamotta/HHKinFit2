@@ -12,27 +12,27 @@
 class HHFitObject {
  public:
   HHFitObject();
-  HHFitObject(TLorentzVector initial4vector);
+  HHFitObject(TLorentzVector const& initial4vector);
   virtual ~HHFitObject(){};
 
-  virtual TLorentzVector getInitial4Vector();
-  virtual TLorentzVector getFit4Vector();
-  virtual TMatrixD getCovMatrix();
+  virtual TLorentzVector getInitial4Vector() const;
+  virtual TLorentzVector getFit4Vector() const;
+  virtual TMatrixD getCovMatrix() const;
 
-  void setFit4Vector(TLorentzVector vec);
-  void setCovMatrix(TMatrixD covmatrix);
+  void setFit4Vector(TLorentzVector const& vec);
+  void setCovMatrix(TMatrixD const& covmatrix);
 
   void reset();
 
-  virtual void printInitial4Vector();
-  virtual void printFit4Vector();
-  virtual void printCovMatrix();
+  virtual void printInitial4Vector() const;
+  virtual void printFit4Vector() const;
+  virtual void printCovMatrix() const;
 
-  virtual void print();
+  virtual void print() const;
 
  protected:
   TLorentzVector m_fit4vector;
-  TLorentzVector m_initial4vector;
+  TLorentzVector const m_initial4vector;
   TMatrixD m_covmatrix;
 };
 

@@ -13,17 +13,18 @@
 
 class HHFitObjectComposite : public HHFitObject {
  public:
-  HHFitObjectComposite(std::vector<HHFitObject*> subobjects);
+	  HHFitObjectComposite(std::vector<HHFitObject*> const& subobjects);
+	  HHFitObjectComposite(HHFitObject* subobject1, HHFitObject* subobject2, HHFitObject* subobject3);
 
  protected:
-  TLorentzVector getFit4Vector();
-  TLorentzVector getInitial4Vector();
-  TMatrixD getCovMatrix();
+  TLorentzVector getFit4Vector() const;
+  TLorentzVector getInitial4Vector() const;
+  TMatrixD getCovMatrix() const;
 
-  void setSubobjects(std::vector<HHFitObject*> subobjects);
+  void setSubobjects(std::vector<HHFitObject*> const& subobjects);
   void addSubobject(HHFitObject* subobject);
 
-  virtual void print();
+  virtual void print() const;
 
  private:
   std::vector<HHFitObject*> m_subobjects;

@@ -10,7 +10,7 @@ HHFitObject::HHFitObject()
 
 }
 
-HHFitObject::HHFitObject(TLorentzVector initial4vector)
+HHFitObject::HHFitObject(TLorentzVector const& initial4vector)
   :m_fit4vector(initial4vector),
    m_initial4vector(initial4vector),
    m_covmatrix(TMatrixD(4,4)){
@@ -18,27 +18,27 @@ HHFitObject::HHFitObject(TLorentzVector initial4vector)
 }
 
 TLorentzVector  
-HHFitObject::getInitial4Vector(){
+HHFitObject::getInitial4Vector() const{
   return(m_initial4vector);
 }
 
 TLorentzVector
-HHFitObject::getFit4Vector(){
+HHFitObject::getFit4Vector() const{
   return(m_fit4vector);
 }
 
 TMatrixD
-HHFitObject::getCovMatrix(){
+HHFitObject::getCovMatrix() const{
   return(m_covmatrix);
 }
 
 void
-HHFitObject::setFit4Vector(TLorentzVector vec){
+HHFitObject::setFit4Vector(TLorentzVector const& vec){
   this->m_fit4vector=vec;
 }
 
 void
-HHFitObject::setCovMatrix(TMatrixD covmatrix){
+HHFitObject::setCovMatrix(TMatrixD const& covmatrix){
   this->m_covmatrix=covmatrix;
 }
 
@@ -48,7 +48,7 @@ HHFitObject::reset(){
 }
 
 void
-HHFitObject::print(){
+HHFitObject::print() const{
   std::cout << "---" << std::endl;
   std::cout <<  "general fit object:" << std::endl;
   this->printInitial4Vector();
@@ -57,7 +57,7 @@ HHFitObject::print(){
 }
 
 void
-HHFitObject::printInitial4Vector(){
+HHFitObject::printInitial4Vector() const{
   std::cout <<  "initial vector (px,py,pz,E,m)"
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getInitial4Vector().Px()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getInitial4Vector().Py()
@@ -68,7 +68,7 @@ HHFitObject::printInitial4Vector(){
 }
 
 void
-HHFitObject::printFit4Vector(){
+HHFitObject::printFit4Vector() const{
   std::cout <<  "  final vector (px,py,pz,E,m)"
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getFit4Vector().Px()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getFit4Vector().Py()
@@ -79,7 +79,7 @@ HHFitObject::printFit4Vector(){
 }
 
 void
-HHFitObject::printCovMatrix(){
+HHFitObject::printCovMatrix() const{
   std::cout <<  "covariance matrix:" << std::endl;
   std::cout   << std::setw(10) << std::fixed<< std::setprecision(2) << this->getCovMatrix()(0,0)
               << std::setw(10) << std::fixed<< std::setprecision(2) << this->getCovMatrix()(0,1)
