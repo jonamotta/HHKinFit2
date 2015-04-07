@@ -59,5 +59,10 @@ HHFitObjectComposite::print() const{
   std::cout <<  "composite fit object:" << std::endl;
   this->printInitial4Vector();
   this->printFit4Vector();
+  std::cout <<  "-----------------" << std::endl;
+  for (std::vector<HHFitObject*>::const_iterator it = m_subobjects.begin() ; it != m_subobjects.end(); ++it){
+    (*it)->printFit4Vector();
+  }
+  std::cout <<  "-----------------" << std::endl;
   this->printCovMatrix();
 }

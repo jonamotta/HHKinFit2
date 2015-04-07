@@ -32,6 +32,7 @@ class HHFitObjectE : public HHFitObject {
   void setLowerFitLimitE(TLorentzVector const& other4vectorMin);
 
   virtual void print() const;
+  void printLimits() const;
 
  private:
   Double_t m_upperLimitE;

@@ -15,7 +15,7 @@ HHFitObjectEConstM::HHFitObjectEConstM(TLorentzVector const& initial4vector)
 
 TLorentzVector
 HHFitObjectEConstM::constrainEtoMinv(Double_t m, TLorentzVector const& pset) const{
-  TLorentzVector pmod = getFit4Vector();
+  TLorentzVector pmod = getInitial4Vector();
   TLorentzVector combined = pset + pmod;
 
   Double_t Mc = m;
@@ -107,5 +107,6 @@ HHFitObjectEConstM::print() const{
   std::cout <<  "energy component fit object with constant mass:" << std::endl;
   this->printInitial4Vector();
   this->printFit4Vector();
-  this->printCovMatrix();
+  this->printLimits();
+//  this->printCovMatrix();
 }

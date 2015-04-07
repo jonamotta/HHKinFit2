@@ -1,5 +1,6 @@
 #include "HHFitObjectE.h"
 #include <iostream>
+#include <iomanip>
 
 
 HHFitObjectE::HHFitObjectE(TLorentzVector const& initial4vector)
@@ -65,5 +66,16 @@ HHFitObjectE::print() const{
   std::cout << "energy component fit object:" << std::endl;
   this->printInitial4Vector();
   this->printFit4Vector();
+  this->printLimits();
   this->printCovMatrix();
 }
+
+
+void
+HHFitObjectE::printLimits() const{
+  std::cout <<  "limits: "
+            << std::setw(10) << std::fixed<< std::setprecision(1) << this->getLowerFitLimitE()
+            << std::setw(10) << std::fixed<< std::setprecision(1) << this->getUpperFitLimitE()
+            << std::endl;
+}
+
