@@ -47,6 +47,9 @@ int main(int argc, char* argv[])
   singlefit->fit();
   std::cout << "final chi2: " << singlefit->getChi2() << std::endl;
 
+  TGraph gr(singlefit->getChi2Function(100));
+  gr.Draw();
+
   TFile f("out.root","UPDATE");
   gr.Write();
   f.Close();
