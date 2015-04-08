@@ -13,6 +13,7 @@
 #include "exceptions/HHCovarianceMatrixException.h"
 #include "TGraph.h"
 #include "TCanvas.h"
+#include "TFile.h"
 
 int main(int argc, char* argv[])
 {
@@ -46,11 +47,9 @@ int main(int argc, char* argv[])
   singlefit->fit();
   std::cout << "final chi2: " << singlefit->getChi2() << std::endl;
 
-  TCanvas c("c","c",700,700);
-  TGraph gr(singlefit->getChi2Function(100));
-  gr.Draw();
-  c.Print("mychi2function.pdf");
-  c.Print("mychi2function.png");
+  TFile f("out.root","UPDATE");
+  gr.Write();
+  f.Close();
 
 //
 //  try{
