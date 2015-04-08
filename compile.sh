@@ -7,3 +7,4 @@ g++ -fPIC -shared src/*.cpp `root-config --cflags --glibs` -I ./include -o libHH
 
 echo "creating executable"
 g++ main.C `root-config --cflags --glibs` -I ./include -L . -lHHKinFit  -o runHHKinFit
+g++ mainTorbenTest.C `root-config --cflags --glibs` -I ./include -L . -lHHKinFit  -o runHHTauTauEventGenerator
