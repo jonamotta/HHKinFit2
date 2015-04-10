@@ -13,9 +13,9 @@ HHFitObjectComposite::HHFitObjectComposite(HHFitObject* subobject1, HHFitObject*
 }
 
 
-TLorentzVector
+HHLorentzVector
 HHFitObjectComposite::getFit4Vector() const{
-  TLorentzVector p(0,0,0,0);
+  HHLorentzVector p(0,0,0,0);
   for (std::vector<HHFitObject*>::const_iterator it = m_subobjects.begin() ; it != m_subobjects.end(); ++it)
     p += (*it)->getFit4Vector();
 //  m_fit4vector = p;
@@ -23,9 +23,9 @@ HHFitObjectComposite::getFit4Vector() const{
 }
 
 
-TLorentzVector
+HHLorentzVector
 HHFitObjectComposite::getInitial4Vector() const {
-  TLorentzVector p(0,0,0,0);
+  HHLorentzVector p(0,0,0,0);
   for (std::vector<HHFitObject*>::const_iterator it = m_subobjects.begin() ; it != m_subobjects.end(); ++it)
     p += (*it)->getInitial4Vector();
 //  m_initial4vector = p;

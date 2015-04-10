@@ -6,17 +6,17 @@
 #define HHFitObjectConstM_
 
 #include "Rtypes.h"
-#include "TLorentzVector.h"
+#include "HHLorentzVector.h"
 #include "TMatrixD.h"
 
 #include "HHFitObjectE.h"
 
 class HHFitObjectEConstM : public HHFitObjectE {
  public:
-  HHFitObjectEConstM(TLorentzVector const& initial4vector);
-  TLorentzVector constrainEtoMinv(Double_t m, TLorentzVector const& other4vector) const;
-  TLorentzVector changeE(Double_t E) const;
-  TLorentzVector scaleE(Double_t scale) const;
+  HHFitObjectEConstM(HHLorentzVector const& initial4vector);
+  HHLorentzVector constrainEtoMinv(Double_t m, HHLorentzVector const& other4vector) const;
+  HHLorentzVector changeE(Double_t E) const;
+  HHLorentzVector scaleE(Double_t scale) const;
 
   void print() const;
 

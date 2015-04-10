@@ -6,7 +6,7 @@
 #define HHFitObjectComposite_
 
 #include "Rtypes.h"
-#include "TLorentzVector.h"
+#include "HHLorentzVector.h"
 #include "TMatrixD.h"
 
 #include "HHFitObject.h"
@@ -17,8 +17,8 @@ class HHFitObjectComposite : public HHFitObject {
 	  HHFitObjectComposite(HHFitObject* subobject1, HHFitObject* subobject2, HHFitObject* subobject3);
 
  protected:
-  TLorentzVector getFit4Vector() const;
-  TLorentzVector getInitial4Vector() const;
+  HHLorentzVector getFit4Vector() const;
+  HHLorentzVector getInitial4Vector() const;
   TMatrixD getCovMatrix() const;
 
   void setSubobjects(std::vector<HHFitObject*> const& subobjects);

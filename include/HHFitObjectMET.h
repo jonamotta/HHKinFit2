@@ -6,7 +6,6 @@
 #define HHFitObjectMET_
 
 #include "Rtypes.h"
-#include "TLorentzVector.h"
 #include "TVector2.h"
 #include "TMatrixD.h"
 #include "HHFitObject.h"

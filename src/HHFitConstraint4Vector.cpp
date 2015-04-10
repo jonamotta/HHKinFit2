@@ -34,7 +34,7 @@ HHFitConstraint4Vector::getChi2() const{
   }
 
   TMatrixD invcov = cov.Invert();
-  TLorentzVector res = m_fitobject->getFit4Vector()-m_fitobject->getInitial4Vector();
+  HHLorentzVector res = m_fitobject->getFit4Vector()-m_fitobject->getInitial4Vector();
 
   Double_t chi2sum=0;
   for(int i=0; i<ncomp; i++){

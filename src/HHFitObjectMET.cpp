@@ -1,11 +1,12 @@
 #include "HHFitObjectMET.h"
+#include "HHLorentzVector.h"
 #include <iostream>
 #include <iomanip>
 
 
 HHFitObjectMET::HHFitObjectMET(TVector2 const& v,TVector2 const& vfit)
-  :HHFitObject(TLorentzVector(v.X(),v.Y(),0,sqrt(v.X()*v.X()+v.Y()*v.Y()))){
-  this->setFit4Vector(TLorentzVector(vfit.X(),vfit.Y(),0,sqrt(vfit.X()*vfit.X()+vfit.Y()*vfit.Y())));
+  :HHFitObject(HHLorentzVector(v.X(),v.Y(),0,sqrt(v.X()*v.X()+v.Y()*v.Y()))){
+  this->setFit4Vector(HHLorentzVector(vfit.X(),vfit.Y(),0,sqrt(vfit.X()*vfit.X()+vfit.Y()*vfit.Y())));
 }
 
 

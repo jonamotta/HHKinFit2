@@ -4,25 +4,25 @@
 #include <iomanip>
 
 HHFitObject::HHFitObject()
-  :m_fit4vector(TLorentzVector()),
-   m_initial4vector(TLorentzVector()),
+  :m_fit4vector(HHLorentzVector()),
+   m_initial4vector(HHLorentzVector()),
    m_covmatrix(TMatrixD(4,4)){
 
 }
 
-HHFitObject::HHFitObject(TLorentzVector const& initial4vector)
+HHFitObject::HHFitObject(HHLorentzVector const& initial4vector)
   :m_fit4vector(initial4vector),
    m_initial4vector(initial4vector),
    m_covmatrix(TMatrixD(4,4)){
 
 }
 
-TLorentzVector  
+HHLorentzVector  
 HHFitObject::getInitial4Vector() const{
   return(m_initial4vector);
 }
 
-TLorentzVector
+HHLorentzVector
 HHFitObject::getFit4Vector() const{
   return(m_fit4vector);
 }
@@ -33,7 +33,7 @@ HHFitObject::getCovMatrix() const{
 }
 
 void
-HHFitObject::setFit4Vector(TLorentzVector const& vec){
+HHFitObject::setFit4Vector(HHLorentzVector const& vec){
   this->m_fit4vector=vec;
 }
 

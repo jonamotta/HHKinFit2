@@ -9,6 +9,7 @@
 #include "HHFitObjectMET.h"
 #include "HHFitObject.h"
 #include "HHFitObjectComposite.h"
+#include "HHLorentzVector.h"
 #include "exceptions/HHEnergyRangeException.h"
 #include "exceptions/HHCovarianceMatrixException.h"
 #include "TGraph.h"
@@ -20,8 +21,8 @@ int main(int argc, char* argv[])
   double mass = 125.0;
 
   //prepare tau objects
-  HHFitObjectE* tau1 = new HHFitObjectEConstM(TLorentzVector(71,0,0,80));
-  HHFitObjectE* tau2 = new HHFitObjectEConstM(TLorentzVector(0,58,0,60));
+  HHFitObjectE* tau1 = new HHFitObjectEConstM(HHLorentzVector(71,0,0,80));
+  HHFitObjectE* tau2 = new HHFitObjectEConstM(HHLorentzVector(0,58,0,60));
   tau1->setLowerFitLimitE(tau1->getInitial4Vector());
   tau1->setUpperFitLimitE(mass,tau2->getInitial4Vector());
   tau2->setLowerFitLimitE(tau2->getInitial4Vector());

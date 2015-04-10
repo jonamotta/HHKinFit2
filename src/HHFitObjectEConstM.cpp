@@ -7,16 +7,16 @@
 #include "exceptions/HHEnergyConstraintException.h"
 
 
-HHFitObjectEConstM::HHFitObjectEConstM(TLorentzVector const& initial4vector)
+HHFitObjectEConstM::HHFitObjectEConstM(HHLorentzVector const& initial4vector)
   :HHFitObjectE(initial4vector){
 
 }
 
 
-TLorentzVector
-HHFitObjectEConstM::constrainEtoMinv(Double_t m, TLorentzVector const& pset) const{
-  TLorentzVector pmod = getInitial4Vector();
-  TLorentzVector combined = pset + pmod;
+HHLorentzVector
+HHFitObjectEConstM::constrainEtoMinv(Double_t m, HHLorentzVector const& pset) const{
+  HHLorentzVector pmod = getInitial4Vector();
+  HHLorentzVector combined = pset + pmod;
 
   Double_t Mc = m;
   Double_t M1c = pset.M();
@@ -74,9 +74,9 @@ HHFitObjectEConstM::constrainEtoMinv(Double_t m, TLorentzVector const& pset) con
 //  return(pmod);
 }
 
-TLorentzVector
+HHLorentzVector
 HHFitObjectEConstM::changeE(Double_t E) const{
-  TLorentzVector temp = this->getFit4Vector();
+  HHLorentzVector temp = this->getFit4Vector();
 
   if(E<temp.M()){
     std::stringstream msg;
@@ -96,7 +96,7 @@ HHFitObjectEConstM::changeE(Double_t E) const{
   return(temp);
 }
 
-TLorentzVector
+HHLorentzVector
 HHFitObjectEConstM::scaleE(Double_t scale) const{
   return(this->changeE(scale*this->getFit4Vector().E()));
 }

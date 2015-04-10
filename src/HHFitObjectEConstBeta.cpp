@@ -3,15 +3,15 @@
 #include <iostream>
 
 
-HHFitObjectEConstBeta::HHFitObjectEConstBeta(TLorentzVector const& initial4vector)
+HHFitObjectEConstBeta::HHFitObjectEConstBeta(HHLorentzVector const& initial4vector)
   :HHFitObjectE(initial4vector){
   //not yet implemented
   assert(0);
 }
 
-TLorentzVector 
-HHFitObjectEConstBeta::constrainEtoMinv(Double_t m, TLorentzVector const& other4vector) const{
-  TLorentzVector p(0,0,0,0);
+HHLorentzVector
+HHFitObjectEConstBeta::constrainEtoMinv(Double_t m, HHLorentzVector const& other4vector) const{
+  HHLorentzVector p(0,0,0,0);
 
   return(p);
 }

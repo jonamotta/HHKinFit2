@@ -6,15 +6,15 @@
 #define HHFitObjectConstBeta_
 
 #include "Rtypes.h"
-#include "TLorentzVector.h"
+#include "HHLorentzVector.h"
 #include "TMatrixD.h"
 
 #include "HHFitObjectE.h"
 
 class HHFitObjectEConstBeta : public HHFitObjectE {
  public:
-  HHFitObjectEConstBeta(TLorentzVector const& initial4vector);
-  TLorentzVector constrainEtoMinv(Double_t m, TLorentzVector const& other4vector) const;
+  HHFitObjectEConstBeta(HHLorentzVector const& initial4vector);
+  HHLorentzVector constrainEtoMinv(Double_t m, HHLorentzVector const& other4vector) const;
 
   void print() const;
 

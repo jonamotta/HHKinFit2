@@ -9,9 +9,17 @@ HHLorentzVector::HHLorentzVector()
   : TLorentzVector(){
 }
 
-void HHLorentzVector::SetEEtaPhiM(double E,double Eta,double Phi,double M){
-  double p(sqrt(E*E-M*M));
-  double sinth(sin(2*atan(exp(-Eta))));
-  double pt(sinth*p);
-  this->SetPtEtaPhiE(pt,Eta,Phi,E);
+void HHLorentzVector::SetEEtaPhiM(double E, double eta, double phi, double m){
+  double p = sqrt(E*E-m*m);
+  double sinth = sin(2*atan(exp(-eta)));
+  double pt = sinth*p;
+  this->SetPtEtaPhiE(pt,eta,phi,E);
+}
+
+HHLorentzVector HHLorentzVector::operator+(HHLorentzVector const& rhs) const{
+	return(HHLorentzVector(rhs.Px()+this->Px(),rhs.Py()+this->Py(),rhs.Pz()+this->Pz(),rhs.E()+this->E()));
+}
+
+HHLorentzVector HHLorentzVector::operator-(HHLorentzVector const& rhs) const{
+	return(HHLorentzVector(rhs.Px()-this->Px(),rhs.Py()-this->Py(),rhs.Pz()-this->Pz(),rhs.E()-this->E()));
 }

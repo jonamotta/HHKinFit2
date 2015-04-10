@@ -6,30 +6,30 @@
 #define HHFitObjectE_
 
 #include "Rtypes.h"
-#include "TLorentzVector.h"
+#include "HHLorentzVector.h"
 #include "TMatrixD.h"
 #include "HHFitObject.h"
 
 
 class HHFitObjectE : public HHFitObject {
  public:
-  HHFitObjectE(TLorentzVector const& initial4vector);
+  HHFitObjectE(HHLorentzVector const& initial4vector);
   
   Double_t getE() const;
-  virtual TLorentzVector changeE(Double_t E) const = 0;
+  virtual HHLorentzVector changeE(Double_t E) const = 0;
   void changeEandSave(Double_t E);
-  virtual TLorentzVector scaleE(Double_t scale) const = 0;
+  virtual HHLorentzVector scaleE(Double_t scale) const = 0;
   void scaleEandSave(Double_t scale);
-  virtual TLorentzVector constrainEtoMinv(Double_t minv, TLorentzVector const& other4vector) const =0;
-  void constrainEtoMinvandSave(Double_t minv, TLorentzVector const& other4vector);
+  virtual HHLorentzVector constrainEtoMinv(Double_t minv, HHLorentzVector const& other4vector) const =0;
+  void constrainEtoMinvandSave(Double_t minv, HHLorentzVector const& other4vector);
 
   Double_t getUpperFitLimitE() const;
   Double_t getLowerFitLimitE() const;
 
   void setUpperFitLimitE(Double_t const upperlimit);
-  void setUpperFitLimitE(Double_t const minv, TLorentzVector const& other4vectorMin);
+  void setUpperFitLimitE(Double_t const minv, HHLorentzVector const& other4vectorMin);
   void setLowerFitLimitE(Double_t const lowerlimit);
-  void setLowerFitLimitE(TLorentzVector const& other4vectorMin);
+  void setLowerFitLimitE(HHLorentzVector const& other4vectorMin);
 
   virtual void print() const;
   void printLimits() const;

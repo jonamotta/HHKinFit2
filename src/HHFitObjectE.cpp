@@ -3,7 +3,7 @@
 #include <iomanip>
 
 
-HHFitObjectE::HHFitObjectE(TLorentzVector const& initial4vector)
+HHFitObjectE::HHFitObjectE(HHLorentzVector const& initial4vector)
   :HHFitObject(initial4vector),
    m_upperLimitE(9999),
    m_lowerLimitE(0){
@@ -21,7 +21,7 @@ HHFitObjectE::scaleEandSave(Double_t E){
 }
 
 void
-HHFitObjectE::constrainEtoMinvandSave(Double_t m, TLorentzVector const& other4vector){
+HHFitObjectE::constrainEtoMinvandSave(Double_t m, HHLorentzVector const& other4vector){
   this->setFit4Vector(constrainEtoMinv(m, other4vector));
 }
 
@@ -46,7 +46,7 @@ HHFitObjectE::setUpperFitLimitE(Double_t upperlimit){
 }
 
 void
-HHFitObjectE::setUpperFitLimitE(Double_t minv, TLorentzVector const& other4vectorMin){
+HHFitObjectE::setUpperFitLimitE(Double_t minv, HHLorentzVector const& other4vectorMin){
   this->setUpperFitLimitE(constrainEtoMinv(minv,other4vectorMin).E());
 }
 
@@ -56,7 +56,7 @@ HHFitObjectE::setLowerFitLimitE(Double_t lowerlimit){
 }
 
 void
-HHFitObjectE::setLowerFitLimitE(TLorentzVector const& lowerlimit){
+HHFitObjectE::setLowerFitLimitE(HHLorentzVector const& lowerlimit){
   m_lowerLimitE = lowerlimit.E();
 }
 
