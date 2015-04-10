@@ -78,20 +78,13 @@ HHLorentzVector
 HHFitObjectEConstM::changeE(Double_t E) const{
   HHLorentzVector temp = this->getFit4Vector();
 
-  if(E<temp.M()){
-    std::stringstream msg;
-    msg << "target energy is smaller than the particle mass: "<<"E(set)="<<E<<" "<<"m="<<temp.M();
-    throw(HHEnergyRangeException(msg.str()));
-  }
-  else if((E<this->getLowerFitLimitE())||(E>this->getUpperFitLimitE())){
+  if((E<this->getLowerFitLimitE())||(E>this->getUpperFitLimitE())){
     std::stringstream msg;
     msg << "target energy is out of limits: "<<"E(set)="<<E<<" "<<"E(limits)=["<<this->getLowerFitLimitE()<<","<< this->getUpperFitLimitE() << "]";
     throw(HHEnergyRangeException(msg.str()));
   }
 
-  Double_t pnew = sqrt(pow(E,2)-pow(temp.M(),2));
-  Double_t ptnew = pnew * sin(2.*atan(exp(-temp.Eta())));
-  temp.SetPtEtaPhiE(ptnew,temp.Eta(),temp.Phi(),E);
+  temp.SetEkeepM(E);
 
   return(temp);
 }

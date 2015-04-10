@@ -12,7 +12,7 @@ class HHTauTauEventGenerator {
 
 public:
 
-HHTauTauEventGenerator(TF1* a);
+HHTauTauEventGenerator(TF1 a,TF1 b);
  HHLorentzVector getTau1boosted();
  HHLorentzVector getTau2boosted();
  HHLorentzVector getTau1();
@@ -21,11 +21,14 @@ HHTauTauEventGenerator(TF1* a);
  HHLorentzVector getTau2Vis();
  TVector2 getMET();
  void generateEvent();
+ double getvisfrac1();
+ double getvisfrac2();
 
 
 private:
  TRandom m_randomnumber;
- TF1* m_PDF;
+ TF1 m_PDF1;
+ TF1 m_PDF2;
  HHLorentzVector m_tau1;
  HHLorentzVector m_tau2;
  HHLorentzVector m_isr;

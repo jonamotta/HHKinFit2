@@ -2,10 +2,9 @@
 #include <cmath>
 #include <iostream>
 #include "TVector3.h"
-HHTauTauEventGenerator::HHTauTauEventGenerator(TF1* a){
- m_PDF=a;
- m_visfrac1=1;
- m_visfrac2=1;
+HHTauTauEventGenerator::HHTauTauEventGenerator(TF1 a,TF1 b){
+ m_PDF1=a;
+ m_PDF2=b;
 }
 void HHTauTauEventGenerator::generateEvent() {
 // Generate lorentzvectors for the two tau in the rest frame of the higgs
@@ -44,33 +43,29 @@ void HHTauTauEventGenerator::generateEvent() {
   double bx(m_higgs.Px()/m_higgs.E());
   double by(m_higgs.Py()/m_higgs.E());
   double bz(m_higgs.Pz()/m_higgs.E());
-    HHLorentzVector boost1(m_tau1);
-  HHLorentzVector boost2(m_tau2);
-  boost1.Boost(bx,by,bz);
-  m_tau1boosted=boost1; // why  m_tau1boosted(boost1); dont work?
-  boost2.Boost(bx,by,bz);
-  m_tau2boosted=boost2;
+
+ // boost1.Boost(bx,by,bz);
+   m_tau1boosted=m_tau1;
+  m_tau1boosted.Boost(bx,by,bz);
+  m_tau2boosted=m_tau2;
+  m_tau2boosted.Boost(bx,by,bz);
   //generate lorenzvector for tauvis
+  //generate visfrac
+  m_visfrac1=m_PDF1.GetRandom(0,1);
+  m_visfrac2=m_PDF2.GetRandom(0,1);
   //tau1vis
-  HHLorentzVector vis1 =m_tau1boosted;
-  vis1.SetPx(m_visfrac1*m_tau1boosted.Px());
-  vis1.SetPy(m_visfrac1*m_tau1boosted.Py());
-  vis1.SetPz(m_visfrac1*m_tau1boosted.Pz());
-  m_tau1vis=vis1;
+    m_tau1vis=m_tau1boosted;
+    m_tau1vis.SetEkeepM(m_visfrac1*m_tau1boosted.E());
+
   //tau2vis
-    HHLorentzVector vis2 =m_tau2boosted;
-    vis2.SetPx(m_visfrac2*m_tau2boosted.Px());
-    vis2.SetPy(m_visfrac2*m_tau2boosted.Py());
-    vis2.SetPz(m_visfrac2*m_tau2boosted.Pz());
-    m_tau2vis=vis2;
+    m_tau2vis=m_tau2boosted;
+    m_tau2vis.SetEkeepM(m_visfrac2*m_tau2boosted.E());
+
   //find MET
   double METx=-(m_tau1vis.Px()+m_tau2vis.Px()+m_isr.Px());
-  std::cout << METx << std::endl;
   double METy=-(m_tau1vis.Py()+m_tau2vis.Py()+m_isr.Py());
   TVector2 met(METx,METy);
   m_MET=met;
-  std::cout << "met test" << std::endl;
-  m_MET.Print();
   }
 
 HHLorentzVector HHTauTauEventGenerator::getTau1(){
@@ -99,6 +94,14 @@ HHLorentzVector  HHTauTauEventGenerator::getTau2Vis(){
 
 TVector2  HHTauTauEventGenerator::getMET(){
   return(m_MET);
+}
+
+double HHTauTauEventGenerator::getvisfrac1(){
+	return(m_visfrac1);
+}
+
+double HHTauTauEventGenerator::getvisfrac2(){
+	return(m_visfrac2);
 }
 
 
