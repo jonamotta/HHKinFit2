@@ -2,3 +2,10 @@ libHHKinFit.so
 result.root
 runHHKinFit
 doc
+.*
+*~
+*.pdf
+*.png
+*.root
+runHHTauTauEventGenerator
+runHHKinFit
