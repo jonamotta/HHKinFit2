@@ -2,26 +2,34 @@
 #include <cmath>
 #include <iostream>
 #include "TVector3.h"
-HHTauTauEventGenerator::HHTauTauEventGenerator(TF1 a,TF1 b){
-  m_PDF1=a;
-  m_PDF2=b;
-  m_randomnumber;
-  m_tau1;
-  m_tau2;
-  m_isr;
-  m_higgs;
-  m_tau1boosted;
-  m_tau2boosted;
-  m_visfrac1;
-  m_visfrac2;
-  m_tau1vis;
-  m_tau2vis;
-  m_MET;
-  m_mhiggs=125.7;
-  m_mtau1=1.77682;
-  m_mtau2=1.77682;
-  m_pi=3.14159265359;
-  m_misr=0;
+HHTauTauEventGenerator::HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD c):
+  m_PDF1(a),
+  m_PDF2(b),
+  m_randomnumber(),
+  m_tau1(),
+  m_tau2(),
+  m_isr(),
+  m_higgs(),
+  m_tau1boosted(),
+  m_tau2boosted(),
+  m_visfrac1(),
+  m_visfrac2(),
+  m_tau1vis(),
+  m_tau2vis(),
+  m_MET(2),
+  m_mhiggs(125.7),
+  m_mtau1(1.77682),
+  m_mtau2(1.77682),
+  m_pi(3.14159265359),
+  m_misr(0),
+  m_covarmatrix(c),
+  m_METwithsigma(2),
+  m_L(2,2)
+  {
+	m_L[0][0]=sqrt(c[0][0]);
+	m_L[0][1]=(c[0][1]-c[1][0])/sqrt(c[1][1]-c[1][0]/sqrt(c[0][0]));
+	m_L[1][0]=c[1][0]/sqrt(c[0][0]);
+	m_L[1][1]=sqrt(c[1][1]-c[1][0]/sqrt(c[0][0]));
 }
 void HHTauTauEventGenerator::generateEvent() {
   // Generate lorentzvectors for the two tau in the rest frame of the higgs
@@ -73,13 +81,13 @@ void HHTauTauEventGenerator::generateEvent() {
   m_tau2vis=m_tau2boosted;
   m_tau2vis.SetEkeepM(m_visfrac2*m_tau2boosted.E());
   //find MET
-
-  double METx=-(m_tau1vis.Px()+m_tau2vis.Px()+m_isr.Px());
-  double METy=-(m_tau1vis.Py()+m_tau2vis.Py()+m_isr.Py());
-  TVector2 met(METx,METy);
-  m_MET=met;
+  m_MET[0]= -(m_tau1vis.Px()+m_tau2vis.Px()+m_isr.Px());
+  m_MET[1]= -(m_tau1vis.Py()+m_tau2vis.Py()+m_isr.Py());
   // modify MET with a covariance-matrix
-
+  TVectorD Gausvector(2);
+  Gausvector[0]=m_randomnumber.Gaus(0,1);
+  Gausvector[1]=m_randomnumber.Gaus(0,1);
+  m_METwithsigma=m_MET+m_L*Gausvector;
 }
 
 HHLorentzVector HHTauTauEventGenerator::getTau1(){
@@ -106,8 +114,12 @@ HHLorentzVector  HHTauTauEventGenerator::getTau2Vis(){
   return(m_tau2vis);
 }
 
-TVector2  HHTauTauEventGenerator::getMET(){
+TVectorD  HHTauTauEventGenerator::getMET(){
   return(m_MET);
+}
+
+TVectorD  HHTauTauEventGenerator::getMETwithsigma(){
+  return(m_METwithsigma);
 }
 
 double HHTauTauEventGenerator::getvisfrac1(){
@@ -128,6 +140,26 @@ void HHTauTauEventGenerator::setMtau1(double M){
 
 void HHTauTauEventGenerator::setMtau2(double M){
   m_mtau2=M;
+}
+
+double HHTauTauEventGenerator::getMhiggs(){
+  return(m_mhiggs);
+}
+
+double HHTauTauEventGenerator::getMtau1(){
+  return(m_mtau1);
+}
+
+double HHTauTauEventGenerator::getMtau2(){
+  return(m_mtau2);
+}
+
+void HHTauTauEventGenerator::PrintCovarmatrix(){
+	m_covarmatrix.Print();
+}
+
+void HHTauTauEventGenerator::PrintLmatrix(){
+	m_L.Print();
 }
 
 

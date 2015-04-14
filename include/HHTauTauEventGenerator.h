@@ -9,13 +9,13 @@ class for generating lorentzvectors for Tau in higgsdecay: Higgs->TauTau
 #include "HHLorentzVector.h"
 #include "TF1.h"
 #include "TRandom.h"
-#include "TVector2.h"
+#include "TVectorD.h"
  
 class HHTauTauEventGenerator {
 
 public:
 
-HHTauTauEventGenerator(TF1 a,TF1 b);
+HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD c);
  HHLorentzVector getTau1boosted();
  HHLorentzVector getTau2boosted();
  HHLorentzVector getTau1();
@@ -25,10 +25,17 @@ HHTauTauEventGenerator(TF1 a,TF1 b);
  void setMhiggs(double M);
  void setMtau1(double M);
  void setMtau2(double M);
- TVector2 getMET();
+ double getMhiggs();
+ double getMtau1();
+ double getMtau2();
+ TVectorD getMET();
+ TVectorD getMETwithsigma();
  void generateEvent();
  double getvisfrac1();
  double getvisfrac2();
+ void PrintLmatrix();
+ void PrintCovarmatrix();
+
 
 
 private:
@@ -45,12 +52,16 @@ private:
  double m_visfrac2;
  HHLorentzVector m_tau1vis;
  HHLorentzVector m_tau2vis;
- TVector2 m_MET;
+ TVectorD m_MET;
+ TVectorD m_METwithsigma;
  double m_mhiggs;
  double m_mtau1;
  double m_mtau2;
  double m_pi;
  double m_misr;
+ TMatrixD m_covarmatrix;
+ TMatrixD m_L;
+
 
 };
 
