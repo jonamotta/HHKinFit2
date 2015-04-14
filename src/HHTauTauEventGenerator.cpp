@@ -113,6 +113,13 @@ HHLorentzVector  HHTauTauEventGenerator::getTau1Vis(){
 HHLorentzVector  HHTauTauEventGenerator::getTau2Vis(){
   return(m_tau2vis);
 }
+HHLorentzVector HHTauTauEventGenerator::getISR(){
+  return(m_isr);
+}
+
+HHLorentzVector HHTauTauEventGenerator::getHiggs(){
+	return(m_higgs);
+}
 
 TVectorD  HHTauTauEventGenerator::getMET(){
   return(m_MET);
@@ -161,6 +168,31 @@ void HHTauTauEventGenerator::PrintCovarmatrix(){
 void HHTauTauEventGenerator::PrintLmatrix(){
 	m_L.Print();
 }
+
+double HHTauTauEventGenerator::getInveriantMass(){
+    HHLorentzVector temp=m_tau1+m_tau2;
+	return(temp.M());
+}
+
+double HHTauTauEventGenerator::getAbsPtMET(){
+	double temp=sqrt(m_MET[0]*m_MET[0]+m_MET[1]*m_MET[1]);
+	return(temp);
+}
+
+double HHTauTauEventGenerator::getPhiMET(){
+	TVector2 temp(m_MET[0],m_MET[1]);
+	return(temp.Phi());
+}
+
+ double HHTauTauEventGenerator::getAbsPtMETwithsigma(){
+	 double temp=sqrt(m_METwithsigma[0]*m_METwithsigma[0]+m_METwithsigma[1]*m_METwithsigma[1]);
+	 return(temp);
+}
+
+ double HHTauTauEventGenerator::getPhiMETwithsigma(){
+ 	TVector2 temp(m_METwithsigma[0],m_METwithsigma[1]);
+ 	return(temp.Phi());
+ }
 
 
 
