@@ -6,7 +6,7 @@ echo "creating shared library"
 g++ -fPIC -shared src/*.cpp `root-config --cflags --glibs` -I ./include -o libHHKinFit.so
 
 echo "creating executable"
-g++ main.C `root-config --cflags --glibs` -I ./include -L . -lHHKinFit  -o runHHKinFit
-g++ mainTorbenTest.C `root-config --cflags --glibs` -I ./include -L . -lHHKinFit  -o runHHTauTauEventGenerator
-g++ controlplots.C `root-config --cflags --glibs` -I ./include -L . -lHHKinFit  -o createcontrolplots
-g++ KinFitwithEventGenerator.C `root-config --cflags --glibs` -I ./include -L . -lHHKinFit  -o KinFitwithEventGenerator
+#g++ main.C `root-config --cflags --glibs` -I ./include -L . -lHHKinFit  -o runHHKinFit
+#g++ mainTorbenTest.C `root-config --cflags --glibs` -I ./include -L . -lHHKinFit  -o runHHTauTauEventGenerator
+#g++ controlplots.C `root-config --cflags --glibs` -I ./include -L . -lHHKinFit  -o createcontrolplots
+#g++ KinFitwithEventGenerator.C `root-config --cflags --glibs` -I ./include -L . -lHHKinFit  -o KinFitwithEventGenerator

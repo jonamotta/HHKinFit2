@@ -6,78 +6,78 @@
 class PSMath {
  public:
   PSMath();
-  static Int_t PSfit(Int_t iloop, Int_t &iter, Int_t &method, Int_t &mode,  
-	      Bool_t &noNewtonShifts, Int_t printlevel,
-	      Int_t np, Double_t a[], Double_t astart[], Double_t alimit[][2], 
-	      Double_t aprec[], Double_t daN[], Double_t h[], Double_t aMemory[][5],
-	      Double_t chi2, Double_t chi2iter[], Double_t g[], Double_t H[], Double_t Hinv[] );
+  static int PSfit(int iloop, int &iter, int &method, int &mode,
+	      bool &noNewtonShifts, int printlevel,
+	      int np, double a[], double astart[], double alimit[][2],
+	      double aprec[], double daN[], double h[], double aMemory[][5],
+	      double chi2, double chi2iter[], double g[], double H[], double Hinv[] );
 
-  static void PSNewtonLimitShift(Int_t sign, Int_t np, Double_t a[], Double_t alimit[][2], Double_t aprec[],
-			  Double_t daN[], Double_t h[], Double_t g[], Double_t H[]);
+  static void PSNewtonLimitShift(int sign, int np, double a[], double alimit[][2], double aprec[],
+			  double daN[], double h[], double g[], double H[]);
   
-  static Double_t PSNewtonAnalyzer(Int_t np, Double_t a[], Double_t alimit[][2], Double_t aprec[],
-			    Double_t daN[], Double_t h[], 
-			    Double_t g[], Double_t H[], Double_t Hinv[], Double_t chi2, Bool_t noNewtonShifts, Int_t printlevel=1);
+  static double PSNewtonAnalyzer(int np, double a[], double alimit[][2], double aprec[],
+			    double daN[], double h[],
+			    double g[], double H[], double Hinv[], double chi2, bool noNewtonShifts, int printlevel=1);
 
-  static void PSfitShow(Int_t iloop, Int_t convergence, Int_t iter, 
-		 Int_t method, Int_t mode, 
-		 Int_t printlevel, Int_t graphiklevel,
-		 Int_t np, Double_t a[], Double_t astart[], Double_t alimit[][2], 
-		 Double_t aprec [], Double_t daN[], Double_t h[], Double_t chi2,
-		 Double_t g[], Double_t H[] );
+  static void PSfitShow(int iloop, int convergence, int iter,
+		 int method, int mode,
+		 int printlevel, int graphiklevel,
+		 int np, double a[], double astart[], double alimit[][2],
+		 double aprec [], double daN[], double h[], double chi2,
+		 double g[], double H[] );
 
-  static Double_t PSLineSearch(Int_t & mode, Double_t hh, Double_t xlimit[], 
-			Double_t epsx, Double_t epsf, Double_t x[4], Double_t f[], 
-			Double_t chi2 , Int_t printlevel);
+  static double PSLineSearch(int & mode, double hh, double xlimit[],
+			double epsx, double epsf, double x[4], double f[],
+			double chi2 , int printlevel);
 
-  static void PSLineLimit(Int_t np, Double_t astart[], Double_t daN[], Double_t alimit[][2], Double_t xlimit[] );
+  static void PSLineLimit(int np, double astart[], double daN[], double alimit[][2], double xlimit[] );
 
-  static Double_t  PSVnorm(Double_t x[], Int_t n);
+  static double  PSVnorm(double x[], int n);
 
-  static void PSVprint(const char* text, Double_t x[], Int_t n);
-  static void PSMprint(const char* text, Double_t A[], Int_t ni, Int_t nj);
-  static void PSM2print(const char* text, Double_t A[][2], Int_t ni);
+  static void PSVprint(const char* text, double x[], int n);
+  static void PSMprint(const char* text, double A[], int ni, int nj);
+  static void PSM2print(const char* text, double A[][2], int ni);
 
-  static Double_t PSMinverse(Double_t H[], Double_t Hinv[], Int_t p);
+  static double PSMinverse(double H[], double Hinv[], int p);
 
-  static Double_t PSMCholtest();
+  static double PSMCholtest();
 
-  static Double_t PSMmultiply(Double_t A[],Double_t B[],Double_t C[],Int_t n1,Int_t n2);
+  static double PSMmultiply(double A[],double B[],double C[],int n1,int n2);
 
-  static Double_t PSMmultiplyMRRT(Double_t A[], Int_t n1, Int_t n2);
+  static double PSMmultiplyMRRT(double A[], int n1, int n2);
 
-  static Double_t PSMmultiplyMT(Double_t A[], Double_t B[], Int_t n1, Int_t n2);
+  static double PSMmultiplyMT(double A[], double B[], int n1, int n2);
 
-  static Double_t PSMRTrianInvert2(Double_t R[], Int_t n);
+  static double PSMRTrianInvert2(double R[], int n);
 
-  static Double_t PSMRTrianInvert(Double_t R[], Double_t Rinv[],  Int_t n);
+  static double PSMRTrianInvert(double R[], double Rinv[],  int n);
   
-  static Double_t PSMCholesky(Double_t M[], Double_t R[],  Int_t n);
+  static double PSMCholesky(double M[], double R[],  int n);
 
-  static Double_t PSfitCheckLimits(Int_t np, Double_t a[], Double_t h[], 
-			    Double_t alimit[][2], Double_t aprecision[], 
-			    Double_t daN[], Double_t g[], Double_t d);
+  static double PSfitCheckLimits(int np, double a[], double h[],
+			    double alimit[][2], double aprecision[],
+			    double daN[], double g[], double d);
   
-  static Double_t PSminIterate(Double_t a[], Double_t daN[], Double_t h[], Int_t p,  
-			Double_t g[], Double_t H[], Double_t Hinv[], Double_t X0);
+  static double PSminIterate(double a[], double daN[], double h[], int p,
+			double g[], double H[], double Hinv[], double X0);
   
-  static Double_t PSfuncQuadratic(Double_t a[], Double_t amean[], Double_t F0, 
-			   Double_t g[], Double_t H[], Int_t np);
+  static double PSfuncQuadratic(double a[], double amean[], double F0,
+			   double g[], double H[], int np);
 
 
  
-  static Int_t PSderivative(Int_t icall, Int_t np, Double_t a[], Double_t h[],
-		     Double_t chi2, Double_t chi2iter[],
-		     Double_t g[], Double_t H[]);
+  static int PSderivative(int icall, int np, double a[], double h[],
+		     double chi2, double chi2iter[],
+		     double g[], double H[]);
 
-  static Int_t PSderivative1(Int_t icall, Double_t a[], Double_t h[], 
-			       Double_t chi2, Double_t g[], Double_t H[]);
+  static int PSderivative1(int icall, double a[], double h[],
+			       double chi2, double g[], double H[]);
 
-  static Double_t PSfitMinStep(Int_t np, Double_t a[], Double_t h[], 
-			Double_t chi2iter[],
-			Double_t g[], Double_t H[], Double_t Hinv[], Double_t daN[]);
+  static double PSfitMinStep(int np, double a[], double h[],
+			double chi2iter[],
+			double g[], double H[], double Hinv[], double daN[]);
 
-  static Int_t PSfitconstrain0(Double_t F, Double_t g, Double_t H, Double_t Fix, Double_t aix[]);
+  static int PSfitconstrain0(double F, double g, double H, double Fix, double aix[]);
 
 
 };

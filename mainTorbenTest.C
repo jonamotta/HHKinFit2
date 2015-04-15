@@ -8,6 +8,7 @@
 #include "TFile.h"
 #include <cmath>
 
+using namespace HHKinFit2;
 
 int main(int argc, char* argv[])
 {

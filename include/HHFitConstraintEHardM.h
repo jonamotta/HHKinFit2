@@ -9,16 +9,18 @@
 #include "HHFitObject.h"
 #include <vector>
 
+namespace HHKinFit2{
 class HHFitConstraintEHardM : public HHFitConstraint {
  public:
-  HHFitConstraintEHardM(HHFitObject* fitobject, HHFitObject* constrainedobject, Double_t mass);
+  HHFitConstraintEHardM(HHFitObject* fitobject, HHFitObject* constrainedobject, double mass);
 
-  Double_t getChi2() const;
+  double getChi2() const;
 
  private:
   HHFitObject* const m_constrainedobject;
-  Double_t const m_mass;
+  double const m_mass;
   
 };
+}
 
 #endif /* HHFitConstraintEHardM_ */

@@ -10,6 +10,7 @@
 #include "PSMath.h"
 #include <iomanip>
 #include "TAxis.h"
+using namespace HHKinFit2;
 
 
 HHKinFit::HHKinFit()
@@ -22,21 +23,21 @@ void
 HHKinFit::fit(){
 
 	  //  ----------  for PSfit -----
-	  const Int_t np = 1;
-	  Double_t a[np];
-	  Double_t astart[np];
-	  Double_t alimit[np][2];
-	  Double_t aprec[np];
-	  Double_t daN[np];
-	  Double_t h[np];
-	  Double_t chi2iter[1], aMemory[np][5], g[np], H[np * np], Hinv[np * np];
-	  Bool_t noNewtonShifts = false;
+	  const int np = 1;
+	  double a[np];
+	  double astart[np];
+	  double alimit[np][2];
+	  double aprec[np];
+	  double daN[np];
+	  double h[np];
+	  double chi2iter[1], aMemory[np][5], g[np], H[np * np], Hinv[np * np];
+	  bool noNewtonShifts = false;
 
-	  Int_t iter = 0;             //  number of iterations
-	  Int_t method = 1;           //  initial fit method, see PSfit()
-	  Int_t mode = 1;             //  mode =1 for start of a new fit by PSfit()
-	//   Int_t icallNewton = -1;     //  init start of Newton Method
-	//   Int_t iloop = 0;            // counter for falls to fit function
+	  int iter = 0;             //  number of iterations
+	  int method = 1;           //  initial fit method, see PSfit()
+	  int mode = 1;             //  mode =1 for start of a new fit by PSfit()
+	//   int icallNewton = -1;     //  init start of Newton Method
+	//   int iloop = 0;            // counter for falls to fit function
 
 
 
@@ -61,10 +62,10 @@ HHKinFit::fit(){
 	    astart[0] = alimit[0][1] - h[0];
 	  }
 
-	  for (Int_t ip = 0; ip < np; ip++) {
+	  for (int ip = 0; ip < np; ip++) {
 	    a[ip] = astart[ip];
 	  }
-	  for (Int_t ip = 0; ip < np; ip++) {
+	  for (int ip = 0; ip < np; ip++) {
 	    aMemory[ip][0] = -999.0;
 	    aMemory[ip][1] = -995.0;
 	    aMemory[ip][2] = -990.0;
@@ -72,11 +73,11 @@ HHKinFit::fit(){
 	    aMemory[ip][3] = -980.0;
 	  }
 
-	  Double_t chi2(99999);
-	  Int_t convergence(0);
-	  Int_t printlevel(0);
-	  Int_t m_maxloops(10000);
-	  for (Int_t iloop = 0; iloop < m_maxloops * 10 && iter < m_maxloops; iloop++) { // FIT loop
+	  double chi2(99999);
+	  int convergence(0);
+	  int printlevel(0);
+	  int m_maxloops(10000);
+	  for (int iloop = 0; iloop < m_maxloops * 10 && iter < m_maxloops; iloop++) { // FIT loop
 	    m_fitobjects[0]->changeEandSave(a[0]);
 	    chi2=this->getChi2();
 //	    std::cout << iloop << " a[0]: " << a[0] << " chi2: " << std::fixed << std::setprecision(8) << chi2 << std::endl;
@@ -116,9 +117,9 @@ HHKinFit::fit(){
 
 }
 
-Double_t 
+double
 HHKinFit::getChi2() const{
-  Double_t chi2=0;
+  double chi2=0;
   for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it)
     chi2 += (*it)->getChi2();
   return(chi2);
@@ -146,14 +147,14 @@ HHKinFit::addConstraint(HHFitConstraint* constraint){
 
 TGraph
 HHKinFit::getChi2Function(int steps){
-  Int_t npoints(m_fitobjects.size()*steps);
+  int npoints(m_fitobjects.size()*steps);
   TGraph gr(npoints);
   gr.SetName("chi2function");
-  Double_t stepsize((m_fitobjects[0]->getUpperFitLimitE() - m_fitobjects[0]->getLowerFitLimitE())/steps);
+  double stepsize((m_fitobjects[0]->getUpperFitLimitE() - m_fitobjects[0]->getLowerFitLimitE())/steps);
   for (unsigned int i=0; i<npoints; i++){
-	Double_t e = m_fitobjects[0]->getLowerFitLimitE()+ i*stepsize;
+	double e = m_fitobjects[0]->getLowerFitLimitE()+ i*stepsize;
     m_fitobjects[0]->changeEandSave(e);
-    Double_t chi2(this->getChi2());
+    double chi2(this->getChi2());
 //    std::cout << i << " " << e << " " << chi2 << std::endl;
     gr.SetPoint(i,e,chi2);
   }

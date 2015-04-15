@@ -5,21 +5,20 @@
 #ifndef HHFitObjectConstM_
 #define HHFitObjectConstM_
 
-#include "Rtypes.h"
 #include "HHLorentzVector.h"
 #include "TMatrixD.h"
-
 #include "HHFitObjectE.h"
 
+namespace HHKinFit2{
 class HHFitObjectEConstM : public HHFitObjectE {
  public:
   HHFitObjectEConstM(HHLorentzVector const& initial4vector);
-  HHLorentzVector constrainEtoMinv(Double_t m, HHLorentzVector const& other4vector) const;
-  HHLorentzVector changeE(Double_t E) const;
-  HHLorentzVector scaleE(Double_t scale) const;
+  HHLorentzVector constrainEtoMinv(double m, HHLorentzVector const& other4vector) const;
+  HHLorentzVector changeE(double E) const;
+  HHLorentzVector scaleE(double scale) const;
 
   void print() const;
 
 };
-
+}
 #endif /* HHFitObjectConstM_ */

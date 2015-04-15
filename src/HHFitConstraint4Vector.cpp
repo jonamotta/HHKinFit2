@@ -6,7 +6,7 @@
 #include "exceptions/HHCovarianceMatrixException.h"
 
 
-HHFitConstraint4Vector::HHFitConstraint4Vector(HHFitObject* object, Bool_t px, Bool_t py, Bool_t pz, Bool_t E)
+HHKinFit2::HHFitConstraint4Vector::HHFitConstraint4Vector(HHFitObject* object, bool px, bool py, bool pz, bool E)
   : HHFitConstraint(object){
   m_components[0]=px;
   m_components[1]=py;
@@ -14,8 +14,8 @@ HHFitConstraint4Vector::HHFitConstraint4Vector(HHFitObject* object, Bool_t px, B
   m_components[3]=E;
 }
 
-Double_t 
-HHFitConstraint4Vector::getChi2() const{
+double
+HHKinFit2::HHFitConstraint4Vector::getChi2() const{
   int ncomp = 0;
   for (int i=0; i<4; i++) if (m_components[i])  ncomp++;
   TMatrixD cov(ncomp,ncomp);
@@ -36,7 +36,7 @@ HHFitConstraint4Vector::getChi2() const{
   TMatrixD invcov = cov.Invert();
   HHLorentzVector res = m_fitobject->getFit4Vector()-m_fitobject->getInitial4Vector();
 
-  Double_t chi2sum=0;
+  double chi2sum=0;
   for(int i=0; i<ncomp; i++){
     for(int j=0;j<ncomp;j++){
       chi2sum+=res(i)*res(j)*invcov(i,j);

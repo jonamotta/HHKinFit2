@@ -5,12 +5,12 @@
 #ifndef HHFitObjectComposite_
 #define HHFitObjectComposite_
 
-#include "Rtypes.h"
 #include "HHLorentzVector.h"
 #include "TMatrixD.h"
 
 #include "HHFitObject.h"
 
+namespace HHKinFit2{
 class HHFitObjectComposite : public HHFitObject {
  public:
 	  HHFitObjectComposite(std::vector<HHFitObject*> const& subobjects);
@@ -29,5 +29,5 @@ class HHFitObjectComposite : public HHFitObject {
  private:
   std::vector<HHFitObject*> m_subobjects;
 };
-
+}
 #endif /* HHFitObjectComposite_ */

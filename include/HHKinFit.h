@@ -5,18 +5,18 @@
 #ifndef HHKinFit_
 #define HHKinFit_
 
-#include "Rtypes.h"
 #include "TGraph.h"
 #include <vector>
 #include "HHFitObjectE.h"
 #include "HHFitConstraint.h"
 
+namespace HHKinFit2{
 class HHKinFit {
  public:
   HHKinFit();
 
   void fit();
-  Double_t getChi2() const;
+  double getChi2() const;
   std::vector<HHFitObjectE*> getListOfFitObjects() const;
   std::vector<HHFitConstraint*> getListOfConstraints() const;
   
@@ -31,5 +31,5 @@ class HHKinFit {
   std::vector<HHFitConstraint*> m_constraints;
 
 };
-
+}
 #endif /* HHKinFit_ */

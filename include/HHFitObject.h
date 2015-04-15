@@ -5,10 +5,10 @@
 #ifndef HHFitObject_
 #define HHFitObject_
 
-#include "Rtypes.h"
 #include "TMatrixD.h"
 #include "HHLorentzVector.h"
 
+namespace HHKinFit2{
 class HHFitObject {
  public:
   HHFitObject();
@@ -35,5 +35,5 @@ class HHFitObject {
   HHLorentzVector const m_initial4vector;
   TMatrixD m_covmatrix;
 };
-
+}
 #endif /* HHFitObject_ */

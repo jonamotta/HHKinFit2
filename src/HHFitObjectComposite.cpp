@@ -1,11 +1,11 @@
 #include "HHFitObjectComposite.h"
 #include <iostream>
 
-HHFitObjectComposite::HHFitObjectComposite(std::vector<HHFitObject*> const& subobjects)
+HHKinFit2::HHFitObjectComposite::HHFitObjectComposite(std::vector<HHFitObject*> const& subobjects)
   : m_subobjects(subobjects){
 }
 
-HHFitObjectComposite::HHFitObjectComposite(HHFitObject* subobject1, HHFitObject* subobject2, HHFitObject* subobject3)
+HHKinFit2::HHFitObjectComposite::HHFitObjectComposite(HHFitObject* subobject1, HHFitObject* subobject2, HHFitObject* subobject3)
   : m_subobjects(){
   this->addSubobject(subobject1);
   this->addSubobject(subobject2);
@@ -13,8 +13,8 @@ HHFitObjectComposite::HHFitObjectComposite(HHFitObject* subobject1, HHFitObject*
 }
 
 
-HHLorentzVector
-HHFitObjectComposite::getFit4Vector() const{
+HHKinFit2::HHLorentzVector
+HHKinFit2::HHFitObjectComposite::getFit4Vector() const{
   HHLorentzVector p(0,0,0,0);
   for (std::vector<HHFitObject*>::const_iterator it = m_subobjects.begin() ; it != m_subobjects.end(); ++it)
     p += (*it)->getFit4Vector();
@@ -23,8 +23,8 @@ HHFitObjectComposite::getFit4Vector() const{
 }
 
 
-HHLorentzVector
-HHFitObjectComposite::getInitial4Vector() const {
+HHKinFit2::HHLorentzVector
+HHKinFit2::HHFitObjectComposite::getInitial4Vector() const {
   HHLorentzVector p(0,0,0,0);
   for (std::vector<HHFitObject*>::const_iterator it = m_subobjects.begin() ; it != m_subobjects.end(); ++it)
     p += (*it)->getInitial4Vector();
@@ -33,7 +33,7 @@ HHFitObjectComposite::getInitial4Vector() const {
 }
 
 TMatrixD
-HHFitObjectComposite::getCovMatrix() const{
+HHKinFit2::HHFitObjectComposite::getCovMatrix() const{
   TMatrixD cov(4,4);
   for (std::vector<HHFitObject*>::const_iterator it = m_subobjects.begin() ; it != m_subobjects.end(); ++it)
     cov += (*it)->getCovMatrix();
@@ -43,18 +43,18 @@ HHFitObjectComposite::getCovMatrix() const{
 
 
 void
-HHFitObjectComposite::setSubobjects(std::vector<HHFitObject*> const& subobjects){
+HHKinFit2::HHFitObjectComposite::setSubobjects(std::vector<HHFitObject*> const& subobjects){
   m_subobjects=subobjects;
 }
 
 
 void
-HHFitObjectComposite::addSubobject(HHFitObject* subobject){
+HHKinFit2::HHFitObjectComposite::addSubobject(HHFitObject* subobject){
   m_subobjects.push_back(subobject);
 }
 
 void
-HHFitObjectComposite::print() const{
+HHKinFit2::HHFitObjectComposite::print() const{
   std::cout << "---" << std::endl;
   std::cout <<  "composite fit object:" << std::endl;
   this->printInitial4Vector();

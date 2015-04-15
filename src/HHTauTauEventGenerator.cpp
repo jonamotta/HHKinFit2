@@ -2,7 +2,8 @@
 #include <cmath>
 #include <iostream>
 #include "TVector3.h"
-HHTauTauEventGenerator::HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD c):
+
+HHKinFit2::HHTauTauEventGenerator::HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD c):
   m_PDF1(a),
   m_PDF2(b),
   m_randomnumber(),
@@ -32,7 +33,7 @@ HHTauTauEventGenerator::HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD c):
 	m_L[1][0]=c[1][0]/sqrt(c[0][0]);
 	m_L[1][1]=sqrt(c[1][1]-c[1][0]/sqrt(c[0][0]));
 }
-void HHTauTauEventGenerator::generateEvent() {
+void HHKinFit2::HHTauTauEventGenerator::generateEvent() {
   // Generate lorentzvectors for the two tau in the rest frame of the higgs
   m_eventnumber++;
   double cthtau1=m_randomnumber.Uniform(-1,1);
@@ -105,111 +106,111 @@ void HHTauTauEventGenerator::generateEvent() {
 //    }
 }
 
-HHLorentzVector HHTauTauEventGenerator::getTau1(){
+HHKinFit2::HHLorentzVector HHKinFit2::HHTauTauEventGenerator::getTau1(){
   return(m_tau1);
 }
 
-HHLorentzVector HHTauTauEventGenerator::getTau2(){
+HHKinFit2::HHLorentzVector HHKinFit2::HHTauTauEventGenerator::getTau2(){
   return(m_tau2);
 }
 
-HHLorentzVector  HHTauTauEventGenerator::getTau1boosted(){
+HHKinFit2::HHLorentzVector  HHKinFit2::HHTauTauEventGenerator::getTau1boosted(){
   return(m_tau1boosted);
 }
 
-HHLorentzVector  HHTauTauEventGenerator::getTau2boosted(){
+HHKinFit2::HHLorentzVector  HHKinFit2::HHTauTauEventGenerator::getTau2boosted(){
   return(m_tau2boosted);
 }
 
-HHLorentzVector  HHTauTauEventGenerator::getTau1Vis(){
+HHKinFit2::HHLorentzVector  HHKinFit2::HHTauTauEventGenerator::getTau1Vis(){
   return(m_tau1vis);
 }
 
-HHLorentzVector  HHTauTauEventGenerator::getTau2Vis(){
+HHKinFit2::HHLorentzVector  HHKinFit2::HHTauTauEventGenerator::getTau2Vis(){
   return(m_tau2vis);
 }
-HHLorentzVector HHTauTauEventGenerator::getISR(){
+HHKinFit2::HHLorentzVector HHKinFit2::HHTauTauEventGenerator::getISR(){
   return(m_isr);
 }
 
-HHLorentzVector HHTauTauEventGenerator::getHiggs(){
+HHKinFit2::HHLorentzVector HHKinFit2::HHTauTauEventGenerator::getHiggs(){
 	return(m_higgs);
 }
 
-TVectorD  HHTauTauEventGenerator::getMET(){
+TVectorD  HHKinFit2::HHTauTauEventGenerator::getMET(){
   return(m_MET);
 }
 
-TVectorD  HHTauTauEventGenerator::getMETwithsigma(){
+TVectorD  HHKinFit2::HHTauTauEventGenerator::getMETwithsigma(){
   return(m_METwithsigma);
 }
 
-double HHTauTauEventGenerator::getvisfrac1(){
+double HHKinFit2::HHTauTauEventGenerator::getvisfrac1(){
   return(m_visfrac1);
 }
 
-double HHTauTauEventGenerator::getvisfrac2(){
+double HHKinFit2::HHTauTauEventGenerator::getvisfrac2(){
   return(m_visfrac2);
 }
 
-void HHTauTauEventGenerator::setMhiggs(double M){
+void HHKinFit2::HHTauTauEventGenerator::setMhiggs(double M){
   m_mhiggs=M;
 }
 
-void HHTauTauEventGenerator::setMtau1(double M){
+void HHKinFit2::HHTauTauEventGenerator::setMtau1(double M){
   m_mtau1=M;
 }
 
-void HHTauTauEventGenerator::setMtau2(double M){
+void HHKinFit2::HHTauTauEventGenerator::setMtau2(double M){
   m_mtau2=M;
 }
 
-double HHTauTauEventGenerator::getMhiggs(){
+double HHKinFit2::HHTauTauEventGenerator::getMhiggs(){
   return(m_mhiggs);
 }
 
-double HHTauTauEventGenerator::getMtau1(){
+double HHKinFit2::HHTauTauEventGenerator::getMtau1(){
   return(m_mtau1);
 }
 
-double HHTauTauEventGenerator::getMtau2(){
+double HHKinFit2::HHTauTauEventGenerator::getMtau2(){
   return(m_mtau2);
 }
 
-void HHTauTauEventGenerator::PrintCovarmatrix(){
+void HHKinFit2::HHTauTauEventGenerator::PrintCovarmatrix(){
 	m_covarmatrix.Print();
 }
 
-void HHTauTauEventGenerator::PrintLmatrix(){
+void HHKinFit2::HHTauTauEventGenerator::PrintLmatrix(){
 	m_L.Print();
 }
 
-double HHTauTauEventGenerator::getInveriantMass(){
+double HHKinFit2::HHTauTauEventGenerator::getInveriantMass(){
     HHLorentzVector temp=m_tau1+m_tau2;
 	return(temp.M());
 }
 
-double HHTauTauEventGenerator::getAbsPtMET(){
+double HHKinFit2::HHTauTauEventGenerator::getAbsPtMET(){
 	double temp=sqrt(m_MET[0]*m_MET[0]+m_MET[1]*m_MET[1]);
 	return(temp);
 }
 
-double HHTauTauEventGenerator::getPhiMET(){
+double HHKinFit2::HHTauTauEventGenerator::getPhiMET(){
 	TVector2 temp(m_MET[0],m_MET[1]);
 	return(temp.Phi());
 }
 
- double HHTauTauEventGenerator::getAbsPtMETwithsigma(){
+ double HHKinFit2::HHTauTauEventGenerator::getAbsPtMETwithsigma(){
 	 double temp=sqrt(m_METwithsigma[0]*m_METwithsigma[0]+m_METwithsigma[1]*m_METwithsigma[1]);
 	 return(temp);
 }
 
- double HHTauTauEventGenerator::getPhiMETwithsigma(){
+ double HHKinFit2::HHTauTauEventGenerator::getPhiMETwithsigma(){
  	TVector2 temp(m_METwithsigma[0],m_METwithsigma[1]);
  	return(temp.Phi());
  }
 
- TMatrixD HHTauTauEventGenerator::getCovarmatrix(){
+ TMatrixD HHKinFit2::HHTauTauEventGenerator::getCovarmatrix(){
 	 return(m_covarmatrix);
  }
 

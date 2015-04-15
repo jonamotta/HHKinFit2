@@ -3,7 +3,7 @@
 #include <iomanip>
 
 
-HHFitObjectE::HHFitObjectE(HHLorentzVector const& initial4vector)
+HHKinFit2::HHFitObjectE::HHFitObjectE(HHLorentzVector const& initial4vector)
   :HHFitObject(initial4vector),
    m_upperLimitE(9999999),
    m_lowerLimitE(0){
@@ -11,57 +11,57 @@ HHFitObjectE::HHFitObjectE(HHLorentzVector const& initial4vector)
 }
 
 void
-HHFitObjectE::changeEandSave(Double_t E){
+HHKinFit2::HHFitObjectE::changeEandSave(double E){
   this->setFit4Vector(changeE(E));
 }
 
 void
-HHFitObjectE::scaleEandSave(Double_t E){
+HHKinFit2::HHFitObjectE::scaleEandSave(double E){
   this->setFit4Vector(scaleE(E));
 }
 
 void
-HHFitObjectE::constrainEtoMinvandSave(Double_t m, HHLorentzVector const& other4vector){
+HHKinFit2::HHFitObjectE::constrainEtoMinvandSave(double m, HHLorentzVector const& other4vector){
   this->setFit4Vector(constrainEtoMinv(m, other4vector));
 }
 
-Double_t
-HHFitObjectE::getE() const{
+double
+HHKinFit2::HHFitObjectE::getE() const{
   return(m_fit4vector.E());
 }
 
-Double_t
-HHFitObjectE::getUpperFitLimitE() const{
+double
+HHKinFit2::HHFitObjectE::getUpperFitLimitE() const{
   return(m_upperLimitE);
 }
 
-Double_t
-HHFitObjectE::getLowerFitLimitE() const{
+double
+HHKinFit2::HHFitObjectE::getLowerFitLimitE() const{
   return(m_lowerLimitE);
 }
 
 void
-HHFitObjectE::setUpperFitLimitE(Double_t upperlimit){
+HHKinFit2::HHFitObjectE::setUpperFitLimitE(double upperlimit){
   m_upperLimitE = upperlimit;
 }
 
 void
-HHFitObjectE::setUpperFitLimitE(Double_t minv, HHLorentzVector const& other4vectorMin){
+HHKinFit2::HHFitObjectE::setUpperFitLimitE(double minv, HHLorentzVector const& other4vectorMin){
   this->setUpperFitLimitE(constrainEtoMinv(minv,other4vectorMin).E());
 }
 
 void
-HHFitObjectE::setLowerFitLimitE(Double_t lowerlimit){
+HHKinFit2::HHFitObjectE::setLowerFitLimitE(double lowerlimit){
   m_lowerLimitE = lowerlimit;
 }
 
 void
-HHFitObjectE::setLowerFitLimitE(HHLorentzVector const& lowerlimit){
+HHKinFit2::HHFitObjectE::setLowerFitLimitE(HHLorentzVector const& lowerlimit){
   m_lowerLimitE = lowerlimit.E();
 }
 
 void
-HHFitObjectE::print() const{
+HHKinFit2::HHFitObjectE::print() const{
   std::cout << "---" << std::endl;
   std::cout << "energy component fit object:" << std::endl;
   this->printInitial4Vector();
@@ -72,7 +72,7 @@ HHFitObjectE::print() const{
 
 
 void
-HHFitObjectE::printLimits() const{
+HHKinFit2::HHFitObjectE::printLimits() const{
   std::cout <<  "limits: "
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getLowerFitLimitE()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getUpperFitLimitE()

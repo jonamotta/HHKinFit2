@@ -11,6 +11,7 @@ class for generating lorentzvectors for Tau in higgsdecay: Higgs->TauTau
 #include "TRandom.h"
 #include "TVectorD.h"
  
+namespace HHKinFit2{
 class HHTauTauEventGenerator {
 
 public:
@@ -73,5 +74,5 @@ private:
 
 
 };
-
+}
 #endif /* HHTauTauEventGenerator_ */

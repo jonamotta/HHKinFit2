@@ -16,6 +16,8 @@
 #include "TCanvas.h"
 #include "TFile.h"
 
+using namespace HHKinFit2;
+
 int main(int argc, char* argv[])
 {
   double mass = 125.0;

@@ -4,6 +4,8 @@
 #include "exceptions/HHEnergyRangeException.h"
 #include "TDirectory.h"
 
+using namespace HHKinFit2;
+
 int main(int argc, char* argv[])
 {
 	TF1 PDF1("PDF1","2*x",0,2);

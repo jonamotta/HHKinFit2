@@ -5,22 +5,21 @@
 #ifndef HHFitObjectMET_
 #define HHFitObjectMET_
 
-#include "Rtypes.h"
 #include "TVector2.h"
 #include "TMatrixD.h"
 #include "HHFitObject.h"
 
-
+namespace HHKinFit2{
 class HHFitObjectMET : public HHFitObject {
  public:
   HHFitObjectMET(TVector2 const& initialvector,TVector2 const& fitvector=TVector2(0,0));
   
-  void setCovMatrix(Double_t xx, Double_t yy, Double_t xy);
+  void setCovMatrix(double xx, double yy, double xy);
 
   virtual void print() const;
   virtual void printInitial4Vector() const;
   virtual void printFit4Vector() const;
   virtual void printCovMatrix() const;
 };
-
+}
 #endif /* HHFitObjectMET_ */

@@ -34,12 +34,12 @@
 //  PSderivative1       1-dim case of PSderivative,  see documentation there
 //  PSderivative        Tool for numerical calc. of derivative and Hesse matrix
 
-Int_t
-PSMath::PSfit (Int_t iloop, Int_t &iter, Int_t &method, Int_t &mode,
-               Bool_t &noNewtonShifts, Int_t printlevel, Int_t np, Double_t a[],
-               Double_t astart[], Double_t alimit[][2], Double_t aprec[],
-               Double_t daN[], Double_t h[], Double_t aMemory[][5], Double_t chi2,
-               Double_t chi2iter[], Double_t g[], Double_t H[], Double_t Hinv[])
+int
+PSMath::PSfit (int iloop, int &iter, int &method, int &mode,
+               Bool_t &noNewtonShifts, int printlevel, int np, double a[],
+               double astart[], double alimit[][2], double aprec[],
+               double daN[], double h[], double aMemory[][5], double chi2,
+               double chi2iter[], double g[], double H[], double Hinv[])
 {
   // generic fitter using Newton method and Line Search within parameter limits
   // iter:     set iter=0 at start of a new fit, 
@@ -69,16 +69,16 @@ PSMath::PSfit (Int_t iloop, Int_t &iter, Int_t &method, Int_t &mode,
   //                             intermediate storage of chi2
   // Hinv[np*np] Inverse of Hesse matrix
 
-  static Int_t icallNewton, iterMemory;
-  static Double_t chi2Memory;
-  static Double_t x[4], f[4];
-  static Double_t xx, xlimit[2];
-  static Double_t xh, daNabs;
-  static Double_t epsx = 0.1, epsf = 0.1;
-  Int_t convergence;
+  static int icallNewton, iterMemory;
+  static double chi2Memory;
+  static double x[4], f[4];
+  static double xx, xlimit[2];
+  static double xh, daNabs;
+  static double epsx = 0.1, epsf = 0.1;
+  int convergence;
 
-  Int_t itemp, ready;
-  Double_t temp, d;
+  int itemp, ready;
+  double temp, d;
 
   //  std::cout << "PSfit ==== iloop " << iloop << "  chi2 " << chi2 << std::endl;
 
@@ -89,7 +89,7 @@ PSMath::PSfit (Int_t iloop, Int_t &iter, Int_t &method, Int_t &mode,
     iterMemory = 0;
     iter = 0;
     chi2Memory = 123456.;
-    for (Int_t ip = 0; ip < np; ip++) {                          // check limits
+    for (int ip = 0; ip < np; ip++) {                          // check limits
       alimit[ip][0] = fmax (alimit[ip][0], -pow (10.0, 10.0));
       alimit[ip][1] = fmin (alimit[ip][1], pow (10.0, 10.0));
       if (alimit[ip][0] >= alimit[ip][1]) {
@@ -115,7 +115,7 @@ PSMath::PSfit (Int_t iloop, Int_t &iter, Int_t &method, Int_t &mode,
 	  std::cout << "No Convergence! Back to LineSearch!" << std::endl;
       method = 1;                       // switch to line search
       mode = 1;
-      for (Int_t ip = 0; ip < np; ip++) {
+      for (int ip = 0; ip < np; ip++) {
 	astart[ip] = a[ip];
       }
     }
@@ -138,16 +138,16 @@ PSMath::PSfit (Int_t iloop, Int_t &iter, Int_t &method, Int_t &mode,
       }      // limits for line search
     }
 
-    Double_t epsxLS = epsx;
+    double epsxLS = epsx;
 
-    for(Int_t ip = 0; ip < np; ip++) {
+    for(int ip = 0; ip < np; ip++) {
       if(aprec[ip]*0.5/fabs(daN[ip]) < epsxLS){
 	epsxLS = aprec[ip]*0.5/fabs(daN[ip]);
       }
     }
 
     xx = PSLineSearch (mode, xh, xlimit, epsxLS, epsf, x, f, chi2, printlevel);
-    for (Int_t ip = 0; ip < np; ip++) {
+    for (int ip = 0; ip < np; ip++) {
       a[ip] = astart[ip] + xx * daN[ip];
     }
 
@@ -162,7 +162,7 @@ PSMath::PSfit (Int_t iloop, Int_t &iter, Int_t &method, Int_t &mode,
       //      PSVprint("aMemory ",aMemory,np) ;
       //      PSVprint("      a ", a, np) ;
       bool didConverge = true;
-      for (Int_t ip = 0; ip < np; ip++) { // check for progress w.r.t. previous iteration
+      for (int ip = 0; ip < np; ip++) { // check for progress w.r.t. previous iteration
         if (fabs(a[ip] - aMemory[ip][0]) > aprec[ip]) {
 	  if(printlevel >=2)
 	    std::cout << "No Convergence as Parameter " << np << " is " << fabs(a[ip] - aMemory[ip][0]) << " away from previous iteration." << std::endl;
@@ -178,9 +178,9 @@ PSMath::PSfit (Int_t iloop, Int_t &iter, Int_t &method, Int_t &mode,
       }
 
  
-      for (Int_t previousIter = 1; previousIter <= 4; previousIter++){
+      for (int previousIter = 1; previousIter <= 4; previousIter++){
 	bool weHaveBeenHereBefore = true;
-	for (Int_t ip = 0; ip < np; ip++) {
+	for (int ip = 0; ip < np; ip++) {
 	  if(fabs(aMemory[ip][previousIter] - a[ip]) > aprec[ip]*0.01){
 	    weHaveBeenHereBefore = false;
 	    if(printlevel >=2)
@@ -196,7 +196,7 @@ PSMath::PSfit (Int_t iloop, Int_t &iter, Int_t &method, Int_t &mode,
 	}
       }
 
-      for (Int_t ip = 0; ip < np; ip++) {
+      for (int ip = 0; ip < np; ip++) {
 	aMemory[ip][4] = aMemory[ip][3];
 	aMemory[ip][3] = aMemory[ip][2];
 	aMemory[ip][2] = aMemory[ip][1];
@@ -247,7 +247,7 @@ PSMath::PSfit (Int_t iloop, Int_t &iter, Int_t &method, Int_t &mode,
 	  std::cout << "No Minimum! Back to Linesearch!" << std::endl;
 	method = 1;
 	mode = 1;                        // switch to line search
-	for (Int_t ip = 0; ip < np; ip++) {
+	for (int ip = 0; ip < np; ip++) {
           astart[ip] = a[ip];
         }
       }
@@ -257,14 +257,14 @@ PSMath::PSfit (Int_t iloop, Int_t &iter, Int_t &method, Int_t &mode,
 }
 //----------------------------------------------------------------
 void
-PSMath::PSNewtonLimitShift (Int_t sign, Int_t np, Double_t a[],
-                            Double_t alimit[][2], Double_t aprec[],
-                            Double_t daN[], Double_t h[], Double_t g[],
-                            Double_t H[])
+PSMath::PSNewtonLimitShift (int sign, int np, double a[],
+                            double alimit[][2], double aprec[],
+                            double daN[], double h[], double g[],
+                            double H[])
 {
   // ------- for Newton Method: if close to limit shift central point by less than precision
   if (sign > 0) {
-    for (Int_t ip = 0; ip < np; ip++) {                 // check limits
+    for (int ip = 0; ip < np; ip++) {                 // check limits
       daN[ip] = 0.;
       //      cout << "a[ip] " << a[ip] << "  alimit[ip][0] " << alimit[ip][0]
       //	   << "  aprec[ip] " << aprec[ip] << endl;
@@ -291,10 +291,10 @@ PSMath::PSNewtonLimitShift (Int_t sign, Int_t np, Double_t a[],
     //    PSVprint("in Shift  vorher  daN ",daN,np) ;
     //    PSVprint("in Shift  vorher  a ",a,np) ;
     //    PSVprint("in Shift  vorher  g ",g,np) ;
-    for (Int_t ip = 0; ip < np; ip++) {
+    for (int ip = 0; ip < np; ip++) {
       daN[ip] = -daN[ip];
       a[ip] = a[ip] + daN[ip];
-      for (Int_t jp = 0; jp < np; jp++) {
+      for (int jp = 0; jp < np; jp++) {
         g[ip] = g[ip] + H[ip * np + jp] * daN[jp]; // also shift derivative
       }
     }
@@ -303,21 +303,21 @@ PSMath::PSNewtonLimitShift (Int_t sign, Int_t np, Double_t a[],
   }
 }
 //----------------------------------------------------------------
-Double_t
-PSMath::PSNewtonAnalyzer (Int_t np, Double_t a[], Double_t alimit[][2],
-                          Double_t aprec[], Double_t daN[], Double_t h[],
-                          Double_t g[], Double_t H[], Double_t Hinv[],
-                          Double_t chi2, Bool_t noNewtonShifts, Int_t printlevel)
+double
+PSMath::PSNewtonAnalyzer (int np, double a[], double alimit[][2],
+                          double aprec[], double daN[], double h[],
+                          double g[], double H[], double Hinv[],
+                          double chi2, Bool_t noNewtonShifts, int printlevel)
 {
   //  cout << "   PSNewtonAnalyzer  chi2 = " << chi2 << "\n" ;
 
-  Double_t d;                    // convergence test value
-  Int_t iNewton;                 // =1 if Newton Method can be used
-  Double_t gnorm, hnorm;
-  Double_t xlimit[2];         // straight line distance from a[] to alimits[][2]
+  double d;                    // convergence test value
+  int iNewton;                 // =1 if Newton Method can be used
+  double gnorm, hnorm;
+  double xlimit[2];         // straight line distance from a[] to alimits[][2]
 
   d = 100.;
-  for (Int_t ip = 0; ip < np; ip++) {
+  for (int ip = 0; ip < np; ip++) {
     daN[ip] = 0.;
   }
 
@@ -329,7 +329,7 @@ PSMath::PSNewtonAnalyzer (Int_t np, Double_t a[], Double_t alimit[][2],
       if (printlevel>0) std::cout << "PSNewton Analyzer check 1 (det<0)" << std::endl;
     }
   } // check only works for np=2
-  for (Int_t ip = 0; ip < np; ip++) {    // check for positive Diagonal of Hesse
+  for (int ip = 0; ip < np; ip++) {    // check for positive Diagonal of Hesse
     if (H[ip * np + ip] < 0.) {
       iNewton = 0;
       if (printlevel>0) std::cout << "PSNewton Analyzer check 2 (negative diagonal entries)" << std::endl;
@@ -345,14 +345,14 @@ PSMath::PSNewtonAnalyzer (Int_t np, Double_t a[], Double_t alimit[][2],
     }
   }
   if (iNewton == 1) {                      // Newton Step width
-    Double_t temp = PSMinverse (H, Hinv, np);
-    for (Int_t ii = 0; ii < np; ii++) {
-      for (Int_t jj = 0; jj < np; jj++) {
+    double temp = PSMinverse (H, Hinv, np);
+    for (int ii = 0; ii < np; ii++) {
+      for (int jj = 0; jj < np; jj++) {
         daN[ii] = daN[ii] - Hinv[ii * np + jj] * g[jj];
       }
     }
     d = 0.;
-    for (Int_t ip = 0; ip < np; ip++) {
+    for (int ip = 0; ip < np; ip++) {
       d = d - g[ip] * daN[ip];
     }   // convergence test value
     //    cout <<   "    d    = " << d << endl;
@@ -378,12 +378,12 @@ PSMath::PSNewtonAnalyzer (Int_t np, Double_t a[], Double_t alimit[][2],
       std::cout << "Newton Shifts are disabled!" << std::endl;
     gnorm = PSVnorm (g, np);            // continue in direction of derivative
     hnorm = PSVnorm (h, np);              // continue with previous step width
-    for (Int_t ip = 0; ip < np; ip++) {
+    for (int ip = 0; ip < np; ip++) {
       daN[ip] = -g[ip] * hnorm / gnorm;
       if(printlevel>2)
 	std::cout << "daN[" << np << "] set to " << daN[ip] << std::endl;
     }
-    for (Int_t ip = 0; ip < np; ip++) {                 // check limits
+    for (int ip = 0; ip < np; ip++) {                 // check limits
       if (a[ip] < alimit[ip][0] + aprec[ip]) {
         h[ip] = aprec[ip];
         daN[ip] = fmax (daN[ip], 0.);
@@ -409,9 +409,9 @@ PSMath::PSNewtonAnalyzer (Int_t np, Double_t a[], Double_t alimit[][2],
   
   if (printlevel>0) std::cout << "daN shift for Newton in daN[0]: " << daN[0] << " daN[1]: " << daN[1] << std::endl;
   
-  Double_t xmax = fmin (1., xlimit[1]); //  Newton step would lead out of limits
+  double xmax = fmin (1., xlimit[1]); //  Newton step would lead out of limits
 
-  for (Int_t ip = 0; ip < np; ip++) {                       // apply Newton step
+  for (int ip = 0; ip < np; ip++) {                       // apply Newton step
     a[ip] = a[ip] + daN[ip] * xmax;                  // update parameter value
     h[ip] = 100. * sqrt (0.000001 * fabs(chi2 / H[ip * np + ip])); // update step width
   }
@@ -419,7 +419,7 @@ PSMath::PSNewtonAnalyzer (Int_t np, Double_t a[], Double_t alimit[][2],
   if (printlevel>0) std::cout << "Newton shifted to: a[0] = " << a[0] << " a[1] = " << a[1] << std::endl;
 
   //  PSVprint("in Analyzer  vor limits  daN ",daN,np) ;
-  for (Int_t ip = 0; ip < np; ip++) {                 // check limits
+  for (int ip = 0; ip < np; ip++) {                 // check limits
     if (a[ip] < alimit[ip][0] + aprec[ip]) {
       h[ip] = aprec[ip];
       //      cout << " at limit ?  ip " << ip << "  " ;  PSVprint("    g ",g,  np) ;
@@ -441,7 +441,7 @@ PSMath::PSNewtonAnalyzer (Int_t np, Double_t a[], Double_t alimit[][2],
   }
   //  PSVprint("in Analyzer  vor d   daN ",daN,np) ;
   d = 0.;
-  for (Int_t ip = 0; ip < np; ip++) {                 // check limits
+  for (int ip = 0; ip < np; ip++) {                 // check limits
     d = d - g[ip] * daN[ip]; // convergence test value (only when not at limit)
   }
   if (d < 0.) {
@@ -451,9 +451,9 @@ PSMath::PSNewtonAnalyzer (Int_t np, Double_t a[], Double_t alimit[][2],
     d = 111.;
   }
   
-  Double_t d2 = 0.;
-  for (Int_t ip = 0; ip < np; ip++) {
-    for (Int_t jp = 0; jp < np; jp++) {
+  double d2 = 0.;
+  for (int ip = 0; ip < np; ip++) {
+    for (int jp = 0; jp < np; jp++) {
       d2 = d2 + daN[ip] * H[ip * np + jp] * daN[jp];
     }
   }
@@ -465,16 +465,16 @@ PSMath::PSNewtonAnalyzer (Int_t np, Double_t a[], Double_t alimit[][2],
 }
 //-------------------------------------------------------
 void
-PSMath::PSfitShow (Int_t iloop, Int_t convergence, Int_t iter, Int_t method,
-                   Int_t mode, Int_t printlevel, Int_t graphiklevel, Int_t np,
-                   Double_t a[], Double_t astart[], Double_t alimit[][2],
-                   Double_t aprec[], Double_t daN[], Double_t h[],
-                   Double_t chi2, Double_t g[], Double_t H[])
+PSMath::PSfitShow (int iloop, int convergence, int iter, int method,
+                   int mode, int printlevel, int graphiklevel, int np,
+                   double a[], double astart[], double alimit[][2],
+                   double aprec[], double daN[], double h[],
+                   double chi2, double g[], double H[])
 {
   // printlevel: 0: quite mode,      1: one line with fit result
   //             2: full fit result, 3: one line per iteration, 4: more and more
 
-  static Double_t chi2Memory;
+  static double chi2Memory;
   if (printlevel > 0) {
     if (printlevel >= 2 && iloop == 0) {
       std::cout << "---------- PSfitShow ----------- starts with  " << iloop
@@ -533,9 +533,9 @@ PSMath::PSfitShow (Int_t iloop, Int_t convergence, Int_t iter, Int_t method,
   chi2Memory = chi2;
   if (graphiklevel > 0) { // ------------------------ Plots iterations in plane a[0] - a[1]
     //    c1->Clear();
-    static const Int_t nloopmax = 100;
-    static Double_t Xloop[nloopmax];
-    static Double_t Yloop[nloopmax];
+    static const int nloopmax = 100;
+    static double Xloop[nloopmax];
+    static double Yloop[nloopmax];
     static TPolyMarker * iterMarker = NULL;
     static TPolyMarker * loopMarker = NULL;
     if (iloop == 0) {
@@ -546,14 +546,14 @@ PSMath::PSfitShow (Int_t iloop, Int_t convergence, Int_t iter, Int_t method,
       loopMarker = new TPolyMarker (100);
       loopMarker->SetMarkerColor (kBlack);
       loopMarker->SetMarkerSize (0.5);
-      //      static Double_t *Xloop = loopMarker->GetX() ;
-      //      static Double_t *Yloop = loopMarker->GetY() ;
+      //      static double *Xloop = loopMarker->GetX() ;
+      //      static double *Yloop = loopMarker->GetY() ;
 
       //      TF2 * f2 = new TF2("Test-Function","(x**2 + y**2 -1.9*x*y)**2 + x**2 + y**2 -1.9*x*y",
       //			 alimit[0][0], alimit[0][1], alimit[1][0], alimit[1][1] ) ;
       //      f2->SetMinimum( 0.);
       //      f2->SetMaximum(20.);
-      //      Double_t levels[] = {1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.,13.,14.,15.,16.,17.,18.,19.,20.}
+      //      double levels[] = {1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.,13.,14.,15.,16.,17.,18.,19.,20.}
       //      f2->SetContour(20,levels) ;
       //      f2->Draw("CONT1Z");
 
@@ -572,8 +572,8 @@ PSMath::PSfitShow (Int_t iloop, Int_t convergence, Int_t iter, Int_t method,
 
     if (convergence != 0) {
 
-      Double_t *Xiter = iterMarker->GetX ();
-      Double_t *Yiter = iterMarker->GetY ();
+      double *Xiter = iterMarker->GetX ();
+      double *Yiter = iterMarker->GetY ();
       loopMarker->DrawPolyMarker (iloop, Xloop, Yloop, "same");
       iterMarker->DrawPolyMarker (iter, Xiter, Yiter, "same");
 
@@ -590,20 +590,20 @@ PSMath::PSfitShow (Int_t iloop, Int_t convergence, Int_t iter, Int_t method,
   }
 }
 //------------------------------------------------------------------
-Double_t
-PSMath::PSLineSearch (Int_t & mode, Double_t hh, Double_t xlimit[],
-                      Double_t epsx, Double_t epsf, Double_t x[4], Double_t f[],
-                      Double_t chi2, Int_t printlevel)
+double
+PSMath::PSLineSearch (int & mode, double hh, double xlimit[],
+                      double epsx, double epsf, double x[4], double f[],
+                      double chi2, int printlevel)
 {      // 1-dim Line-Search, Method from Blobel textbook p. 252
-  static Double_t xt, ft;
-  Double_t d31, d32, d21;
-  Double_t g, H;
-  Double_t tau = 0.618034;
-  Double_t taufac = tau - tau * tau;
-  Double_t close = 0.004;
-  Double_t h;
-  Double_t temp;
-  Int_t ilimit;
+  static double xt, ft;
+  double d31, d32, d21;
+  double g, H;
+  double tau = 0.618034;
+  double taufac = tau - tau * tau;
+  double close = 0.004;
+  double h;
+  double temp;
+  int ilimit;
 
   //  cout << "chi2 " << chi2 << endl;
 
@@ -689,7 +689,7 @@ PSMath::PSLineSearch (Int_t & mode, Double_t hh, Double_t xlimit[],
       }
       else{                                //Continue in direction of x[3]
 	temp = x[2];
-	Double_t tempf = f[2];
+	double tempf = f[2];
 	x[2] = x[3];
 	f[2] = f[3];
 	x[3] = x[2] + x[2] - x[1];
@@ -812,7 +812,7 @@ PSMath::PSLineSearch (Int_t & mode, Double_t hh, Double_t xlimit[],
     if(printlevel > 2)
 	std::cout << "Mode 5!" << std::endl;
     ft = chi2;
-    Double_t deltaChi2 = fabs(ft - f[2]);
+    double deltaChi2 = fabs(ft - f[2]);
     //    cout <<" in mode 5    xt  " << xt << "   ft " << ft << endl;
     //    PSVprint("  x ",x,4) ;
     
@@ -877,18 +877,18 @@ PSMath::PSLineSearch (Int_t & mode, Double_t hh, Double_t xlimit[],
 
 //------------------------------------
 void
-PSMath::PSLineLimit (Int_t np, Double_t astart[], Double_t daN[],
-                     Double_t alimit[][2], Double_t xlimit[])
+PSMath::PSLineLimit (int np, double astart[], double daN[],
+                     double alimit[][2], double xlimit[])
 {
   // calculate xlimit for line search along direction daN
-  Double_t temp0, temp1, temp;
+  double temp0, temp1, temp;
   xlimit[0] = -pow (10.0, 10.0);
   xlimit[1] = pow (10.0, 10.0);
 
   //  cout << "    xlimit[0] "  << xlimit[0] << "    xlimit[1] " << xlimit[1] << endl; 
   //  PSVprint( "PSLineLimit    astart ",astart,np) ;
   //  PSM2print("PSLineLimit    alimit ",alimit,np) ;
-  for (Int_t ip = 0; ip < np; ip++) {                // limits
+  for (int ip = 0; ip < np; ip++) {                // limits
     if (daN[ip] != 0.) {
       temp0 = (alimit[ip][0] - astart[ip]) / daN[ip];
       temp1 = (alimit[ip][1] - astart[ip]) / daN[ip];
@@ -906,10 +906,10 @@ PSMath::PSLineLimit (Int_t np, Double_t astart[], Double_t daN[],
   //  cout << "    xlimit[0] " << xlimit[0] << "    xlimit[1] " << xlimit[1] << endl; 
 }
 //---------------------------------
-Double_t
-PSMath::PSVnorm (Double_t x[], Int_t n)
+double
+PSMath::PSVnorm (double x[], int n)
 {
-  Double_t xnorm = 0.;
+  double xnorm = 0.;
   for (int i = 0; i < n; i++) {
     xnorm = xnorm + pow (x[i], 2.0);
   }
@@ -917,7 +917,7 @@ PSMath::PSVnorm (Double_t x[], Int_t n)
 }
 //----------------------------------------------------------------
 void
-PSMath::PSVprint (const char* text, Double_t x[], Int_t n)
+PSMath::PSVprint (const char* text, double x[], int n)
 {
   //  cout << "   PS Vector print  " << "  " << n << "\n" ;
   std::cout << text << "[" << n << "] = ";
@@ -929,7 +929,7 @@ PSMath::PSVprint (const char* text, Double_t x[], Int_t n)
 }
 //----------------------------------------------------------------
 void
-PSMath::PSMprint (const char* text, Double_t A[], Int_t ni, Int_t nj)
+PSMath::PSMprint (const char* text, double A[], int ni, int nj)
 {
   std::cout << text << "[" << ni << "]" << "[" << nj << "]" << "\n";
   for (int i = 0; i < ni; i++) {
@@ -942,7 +942,7 @@ PSMath::PSMprint (const char* text, Double_t A[], Int_t ni, Int_t nj)
 }
 //----------------------------------------------------------------
 void
-PSMath::PSM2print (const char* text, Double_t A[][2], Int_t ni)
+PSMath::PSM2print (const char* text, double A[][2], int ni)
 {
   for (int i = 0; i < ni; i++) {
     std::cout << text << "[" << i << "]" << "[]";
@@ -953,13 +953,13 @@ PSMath::PSM2print (const char* text, Double_t A[][2], Int_t ni)
   }
 }
 //------------------------------------------------------------------
-Double_t
-PSMath::PSMinverse (Double_t H[], Double_t Hinv[], Int_t p)
+double
+PSMath::PSMinverse (double H[], double Hinv[], int p)
 {    // invert a symmetric matrix H[p,p]
   // for 2*2 and 3*3 inversion also works for a non-symmetric matrix
-  Double_t temp;
+  double temp;
   if (p == 2) {
-    Double_t det = H[0] * H[3] - H[1] * H[2];
+    double det = H[0] * H[3] - H[1] * H[2];
     Hinv[0] = H[3] / det;
     Hinv[3] = H[0] / det;
     Hinv[1] = -H[1] / det;
@@ -976,7 +976,7 @@ PSMath::PSMinverse (Double_t H[], Double_t Hinv[], Int_t p)
     Hinv[2 * p + 0] = H[0 * p + 1] * H[1 * p + 2] - H[0 * p + 2] * H[1 * p + 1];
     Hinv[2 * p + 1] = H[0 * p + 2] * H[1 * p + 0] - H[0 * p + 0] * H[1 * p + 2];
     Hinv[2 * p + 2] = H[0 * p + 0] * H[1 * p + 1] - H[0 * p + 1] * H[1 * p + 0];
-    Double_t det = H[0 * p + 0] * Hinv[0 * p + 0]
+    double det = H[0 * p + 0] * Hinv[0 * p + 0]
         + H[1 * p + 0] * Hinv[0 * p + 1] + H[2 * p + 0] * Hinv[0 * p + 2];
     ;
     for (int ii = 0; ii < p; ii++) {
@@ -993,19 +993,19 @@ PSMath::PSMinverse (Double_t H[], Double_t Hinv[], Int_t p)
   return 0.;
 }
 //-----------------------------
-Double_t
+double
 PSMath::PSMCholtest ()
 { // test inversion of symmetric matrix via cholesky LR decomposition
-  Double_t M[4 * 4], R[4 * 4], Rinv[4 * 4], Mtest[4 * 4];
+  double M[4 * 4], R[4 * 4], Rinv[4 * 4], Mtest[4 * 4];
   // test for  R- right triangular matrix
-  Double_t Test1[1 * 1] = { 9. };
-  Double_t Test2[2 * 2] = { 9., 3., 0., 5. };
-  Double_t Test3[3 * 3] = { 9., 3., 2., 0., 5., -4., 0., 0., -9. };
-  Double_t Test4[4 * 4] = { 9., 3., 2., 0., 0., 5., -4., 1., 0., 0., 60., -9.,
+  double Test1[1 * 1] = { 9. };
+  double Test2[2 * 2] = { 9., 3., 0., 5. };
+  double Test3[3 * 3] = { 9., 3., 2., 0., 5., -4., 0., 0., -9. };
+  double Test4[4 * 4] = { 9., 3., 2., 0., 0., 5., -4., 1., 0., 0., 60., -9.,
       0., 0., 0., 40. };
 
-  Int_t n = 4;
-  Double_t temp;
+  int n = 4;
+  double temp;
   temp = PSMmultiplyMT (M, Test4, n, n);
   //  for (int ii=0; ii < n ; ii++) {
   //    for (int jj=0; jj < n ; jj++) {
@@ -1040,9 +1040,9 @@ PSMath::PSMCholtest ()
   return 0.;
 }
 //-----------------------------
-Double_t
-PSMath::PSMmultiply (Double_t A[], Double_t B[], Double_t C[], Int_t n1,
-                     Int_t n2)
+double
+PSMath::PSMmultiply (double A[], double B[], double C[], int n1,
+                     int n2)
 { // multiply matrix  A = B * C,  Aij = Bik * Ckj,
 //  A(n1,n1)   B(n1,n2)  C(n2,n1)
   for (int ii = 0; ii < n1; ii++) {
@@ -1056,8 +1056,8 @@ PSMath::PSMmultiply (Double_t A[], Double_t B[], Double_t C[], Int_t n1,
   return 0.;
 }
 //-----------------------------
-Double_t
-PSMath::PSMmultiplyMRRT (Double_t A[], Int_t n1, Int_t n2)
+double
+PSMath::PSMmultiplyMRRT (double A[], int n1, int n2)
 {  // multiply triangular matrix R=A  with transpose,
 //  store result in input, B = R * R^T,  A = B,
 //  Aij= Bik * Bjk,  A(n1,n1)   B(n1,n2)
@@ -1078,8 +1078,8 @@ PSMath::PSMmultiplyMRRT (Double_t A[], Int_t n1, Int_t n2)
   return 0;
 }
 //-----------------------------
-Double_t
-PSMath::PSMmultiplyMT (Double_t A[], Double_t B[], Int_t n1, Int_t n2)
+double
+PSMath::PSMmultiplyMT (double A[], double B[], int n1, int n2)
 {  // multiply matrix  A = B * B^T,  Aij = Bik * Bjk,  A(n1,n1)   B(n1,n2)
   for (int ii = 0; ii < n1; ii++) {
     for (int jj = 0; jj < n1; jj++) {
@@ -1092,8 +1092,8 @@ PSMath::PSMmultiplyMT (Double_t A[], Double_t B[], Int_t n1, Int_t n2)
   return 0.;
 }
 //-----------------------------
-Double_t
-PSMath::PSMRTrianInvert2 (Double_t R[], Int_t n)
+double
+PSMath::PSMRTrianInvert2 (double R[], int n)
 {  // invert a triangular R - matrix (n*n)
 //  store result in position of input (R)
   for (int ii = 0; ii < n; ii++) {
@@ -1116,8 +1116,8 @@ PSMath::PSMRTrianInvert2 (Double_t R[], Int_t n)
   return 0.;
 }
 //-----------------------------
-Double_t
-PSMath::PSMRTrianInvert (Double_t R[], Double_t Rinv[], Int_t n)
+double
+PSMath::PSMRTrianInvert (double R[], double Rinv[], int n)
 {  // invert a triangular R - matrix (n*n)       R * Rinv = 1
   for (int ii = 0; ii < n; ii++) {
     for (int jj = 0; jj < n; jj++) {
@@ -1141,8 +1141,8 @@ PSMath::PSMRTrianInvert (Double_t R[], Double_t Rinv[], Int_t n)
 }
 
 //-----------------------------
-Double_t
-PSMath::PSMCholesky (Double_t M[], Double_t R[], Int_t n)
+double
+PSMath::PSMCholesky (double M[], double R[], int n)
 {  // Cholesky decomposition of  M = n*n  symmetric matrix
 // M = R^T * R
   for (int ii = 0; ii < n; ii++) {
@@ -1172,19 +1172,19 @@ PSMath::PSMCholesky (Double_t M[], Double_t R[], Int_t n)
   return 0.;
 }
 //----------------------------------------------------------------
-Double_t
-PSMath::PSfitCheckLimits (Int_t np, Double_t a[], Double_t h[],
-                          Double_t alimit[][2], Double_t aprecision[],
-                          Double_t daN[], Double_t g[], Double_t d)
+double
+PSMath::PSfitCheckLimits (int np, double a[], double h[],
+                          double alimit[][2], double aprecision[],
+                          double daN[], double g[], double d)
 {
   // check limits of fit parameters
   std::cout << "PSfitCheckLimits " << std::endl;
 
-  Double_t dnew;
-  Double_t z, z0, z1;
+  double dnew;
+  double z, z0, z1;
   z0 = 0.;
   z1 = 0.;
-  for (Int_t ip = 0; ip < np; ip++) {
+  for (int ip = 0; ip < np; ip++) {
     if (a[ip] < alimit[ip][0] + aprecision[ip]) {
       z = (a[ip] - (alimit[ip][0] + aprecision[ip])) / daN[ip];
       if (z0 < z) {
@@ -1213,7 +1213,7 @@ PSMath::PSfitCheckLimits (Int_t np, Double_t a[], Double_t h[],
   if (z0 > 0. || z1 > 0.) {
     std::cout << "====================WARNING: out of range: " << "  z0 " << z0
         << "  z1 " << z1 << std::endl;
-    for (Int_t ip = 0; ip < np; ip++) {
+    for (int ip = 0; ip < np; ip++) {
       std::cout << "PSfitCheckLimits: input:  ip " << ip << " a " << a[ip]
           << "  h " << aprecision[ip] << "  Limits:" << alimit[ip][0] << "  "
           << alimit[ip][1] << std::endl;
@@ -1224,7 +1224,7 @@ PSMath::PSfitCheckLimits (Int_t np, Double_t a[], Double_t h[],
     else {
       z = z1;
     }
-    for (Int_t ip = 0; ip < np; ip++) {
+    for (int ip = 0; ip < np; ip++) {
       if (d < 100) {
         dnew = d + g[ip] * daN[ip];
       }
@@ -1250,16 +1250,16 @@ PSMath::PSfitCheckLimits (Int_t np, Double_t a[], Double_t h[],
   return dnew;
 }
 //----------------------------------------------------------------
-Double_t
-PSMath::PSminIterate (Double_t a[], Double_t daN[], Double_t h[], Int_t p,
-                      Double_t g[], Double_t H[], Double_t Hinv[], Double_t X0)
+double
+PSMath::PSminIterate (double a[], double daN[], double h[], int p,
+                      double g[], double H[], double Hinv[], double X0)
 {
   //  cout << "   PSminIterate  X0 = " << X0 << "\n" ;
 
-  Double_t d;                   // convergence test value
-  Int_t iNewton;                 // =1 if Newton Method can be used
+  double d;                   // convergence test value
+  int iNewton;                 // =1 if Newton Method can be used
 
-  for (Int_t ii = 0; ii < p; ii++) {
+  for (int ii = 0; ii < p; ii++) {
     daN[ii] = 0.;
   }
 
@@ -1270,7 +1270,7 @@ PSMath::PSminIterate (Double_t a[], Double_t daN[], Double_t h[], Int_t p,
   }
 
   iNewton = 1;
-  for (Int_t ii = 0; ii < p; ii++) {     // check for positive Diagonal of Hesse
+  for (int ii = 0; ii < p; ii++) {     // check for positive Diagonal of Hesse
     if (H[ii * p + ii] < 0.) {
       iNewton = 0;
       break;
@@ -1281,24 +1281,24 @@ PSMath::PSminIterate (Double_t a[], Double_t daN[], Double_t h[], Int_t p,
     }
   }
   if (iNewton == 1) {               // update parameter value with Newton method
-    for (Int_t ii = 0; ii < p; ii++) {
-      for (Int_t jj = 0; jj < p; jj++) {
+    for (int ii = 0; ii < p; ii++) {
+      for (int jj = 0; jj < p; jj++) {
         daN[ii] = daN[ii] - Hinv[ii * p + jj] * g[jj]; // Newton Step width
       }
     }
     d = 0.;
-    for (Int_t ii = 0; ii < p; ii++) {
+    for (int ii = 0; ii < p; ii++) {
       d = d - g[ii] * daN[ii];
     }       // convergence test value
 
     if (d > 0.) {                // update parameter value in case of positive d
-      for (Int_t ii = 0; ii < p; ii++) {
+      for (int ii = 0; ii < p; ii++) {
         a[ii] = a[ii] + daN[ii];                 // update parameter value
         h[ii] = 100. * sqrt (0.00001 * fabs(X0 / H[ii * p + ii])); // update step width
       }
     }
     else {                              // d < 0   Hesse not positive definit ?!
-      for (Int_t ii = 0; ii < p; ii++) {
+      for (int ii = 0; ii < p; ii++) {
         daN[ii] = -h[ii] * g[ii] / fabs(g[ii]); // simple step in direction of ngative slope
         a[ii] = a[ii] + daN[ii];                 // update parameter value
         //    h[ii] = h[ii]  ;                         // reduce step width
@@ -1307,7 +1307,7 @@ PSMath::PSminIterate (Double_t a[], Double_t daN[], Double_t h[], Int_t p,
     }
   }
   else {                                         // Hesse not positiv definit
-    for (Int_t ii = 0; ii < p; ii++) {
+    for (int ii = 0; ii < p; ii++) {
       daN[ii] = -h[ii] * g[ii] / fabs(g[ii]); // simple step in direction of ngative slope
       a[ii] = a[ii] + daN[ii];                     // update parameter value
       //      h[ii] = h[ii]  ;                           // update step width
@@ -1317,12 +1317,12 @@ PSMath::PSminIterate (Double_t a[], Double_t daN[], Double_t h[], Int_t p,
   return d;
 }
 //----------------------------------------------------------------
-Double_t
-PSMath::PSfuncQuadratic (Double_t a[], Double_t amean[], Double_t F0,
-                         Double_t g[], Double_t H[], Int_t np)
+double
+PSMath::PSfuncQuadratic (double a[], double amean[], double F0,
+                         double g[], double H[], int np)
 {   // compute multi-dim quadratic function from mean, derivative and Hesse
-  Double_t F = F0;
-  Double_t temp;
+  double F = F0;
+  double temp;
   //  cout << F << "\n" ;
   //  PSVprint(" a",a,np) ;
   //  PSVprint(" amean",amean,np) ;
@@ -1338,18 +1338,18 @@ PSMath::PSfuncQuadratic (Double_t a[], Double_t amean[], Double_t F0,
   return F;
 }
 //----------------------------------------------------------------
-Int_t PSMath::PSderivative1 (Int_t icall, Double_t a[], Double_t h[], 
-		      Double_t F, Double_t g[], Double_t H[])
+int PSMath::PSderivative1 (int icall, double a[], double h[],
+		      double F, double g[], double H[])
 {
   // 1-dim case of PSderivative,  see documentation there
   // g,H will contain derivative and second derivative of F(a)
   // ready = 1 if derivatives are ready
 
-  Int_t nstep = 3;
-  Int_t iter  ;                       // number of finished iterations
-  Int_t icalc ;                       // current number of function calculations 
+  int nstep = 3;
+  int iter  ;                       // number of finished iterations
+  int icalc ;                       // current number of function calculations
                                       //     within current iteration
-  Int_t ready = -1 ;
+  int ready = -1 ;
   iter  = icall / nstep ;
   icalc = icall - iter * nstep ;
   if (icalc == 0)  { 
@@ -1376,10 +1376,10 @@ Int_t PSMath::PSderivative1 (Int_t icall, Double_t a[], Double_t h[],
   return ready ;
 }
 //----------------------------------------------------------------
-Int_t
-PSMath::PSderivative (Int_t icall, Int_t np, Double_t a[], Double_t h[],
-                      Double_t chi2, Double_t chi2iter[], Double_t g[],
-                      Double_t H[])
+int
+PSMath::PSderivative (int icall, int np, double a[], double h[],
+                      double chi2, double chi2iter[], double g[],
+                      double H[])
 {
   // Tool for numerical calculation of derivative and Hesse matrix
   //  depending on icall, the components of a[] are shifted up and down.
@@ -1388,15 +1388,15 @@ PSMath::PSderivative (Int_t icall, Int_t np, Double_t a[], Double_t h[],
   //  After all shifts are done the derivative and Hesse matrix are calculated
   //  and the step size is recalculated (reduced).
 
-  //  Int_t icall  ;                 //     current call number
-  //  Int_t np  ;                    //     number of fit parameters
-  //  Double_t a[np], Double_t h[np] ; //  fit parameters and step width 
+  //  int icall  ;                 //     current call number
+  //  int np  ;                    //     number of fit parameters
+  //  double a[np], double h[np] ; //  fit parameters and step width
   //                                 //  (will be updated during the fit)
-  //  Double_t chi2                   //  Function (chi2) value for current a[]
-  //  Double_t chi2iter               //  Function (chi2) with nominal a[]
+  //  double chi2                   //  Function (chi2) value for current a[]
+  //  double chi2iter               //  Function (chi2) with nominal a[]
   //                                 //     (i.e. no shift of a[])
-  //  Double_t g[4] ;                 //  derivative vector  g[np]
-  //  Double_t H[4*4] ;               //  Hesse matrix       H[np*np]
+  //  double g[4] ;                 //  derivative vector  g[np]
+  //  double H[4*4] ;               //  Hesse matrix       H[np*np]
   //                                 //  g[] and H[] are also used as 
   //                                 //    intermediate storage of chi2
   //     icall = 0             for nominal a[]
@@ -1405,34 +1405,34 @@ PSMath::PSderivative (Int_t icall, Int_t np, Double_t a[], Double_t h[],
   //     icall = 2np+1 ... (np*np+3np+2)/2        for ++ shift of a[0]
   //     icall = (np*np+3np+2)/2 ... np*np+np+1   for -- shift of a[0]
 
-  //  Double_t chi2,  d ;             // chi2 value and stop criteria for fit
+  //  double chi2,  d ;             // chi2 value and stop criteria for fit
   if(np == 1)
     std::cout << "WARNING! Using PSderivative for 1-dim Case! Use PSderivative1 instead!" << std::endl;
 
-  Int_t ready = -1;
-  Int_t nstep = 1 + 2 * np + np * (np - 1);
-  Int_t iter;                       // number of finished iteration
-  Int_t icalc;                       // current number of chi2 calculations
+  int ready = -1;
+  int nstep = 1 + 2 * np + np * (np - 1);
+  int iter;                       // number of finished iteration
+  int icalc;                       // current number of chi2 calculations
   //     within current iteration
-  Int_t ia;                          // index of fit parameter to be changed
-  Int_t iai, iaj;                    // same for Hesse_ij
+  int ia;                          // index of fit parameter to be changed
+  int iai, iaj;                    // same for Hesse_ij
 
-  Int_t shiftnom = 0;        //     icall = 0             for nominal a[] //0
-  Int_t shiftp1 = 1;        //     etc see above                          //1
-  Int_t shiftp2 = shiftp1 + np - 1;                                       //1
-  Int_t shiftm1 = shiftp2 + 1;                                            //2
-  Int_t shiftm2 = shiftm1 + np - 1;                                       //2
-  Int_t shiftpp1 = shiftm2 + 1;                                           //3
-  Int_t shiftpp2 = shiftm2 + np * (np - 1) / 2;                           //3
-  Int_t shiftmm1 = shiftpp2 + 1;                                          //4
-  Int_t shiftmm2 = shiftpp2 + np * (np - 1) / 2;                          //3
+  int shiftnom = 0;        //     icall = 0             for nominal a[] //0
+  int shiftp1 = 1;        //     etc see above                          //1
+  int shiftp2 = shiftp1 + np - 1;                                       //1
+  int shiftm1 = shiftp2 + 1;                                            //2
+  int shiftm2 = shiftm1 + np - 1;                                       //2
+  int shiftpp1 = shiftm2 + 1;                                           //3
+  int shiftpp2 = shiftm2 + np * (np - 1) / 2;                           //3
+  int shiftmm1 = shiftpp2 + 1;                                          //4
+  int shiftmm2 = shiftpp2 + np * (np - 1) / 2;                          //3
 
   iter = icall / nstep;
   icalc = icall - iter * nstep;
   
-  Int_t iaold = -1, ia1old = -1, iaiold = -1, iajold = -1;
-  Int_t ianew = -1, ia1new = -1, iainew = -1, iajnew = -1;
-  Double_t signold = 0., signnew = 0.;
+  int iaold = -1, ia1old = -1, iaiold = -1, iajold = -1;
+  int ianew = -1, ia1new = -1, iainew = -1, iajnew = -1;
+  double signold = 0., signnew = 0.;
 
   if (icalc == shiftnom) { //cout <<" Nominal "<< chi2 << "\n" ;
     iaold = -1;
@@ -1470,8 +1470,8 @@ PSMath::PSderivative (Int_t icall, Int_t np, Double_t a[], Double_t h[],
   }
   else if (icalc < shiftpp2) {  // cout <<" Hesse ++ "<< chi2 << "\n" ;
     ia = icalc - shiftm2 - 1;
-    Int_t sum = 0;
-    Int_t test = -1;
+    int sum = 0;
+    int test = -1;
     for (iai = 0; test < 0; iai++) {
       sum = sum + np - 1 - iai;
       if (ia < sum) {
@@ -1507,8 +1507,8 @@ PSMath::PSderivative (Int_t icall, Int_t np, Double_t a[], Double_t h[],
   }
   else if (icalc < shiftmm2) {  // cout <<" Hesse -- "<< chi2 << "\n" ;
     ia = icalc - shiftpp2 - 1;
-    Int_t sum = 0;
-    Int_t test = -1;
+    int sum = 0;
+    int test = -1;
     for (iai = 0; test < 0; iai++) {
       sum = sum + np - 1 - iai;
       if (ia < sum) {
@@ -1599,14 +1599,14 @@ PSMath::PSderivative (Int_t icall, Int_t np, Double_t a[], Double_t h[],
   return ready;
 }
 //----------------------------------------------------------------
-Double_t
-PSMath::PSfitMinStep (Int_t np, Double_t a[], Double_t h[], Double_t chi2iter[],
-                      Double_t g[], Double_t H[], Double_t Hinv[],
-                      Double_t daN[])
+double
+PSMath::PSfitMinStep (int np, double a[], double h[], double chi2iter[],
+                      double g[], double H[], double Hinv[],
+                      double daN[])
 {
   // calcuate Newton Step for minimisation
 
-  Double_t d = 99, temp;
+  double d = 99, temp;
   PSVprint (" Parameters a", a, np);
   PSVprint (" StepSize   h", h, np);
   PSVprint (" Derivative g", g, np);
@@ -1622,17 +1622,17 @@ PSMath::PSfitMinStep (Int_t np, Double_t a[], Double_t h[], Double_t chi2iter[],
   return d;
 }
 //----------------------------------------------------------------
-Int_t
-PSMath::PSfitconstrain0 (Double_t F, Double_t g, Double_t H, Double_t Fix,
-                         Double_t aix[])
+int
+PSMath::PSfitconstrain0 (double F, double g, double H, double Fix,
+                         double aix[])
 {
   //  constrain function F(a) with derivative g(a) and 2nd derivative H(a)
   //  The result assumes a quadratic function 
   //  to Fix = F + g * a + 1/2 * H * a^2
   //  result: The (in general) two solutions are turned in aix[0] and aix[1]
   //  return = number of solutions (0,1,2)
-  Int_t nsolutions = 0;
-  Double_t alin, amin;
+  int nsolutions = 0;
+  double alin, amin;
   aix[0] = 0.;
   aix[1] = 0.;
   if (g == 0) {
@@ -1665,7 +1665,7 @@ PSMath::PSfitconstrain0 (Double_t F, Double_t g, Double_t H, Double_t Fix,
     };
     //    cout << "amin = " << amin << "\n";
     amin = -g / H;
-    Double_t temp = 1. - 2 * alin / amin;
+    double temp = 1. - 2 * alin / amin;
     //    cout << "temp = " << temp << "\n";
     if (temp < 0.) {
       nsolutions = 0;

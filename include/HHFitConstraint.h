@@ -5,19 +5,19 @@
 #ifndef HHFitConstraint_
 #define HHFitConstraint_
 
-#include "Rtypes.h"
 #include "HHFitObject.h"
 
+namespace HHKinFit2{
 class HHFitConstraint {
  public:
   HHFitConstraint(HHFitObject* fitobject);
   virtual ~HHFitConstraint() {};
 
-  virtual Double_t getChi2() const = 0;
+  virtual double getChi2() const = 0;
   
  protected:
   HHFitObject* const m_fitobject;
 
 };
-
+}
 #endif /* HHFitConstraint_ */

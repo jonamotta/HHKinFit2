@@ -3,52 +3,52 @@
 #include <iostream>
 #include <iomanip>
 
-HHFitObject::HHFitObject()
+HHKinFit2::HHFitObject::HHFitObject()
   :m_fit4vector(HHLorentzVector()),
    m_initial4vector(HHLorentzVector()),
    m_covmatrix(TMatrixD(4,4)){
 
 }
 
-HHFitObject::HHFitObject(HHLorentzVector const& initial4vector)
+HHKinFit2::HHFitObject::HHFitObject(HHLorentzVector const& initial4vector)
   :m_fit4vector(initial4vector),
    m_initial4vector(initial4vector),
    m_covmatrix(TMatrixD(4,4)){
 
 }
 
-HHLorentzVector  
-HHFitObject::getInitial4Vector() const{
+HHKinFit2::HHLorentzVector
+HHKinFit2::HHFitObject::getInitial4Vector() const{
   return(m_initial4vector);
 }
 
-HHLorentzVector
-HHFitObject::getFit4Vector() const{
+HHKinFit2::HHLorentzVector
+HHKinFit2::HHFitObject::getFit4Vector() const{
   return(m_fit4vector);
 }
 
 TMatrixD
-HHFitObject::getCovMatrix() const{
+HHKinFit2::HHFitObject::getCovMatrix() const{
   return(m_covmatrix);
 }
 
 void
-HHFitObject::setFit4Vector(HHLorentzVector const& vec){
+HHKinFit2::HHFitObject::setFit4Vector(HHLorentzVector const& vec){
   this->m_fit4vector=vec;
 }
 
 void
-HHFitObject::setCovMatrix(TMatrixD const& covmatrix){
+HHKinFit2::HHFitObject::setCovMatrix(TMatrixD const& covmatrix){
   this->m_covmatrix=covmatrix;
 }
 
 void
-HHFitObject::reset(){
+HHKinFit2::HHFitObject::reset(){
   this->m_fit4vector=this->m_initial4vector;
 }
 
 void
-HHFitObject::print() const{
+HHKinFit2::HHFitObject::print() const{
   std::cout << "---" << std::endl;
   std::cout <<  "general fit object:" << std::endl;
   this->printInitial4Vector();
@@ -57,7 +57,7 @@ HHFitObject::print() const{
 }
 
 void
-HHFitObject::printInitial4Vector() const{
+HHKinFit2::HHFitObject::printInitial4Vector() const{
   std::cout <<  "initial vector (px,py,pz,E,m)"
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getInitial4Vector().Px()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getInitial4Vector().Py()
@@ -68,7 +68,7 @@ HHFitObject::printInitial4Vector() const{
 }
 
 void
-HHFitObject::printFit4Vector() const{
+HHKinFit2::HHFitObject::printFit4Vector() const{
   std::cout <<  "  final vector (px,py,pz,E,m)"
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getFit4Vector().Px()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getFit4Vector().Py()
@@ -79,7 +79,7 @@ HHFitObject::printFit4Vector() const{
 }
 
 void
-HHFitObject::printCovMatrix() const{
+HHKinFit2::HHFitObject::printCovMatrix() const{
   std::cout <<  "covariance matrix:" << std::endl;
   std::cout   << std::setw(10) << std::fixed<< std::setprecision(2) << this->getCovMatrix()(0,0)
               << std::setw(10) << std::fixed<< std::setprecision(2) << this->getCovMatrix()(0,1)

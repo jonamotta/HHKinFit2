@@ -3,6 +3,7 @@
 #ifndef HHLorentzVector_
 #define HHLorentzVector_
 
+namespace HHKinFit2{
 class HHLorentzVector : public TLorentzVector {
 
 public:
@@ -13,5 +14,5 @@ public:
 	HHLorentzVector operator+(HHLorentzVector const& rhs) const;
 	HHLorentzVector operator-(HHLorentzVector const& rhs) const;
 };
-
+}
 #endif /* HHLorentzVector_ */

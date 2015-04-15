@@ -8,14 +8,16 @@
 #include "HHFitConstraint.h"
 #include "TF1.h"
 
+namespace HHKinFit2{
 class HHFitConstraintLikelihood : public HHFitConstraint {
  public:
   HHFitConstraintLikelihood(HHFitObject* object, TF1* likelihood);
 
-  Double_t getChi2() const;
+  double getChi2() const;
 
  private:
   TF1* const m_likelihood;
 };
+}
 
 #endif /* HHFitConstraintLikelihood_ */

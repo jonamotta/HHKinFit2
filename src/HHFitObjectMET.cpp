@@ -3,15 +3,14 @@
 #include <iostream>
 #include <iomanip>
 
-
-HHFitObjectMET::HHFitObjectMET(TVector2 const& v,TVector2 const& vfit)
+HHKinFit2::HHFitObjectMET::HHFitObjectMET(TVector2 const& v,TVector2 const& vfit)
   :HHFitObject(HHLorentzVector(v.X(),v.Y(),0,sqrt(v.X()*v.X()+v.Y()*v.Y()))){
   this->setFit4Vector(HHLorentzVector(vfit.X(),vfit.Y(),0,sqrt(vfit.X()*vfit.X()+vfit.Y()*vfit.Y())));
 }
 
 
 void
-HHFitObjectMET::setCovMatrix(Double_t xx, Double_t yy, Double_t xy){
+HHKinFit2::HHFitObjectMET::setCovMatrix(double xx, double yy, double xy){
   TMatrixD cov(4,4);
   cov(0,0)=xx;
   cov(1,1)=yy;
@@ -22,7 +21,7 @@ HHFitObjectMET::setCovMatrix(Double_t xx, Double_t yy, Double_t xy){
 
 
 void
-HHFitObjectMET::print() const{
+HHKinFit2::HHFitObjectMET::print() const{
   std::cout << "---" << std::endl;
   std::cout << "MET fit object:" << std::endl;
   this->printInitial4Vector();
@@ -32,7 +31,7 @@ HHFitObjectMET::print() const{
 
 
 void
-HHFitObjectMET::printInitial4Vector() const{
+HHKinFit2::HHFitObjectMET::printInitial4Vector() const{
   std::cout <<  "initial vector (px,py,pt)"
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getInitial4Vector().Px()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getInitial4Vector().Py()
@@ -41,7 +40,7 @@ HHFitObjectMET::printInitial4Vector() const{
 }
 
 void
-HHFitObjectMET::printFit4Vector() const{
+HHKinFit2::HHFitObjectMET::printFit4Vector() const{
   std::cout <<  "  final vector (px,py,pt)"
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getFit4Vector().Px()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getFit4Vector().Py()
@@ -50,7 +49,7 @@ HHFitObjectMET::printFit4Vector() const{
 }
 
 void
-HHFitObjectMET::printCovMatrix() const{
+HHKinFit2::HHFitObjectMET::printCovMatrix() const{
   std::cout <<  "covariance matrix:" << std::endl;
   std::cout   << std::setw(10) << std::fixed<< std::setprecision(2) << this->getCovMatrix()(0,0)
               << std::setw(10) << std::fixed<< std::setprecision(2) << this->getCovMatrix()(0,1) << std::endl;
