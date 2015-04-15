@@ -24,7 +24,8 @@ HHTauTauEventGenerator::HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD c):
   m_misr(0),
   m_covarmatrix(c),
   m_METwithsigma(2),
-  m_L(2,2)
+  m_L(2,2),
+  m_eventnumber(0)
   {
 	m_L[0][0]=sqrt(c[0][0]);
 	m_L[0][1]=(c[0][1]-c[1][0])/sqrt(c[1][1]-c[1][0]/sqrt(c[0][0]));
@@ -33,7 +34,7 @@ HHTauTauEventGenerator::HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD c):
 }
 void HHTauTauEventGenerator::generateEvent() {
   // Generate lorentzvectors for the two tau in the rest frame of the higgs
-  
+  m_eventnumber++;
   double cthtau1=m_randomnumber.Uniform(-1,1);
   double etatau1=log(tan(acos(cthtau1)/2));
   double phitau1=m_randomnumber.Uniform(0,2*m_pi);
@@ -88,6 +89,20 @@ void HHTauTauEventGenerator::generateEvent() {
   Gausvector[0]=m_randomnumber.Gaus(0,1);
   Gausvector[1]=m_randomnumber.Gaus(0,1);
   m_METwithsigma=m_MET+m_L*Gausvector;
+
+  HHLorentzVector sum=m_higgs+m_isr;
+  if(sum.M()>13000){
+	  std::cout << "Ecm in Event "<<m_eventnumber<<"  over 13 TeV " << sum.M() <<std::endl;
+      this->generateEvent();
+  }
+//  if(m_tau1boosted.E()>3000){
+//    	  std::cout << "P_tau1  in Event "<<m_eventnumber<<" over 2 TeV" << std::endl;
+//    this->generateEvent();
+//  }
+//  if(m_tau2boosted.E()>3000){
+//      	  std::cout << "P_tau2 in Event "<<m_eventnumber<<" over 2 TeV" << std::endl;
+//      this->generateEvent();
+//    }
 }
 
 HHLorentzVector HHTauTauEventGenerator::getTau1(){
@@ -192,6 +207,10 @@ double HHTauTauEventGenerator::getPhiMET(){
  double HHTauTauEventGenerator::getPhiMETwithsigma(){
  	TVector2 temp(m_METwithsigma[0],m_METwithsigma[1]);
  	return(temp.Phi());
+ }
+
+ TMatrixD HHTauTauEventGenerator::getCovarmatrix(){
+	 return(m_covarmatrix);
  }
 
 

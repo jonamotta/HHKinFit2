@@ -42,10 +42,12 @@ HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD c);
  double getvisfrac2();
  void PrintLmatrix();
  void PrintCovarmatrix();
+ TMatrixD getCovarmatrix();
 
 
 
 private:
+ int m_eventnumber;
  TRandom m_randomnumber;
  TF1 m_PDF1;
  TF1 m_PDF2;

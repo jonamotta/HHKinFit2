@@ -45,13 +45,13 @@ HHKinFit::fit(){
 	  astart[0] = m_fitobjects[0]->getE();    // energy of first tau
 	  aprec[0]  = 0.1;                        //0.1                 // precision for fit
 	  // fill initial step width
-	  h[0] = 0.1*m_fitobjects[0]->getLowerFitLimitE();   //
+	  h[0] = 0.2*(m_fitobjects[0]->getUpperFitLimitE()-m_fitobjects[0]->getLowerFitLimitE());   //
 	  daN[0] = 1.0;   //0.0                 // initial search direction
 
 
 
-	  alimit[0][0] = m_fitobjects[0]->getLowerFitLimitE();              // tau: minimum is visible tau1 energy
-	  alimit[0][1] = m_fitobjects[0]->getUpperFitLimitE();              //      maximum as computed above
+	  alimit[0][0] = 1.00001* m_fitobjects[0]->getLowerFitLimitE();              // tau: minimum is visible tau1 energy
+	  alimit[0][1] = 0.99999* m_fitobjects[0]->getUpperFitLimitE();              //      maximum as computed above
 
 	  // tau: check initial values against fit range
 	  if (astart[0] - h[0] < alimit[0][0]) {

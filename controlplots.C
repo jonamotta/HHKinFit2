@@ -114,9 +114,10 @@ int main(int argc, char* argv[])
 
 	  }
 	 TFile controlplots("controlplots.root","RECREATE");
-	// TDirectory cdtof["blub"];
-	  // cdtof.
-
+	// TDirectory cdtof("blub","blub");
+	// TDirectory* p=&cdtof;
+	 //controlplots.Build(0,p);
+	 //cdtof.cd();
 	 h_invariantmass.Write();
 	 h_EtaTau1.Write();
 	 h_CthTau1.Write();

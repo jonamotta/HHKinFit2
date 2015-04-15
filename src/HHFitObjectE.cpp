@@ -5,7 +5,7 @@
 
 HHFitObjectE::HHFitObjectE(HHLorentzVector const& initial4vector)
   :HHFitObject(initial4vector),
-   m_upperLimitE(9999),
+   m_upperLimitE(9999999),
    m_lowerLimitE(0){
 
 }
