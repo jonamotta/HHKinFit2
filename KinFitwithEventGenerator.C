@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
     HHFitObjectE* tau2 = new HHFitObjectEConstM(testgenerator.getTau2Vis());//  visible Tau2-component from HHTauTauEventGenerator
 
     //prepare MET object
-    HHFitObjectMET* met = new HHFitObjectMET(TVector2(testgenerator.getMET()[0],testgenerator.getMET()[1]));//Use Met components from HHTauTauEventGenerator
+    HHFitObjectMET* met = new HHFitObjectMET(TVector2(testgenerator.getMETwithsigma()[0],testgenerator.getMETwithsigma()[1]));//Use Met components from HHTauTauEventGenerator
     //met->setCovMatrix(100,-100,50);// set Covarmatrix with Matrix in HHTauTauEventGenerator
     met->setCovMatrix(testgenerator.getCovarmatrix()[0][0],testgenerator.getCovarmatrix()[1][1],testgenerator.getCovarmatrix()[1][0]); // set Covarmatrix with Matrix inserted in HHTauTauEventGenerator
     
