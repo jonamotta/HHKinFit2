@@ -90,6 +90,16 @@ void HHKinFit2::HHTauTauEventGenerator::generateEvent() {
   Gausvector[0]=m_randomnumber.Gaus(0,1);
   Gausvector[1]=m_randomnumber.Gaus(0,1);
   m_METwithsigma=m_MET+m_L*Gausvector;
+//  TVectorD isr_pt(2);
+//  isr_pt[0]=m_isr.Px();
+//  isr_pt[1]=m_isr.Py();
+//  TVectorD tauvis1_pt(2);
+//  tauvis1_pt[0]=m_tau1vis.Px();
+//  tauvis1_pt[1]=m_tau1vis.Py();
+//  TVectorD tauvis2_pt(2);
+//  tauvis2_pt[0]=m_tau2vis.Px();
+//  tauvis2_pt[1]=m_tau2vis.Py();
+//  m_METwithsigma=(isr_pt+(m_L*Gausvector))+tauvis1_pt+tauvis2_pt;
 
   HHLorentzVector sum=m_higgs+m_isr;
   if(sum.M()>13000){

@@ -10,17 +10,15 @@
 #include "PSMath.h"
 #include <iomanip>
 #include "TAxis.h"
-using namespace HHKinFit2;
 
-
-HHKinFit::HHKinFit()
+HHKinFit2::HHKinFit::HHKinFit()
 : m_fitobjects(std::vector<HHFitObjectE*>()),
   m_constraints(std::vector<HHFitConstraint*>()){
 }
 
 ///TODO: make it more general!
 void 
-HHKinFit::fit(){
+HHKinFit2::HHKinFit::fit(){
 
 	  //  ----------  for PSfit -----
 	  const int np = 1;
@@ -76,7 +74,7 @@ HHKinFit::fit(){
 	  double chi2(99999);
 	  int convergence(0);
 	  int printlevel(0);
-	  int m_maxloops(10000);
+	  int m_maxloops(500);
 	  for (int iloop = 0; iloop < m_maxloops * 10 && iter < m_maxloops; iloop++) { // FIT loop
 	    m_fitobjects[0]->changeEandSave(a[0]);
 	    chi2=this->getChi2();
@@ -118,35 +116,35 @@ HHKinFit::fit(){
 }
 
 double
-HHKinFit::getChi2() const{
+HHKinFit2::HHKinFit::getChi2() const{
   double chi2=0;
   for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it)
     chi2 += (*it)->getChi2();
   return(chi2);
 }
 
-std::vector<HHFitObjectE*>
-HHKinFit::getListOfFitObjects() const{
+std::vector<HHKinFit2::HHFitObjectE*>
+HHKinFit2::HHKinFit::getListOfFitObjects() const{
   return(m_fitobjects);
 }
 
-std::vector<HHFitConstraint*> 
-HHKinFit::getListOfConstraints() const{
+std::vector<HHKinFit2::HHFitConstraint*>
+HHKinFit2::HHKinFit::getListOfConstraints() const{
   return(m_constraints);
 }
 
 void
-HHKinFit::addFitObjectE(HHFitObjectE* fitobject){
+HHKinFit2::HHKinFit::addFitObjectE(HHFitObjectE* fitobject){
   m_fitobjects.push_back(fitobject);
 }
 
 void
-HHKinFit::addConstraint(HHFitConstraint* constraint){
+HHKinFit2::HHKinFit::addConstraint(HHFitConstraint* constraint){
   m_constraints.push_back(constraint);
 }
 
 TGraph
-HHKinFit::getChi2Function(int steps){
+HHKinFit2::HHKinFit::getChi2Function(int steps){
   int npoints(m_fitobjects.size()*steps);
   TGraph gr(npoints);
   gr.SetName("chi2function");

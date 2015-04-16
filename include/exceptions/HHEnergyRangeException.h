@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace HHKineFit2{
+namespace HHKinFit2{
 class HHEnergyRangeException: public std::runtime_error
 {
 public:
