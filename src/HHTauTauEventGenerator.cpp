@@ -3,10 +3,11 @@
 #include <iostream>
 #include "TVector3.h"
 
-HHKinFit2::HHTauTauEventGenerator::HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD c):
+HHKinFit2::HHTauTauEventGenerator::HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD c, int seed):
+  m_seed(seed),
   m_PDF1(a),
   m_PDF2(b),
-  m_randomnumber(),
+  m_randomnumber(m_seed),
   m_tau1(),
   m_tau2(),
   m_isr(),
@@ -26,6 +27,7 @@ HHKinFit2::HHTauTauEventGenerator::HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD 
   m_covarmatrix(c),
   m_METwithsigma(2),
   m_L(2,2),
+  m_isrwithsigma(),
   m_eventnumber(0)
   {
 	m_L[0][0]=sqrt(c[0][0]);
@@ -34,16 +36,19 @@ HHKinFit2::HHTauTauEventGenerator::HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD 
 	m_L[1][1]=sqrt(c[1][1]-c[1][0]/sqrt(c[0][0]));
 }
 void HHKinFit2::HHTauTauEventGenerator::generateEvent() {
+  m_seed=m_randomnumber.GetSeed();
   // Generate lorentzvectors for the two tau in the rest frame of the higgs
   m_eventnumber++;
   double cthtau1=m_randomnumber.Uniform(-1,1);
   double etatau1=log(tan(acos(cthtau1)/2));
   double phitau1=m_randomnumber.Uniform(0,2*m_pi);
-  double etau1=(m_mhiggs*m_mhiggs-m_mtau2*m_mtau2 +m_mtau1*m_mtau1)/(2*m_mhiggs);
+  //double etau1=(m_mhiggs*m_mhiggs-m_mtau2*m_mtau2 +m_mtau1*m_mtau1)/(2*m_mhiggs);
+  double etau1=m_mhiggs/2;
   m_tau1.SetEEtaPhiM(etau1, etatau1, phitau1, m_mtau1);
   //Tau 2
 
-  double etau2=(m_mhiggs*m_mhiggs-m_mtau1*m_mtau1 +m_mtau2*m_mtau2)/(2*m_mhiggs);
+  //double etau2=(m_mhiggs*m_mhiggs-m_mtau1*m_mtau1 +m_mtau2*m_mtau2)/(2*m_mhiggs);
+  double etau2=m_mhiggs/2;
   double etatau2=-etatau1;
   double phitau2=phitau1+m_pi;
   m_tau2.SetEEtaPhiM(etau2, etatau2, phitau2, m_mtau2);
@@ -56,7 +61,7 @@ void HHKinFit2::HHTauTauEventGenerator::generateEvent() {
   //generate lorentzvector for higgs with lorentzvector from isr-jet
 
   double cthhiggs=m_randomnumber.Uniform(-1,1);
-  double etahiggs=log(tan(acos(cthhiggs)/2));
+  double etahiggs=-log(tan(acos(cthhiggs)/2));
   double pthiggs=ptisr;
   double phihiggs=phiisr+m_pi;
   m_higgs.SetPtEtaPhiM(pthiggs,etahiggs,phihiggs,m_mhiggs);
@@ -90,6 +95,19 @@ void HHKinFit2::HHTauTauEventGenerator::generateEvent() {
   Gausvector[0]=m_randomnumber.Gaus(0,1);
   Gausvector[1]=m_randomnumber.Gaus(0,1);
   m_METwithsigma=m_MET+m_L*Gausvector;
+
+/*  //######test######
+  m_isrwithsigma=m_isr;
+  TVectorD isr_pt(2);
+  isr_pt[0]=m_isr.Px();
+  isr_pt[1]=m_isr.Py();
+  isr_pt=isr_pt+m_L*Gausvector;
+  m_isrwithsigma.SetPx(isr_pt[0]);
+  m_isrwithsigma.SetPy(isr_pt[1]);
+  m_METwithsigma[0]= -(m_tau1vis.Px()+m_tau2vis.Px()+m_isrwithsigma.Px());
+  m_METwithsigma[1]= -(m_tau1vis.Py()+m_tau2vis.Py()+m_isrwithsigma.Py());
+  //######test######*/
+
 //  TVectorD isr_pt(2);
 //  isr_pt[0]=m_isr.Px();
 //  isr_pt[1]=m_isr.Py();

@@ -8,7 +8,7 @@ class for generating lorentzvectors for Tau in higgsdecay: Higgs->TauTau
 
 #include "HHLorentzVector.h"
 #include "TF1.h"
-#include "TRandom.h"
+#include "TRandom3.h"
 #include "TVectorD.h"
  
 namespace HHKinFit2{
@@ -16,7 +16,7 @@ class HHTauTauEventGenerator {
 
 public:
 
-HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD c);
+HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD c, int seed=4357);
  HHLorentzVector getTau1boosted();
  HHLorentzVector getTau2boosted();
  HHLorentzVector getISR();
@@ -44,12 +44,12 @@ HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD c);
  void PrintLmatrix();
  void PrintCovarmatrix();
  TMatrixD getCovarmatrix();
-
+ int m_seed;
 
 
 private:
  int m_eventnumber;
- TRandom m_randomnumber;
+ TRandom3 m_randomnumber;
  TF1 m_PDF1;
  TF1 m_PDF2;
  HHLorentzVector m_tau1;
@@ -58,6 +58,7 @@ private:
  HHLorentzVector m_higgs;
  HHLorentzVector m_tau1boosted;
  HHLorentzVector m_tau2boosted;
+ HHLorentzVector m_isrwithsigma;
  double m_visfrac1;
  double m_visfrac2;
  HHLorentzVector m_tau1vis;

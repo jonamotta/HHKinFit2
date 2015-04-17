@@ -1,7 +1,6 @@
 #include "HHTauTauEventGenerator.h"
 #include "TFile.h"
 #include "TH1D.h"
-#include "exceptions/HHEnergyRangeException.h"
 #include "TDirectory.h"
 #include <iostream>
 #include "HHKinFit.h"
@@ -16,10 +15,14 @@
 #include "HHFitObjectComposite.h"
 #include "HHLorentzVector.h"
 #include "exceptions/HHCovarianceMatrixException.h"
+#include "exceptions/HHEnergyRangeException.h"
 #include "TGraph.h"
 #include "TCanvas.h"
 #include "TFile.h"
 #include "HHFitConstraintLikelihood.h"
+#include "TMath.h"
+#include "TH2D.h"
+#include "TGraph.h"
 
 using namespace HHKinFit2;
 
@@ -77,10 +80,22 @@ int main(int argc, char* argv[])
   TH1D h_PhiMET("h_PhiMET","Angle Phi of the missing transversal momentum vector",100,-3.2,3.2);
   TH1D h_AbsPtmisswithsigma("h_AbsPtmisswithsigma","Absolute Value of the missing transverse momentum with measurmental errors",100,0,100);
   TH1D h_PhiMETwithsigma("h_PhiMETwithsigma","Angle Phi of the missing transversal momentum vector with measurmental errors",100,-3.2,3.2);
-  TH1D h_FitFinalChi2("h_FitFinalChi2","The Final chi2 from the KinFit",100,0,0.0025);
-  TH1D h_FitlikelihoodFinalChi2("h_FitFinalChi2likelihood","The Final chi2 from the KinFit",100,0,0.0025);
+  TH1D h_FitFinalChi2("h_FitFinalChi2","The Final chi2 from the KinFit",100,0,10);
+  TH1D h_FitFinalChi2prob("h_FitFinalChi2prob","The Final chi2 from the KinFit",20,0,1);
+  TH1D h_FitlikelihoodFinalChi2("h_FitFinalChi2likelihood","The Final chi2 from the KinFit",100,0,10);
+  TH1D h_FitlikelihoodFinalChi2prob("h_FitFinalChi2likelihoodprob","The Final probability of the chi2 from the KinFit",20,0,1);
 
-  for(unsigned int i=0; i<100000; i++){
+  TH2D h_TestEtaHiggsProbChi2("h_TestEtaHiggsProbChi2","Testing the correlation between eta from the higgs and the probability of chi2",100,0,1,100,-6,6);
+  h_TestEtaHiggsProbChi2.GetXaxis()->SetTitle("Prob of chi 2");
+  h_TestEtaHiggsProbChi2.GetYaxis()->SetTitle("Eta from Higgs");
+  TH2D h_TestPtHiggsProbChi2("h_TestPtHiggsProbChi2","Testing the correlation between Pt from the higgs and the probability of chi2",100,0,1,100,0,100);
+  h_TestPtHiggsProbChi2.GetXaxis()->SetTitle("Prob of chi 2");
+  h_TestPtHiggsProbChi2.GetYaxis()->SetTitle("Pt from Higgs");
+  TH2D h_TestEtaIsrProbChi2("h_TestEtaIsrProbChi2","Testing the correlation between eta from the isr-jet and the probability of chi2",100,0,1,100,-6,6);
+  h_TestEtaIsrProbChi2.GetXaxis()->SetTitle("Prob of chi 2");
+  h_TestEtaIsrProbChi2.GetYaxis()->SetTitle("Eta from Isr-Jet");
+  TGraph gr_pt(100000);
+  for(unsigned int i=0; i<250000; i++){
     try{
       testgenerator.generateEvent();
     }
@@ -133,9 +148,10 @@ int main(int argc, char* argv[])
     h_PhiMET.Fill(testgenerator.getPhiMET());
     h_AbsPtmisswithsigma.Fill(testgenerator.getAbsPtMETwithsigma());
     h_PhiMETwithsigma.Fill(testgenerator.getPhiMETwithsigma());
+    gr_pt.SetPoint(i,testgenerator.getMETwithsigma()[0],testgenerator.getMETwithsigma()[1]);
     
+
     //KinFit:
-    
     double mass = testgenerator.getMhiggs();
 
     //prepare tau objects
@@ -146,7 +162,7 @@ int main(int argc, char* argv[])
     HHFitObjectMET* met = new HHFitObjectMET(TVector2(testgenerator.getMETwithsigma()[0],testgenerator.getMETwithsigma()[1]));//Use Met components from HHTauTauEventGenerator
     //met->setCovMatrix(100,-100,50);// set Covarmatrix with Matrix in HHTauTauEventGenerator
     met->setCovMatrix(testgenerator.getCovarmatrix()[0][0],testgenerator.getCovarmatrix()[1][1],testgenerator.getCovarmatrix()[1][0]); // set Covarmatrix with Matrix inserted in HHTauTauEventGenerator
-    
+
     //prepare composite object: Higgs
     HHFitObject* higgs  = new HHFitObjectComposite(tau1, tau2, met);
 
@@ -171,18 +187,47 @@ int main(int argc, char* argv[])
     singlefit->addFitObjectE(tau1);
     singlefit->addConstraint(invm);
     singlefit->addConstraint(balance);
+    try {
     singlefit->fit();
+    }
+    catch(HHEnergyRangeException const& e){
+    	std::cout << i << std::endl;
+    	tau1->print();
+    	tau2->print();
+    	met->print();
+    	higgs->print();
+    	std::cout << e.what() << std::endl;
+    	std::cout << testgenerator.m_seed << std::endl;
+    	//throw(e);
+    	std::cout << "-----------------------------------------------" << std::endl;
+    	continue;
+    }
     h_FitFinalChi2.Fill(singlefit->getChi2());
-    
-    //fit with likelihood
+    h_FitFinalChi2prob.Fill(TMath::Prob(singlefit->getChi2(),1));
+    h_TestEtaHiggsProbChi2.Fill(TMath::Prob(singlefit->getChi2(),1),testgenerator.getHiggs().Eta());
+    h_TestPtHiggsProbChi2.Fill(TMath::Prob(singlefit->getChi2(),1),testgenerator.getHiggs().Pt());
+	h_TestEtaIsrProbChi2.Fill(TMath::Prob(singlefit->getChi2(),1),testgenerator.getISR().Eta());
+
+//	if (TMath::Prob(singlefit->getChi2(),1)<0.95){
+//		std::cout << singlefit->getChi2() << std::endl;
+//		std::cout << TMath::Prob(singlefit->getChi2(),1) << std::endl;
+//		std::cout << tau1->getFit4Vector().E() << std::endl;
+//		//TGraph gr_chi2 = singlefit->getChi2Function(300);
+//		//TFile f2 ("chi2.root","RECREATE");
+//		//gr_chi2.Write();
+//		//f2.Close();
+//		//break;
+//	}
+
+    /*//fit with likelihood
     HHKinFit* singlefitliekelihood = new HHKinFit();
     singlefitliekelihood->addFitObjectE(tau1);
     singlefitliekelihood->addConstraint(invm);
     singlefitliekelihood->addConstraint(balance);
     singlefitliekelihood->addConstraint(Likelihood);
     singlefitliekelihood->fit();
-    h_FitlikelihoodFinalChi2.Fill(singlefit->getChi2());
-
+    h_FitlikelihoodFinalChi2.Fill(singlefitliekelihood->getChi2());
+    h_FitlikelihoodFinalChi2prob.Fill(TMath::Prob(singlefitliekelihood->getChi2(),1));*/
     
   }
   TFile controlplots("controlplots.root","RECREATE");
@@ -231,7 +276,14 @@ int main(int argc, char* argv[])
   h_AbsPtmisswithsigma.Write();
   h_PhiMETwithsigma.Write();
   h_FitFinalChi2.Write();
+  h_FitFinalChi2prob.Write();
   h_FitlikelihoodFinalChi2.Write();
+  h_FitlikelihoodFinalChi2prob.Write();
+  h_TestEtaHiggsProbChi2.Write();
+  h_TestPtHiggsProbChi2.Write();
+  h_TestEtaIsrProbChi2.Write();
+  gr_pt.Write();
+
   controlplots.Close();
   
   return(0);

@@ -74,7 +74,7 @@ PSMath::PSfit (int iloop, int &iter, int &method, int &mode,
   static double x[4], f[4];
   static double xx, xlimit[2];
   static double xh, daNabs;
-  static double epsx = 0.1, epsf = 0.1;
+  static double epsx = 0.01, epsf = 0.001;
   int convergence;
 
   int itemp, ready;
