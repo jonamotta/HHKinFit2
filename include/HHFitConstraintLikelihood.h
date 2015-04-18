@@ -9,6 +9,7 @@
 #include "TF1.h"
 #include "HHFitObject.h"
 
+
 namespace HHKinFit2{
 class HHFitConstraintLikelihood : public HHFitConstraint {
  public:
@@ -19,6 +20,7 @@ class HHFitConstraintLikelihood : public HHFitConstraint {
  private:
   TF1* const m_likelihood;
   HHFitObject* m_object;
+
 };
 }
 #endif /* HHFitConstraintLikelihood_ */

@@ -84,17 +84,21 @@ int main(int argc, char* argv[])
   TH1D h_FitFinalChi2prob("h_FitFinalChi2prob","The Final chi2 from the KinFit",20,0,1);
   TH1D h_FitlikelihoodFinalChi2("h_FitFinalChi2likelihood","The Final chi2 from the KinFit",100,0,10);
   TH1D h_FitlikelihoodFinalChi2prob("h_FitFinalChi2likelihoodprob","The Final probability of the chi2 from the KinFit",20,0,1);
+  TH1D h_fracresulutiontau1("h_fracresulution","resulution of the energyfraction from tau1vis",100,-1,1);
+  TH1D h_fracresulutiontau1likelihood("h_fracresulutionlikelihood","resulution of the energyfraction from tau1vis in likelihood-fit",100,-1,1);
 
-  TH2D h_TestEtaHiggsProbChi2("h_TestEtaHiggsProbChi2","Testing the correlation between eta from the higgs and the probability of chi2",100,0,1,100,-6,6);
-  h_TestEtaHiggsProbChi2.GetXaxis()->SetTitle("Prob of chi 2");
-  h_TestEtaHiggsProbChi2.GetYaxis()->SetTitle("Eta from Higgs");
-  TH2D h_TestPtHiggsProbChi2("h_TestPtHiggsProbChi2","Testing the correlation between Pt from the higgs and the probability of chi2",100,0,1,100,0,100);
-  h_TestPtHiggsProbChi2.GetXaxis()->SetTitle("Prob of chi 2");
-  h_TestPtHiggsProbChi2.GetYaxis()->SetTitle("Pt from Higgs");
-  TH2D h_TestEtaIsrProbChi2("h_TestEtaIsrProbChi2","Testing the correlation between eta from the isr-jet and the probability of chi2",100,0,1,100,-6,6);
-  h_TestEtaIsrProbChi2.GetXaxis()->SetTitle("Prob of chi 2");
-  h_TestEtaIsrProbChi2.GetYaxis()->SetTitle("Eta from Isr-Jet");
-  TGraph gr_pt(100000);
+  TH1D h_testingfraclikelihood("h_testingfraclikelihood","visfracs in likelihood-fit",100,0,1.5);
+
+ // TH2D h_TestEtaHiggsProbChi2("h_TestEtaHiggsProbChi2","Testing the correlation between eta from the higgs and the probability of chi2",100,0,1,100,-6,6);
+ // h_TestEtaHiggsProbChi2.GetXaxis()->SetTitle("Prob of chi 2");
+ // h_TestEtaHiggsProbChi2.GetYaxis()->SetTitle("Eta from Higgs");
+  //TH2D h_TestPtHiggsProbChi2("h_TestPtHiggsProbChi2","Testing the correlation between Pt from the higgs and the probability of chi2",100,0,1,100,0,100);
+ // h_TestPtHiggsProbChi2.GetXaxis()->SetTitle("Prob of chi 2");
+ // h_TestPtHiggsProbChi2.GetYaxis()->SetTitle("Pt from Higgs");
+ // TH2D h_TestEtaIsrProbChi2("h_TestEtaIsrProbChi2","Testing the correlation between eta from the isr-jet and the probability of chi2",100,0,1,100,-6,6);
+ // h_TestEtaIsrProbChi2.GetXaxis()->SetTitle("Prob of chi 2");
+ // h_TestEtaIsrProbChi2.GetYaxis()->SetTitle("Eta from Isr-Jet");
+ // TGraph gr_pt(100000);
   for(unsigned int i=0; i<250000; i++){
     try{
       testgenerator.generateEvent();
@@ -148,7 +152,8 @@ int main(int argc, char* argv[])
     h_PhiMET.Fill(testgenerator.getPhiMET());
     h_AbsPtmisswithsigma.Fill(testgenerator.getAbsPtMETwithsigma());
     h_PhiMETwithsigma.Fill(testgenerator.getPhiMETwithsigma());
-    gr_pt.SetPoint(i,testgenerator.getMETwithsigma()[0],testgenerator.getMETwithsigma()[1]);
+   // gr_pt.SetPoint(i,testgenerator.getMETwithsigma()[0],testgenerator.getMETwithsigma()[1]);
+
     
 
     //KinFit:
@@ -166,11 +171,6 @@ int main(int argc, char* argv[])
     //prepare composite object: Higgs
     HHFitObject* higgs  = new HHFitObjectComposite(tau1, tau2, met);
 
-   //std::cout << "#####################" << i << "#####################" << std::endl;
-    //tau1->print();
-    //tau2->print();
-    //met->print();
-    //higgs->print();
     tau1->setLowerFitLimitE(tau1->getInitial4Vector());
     tau1->setUpperFitLimitE(mass,tau2->getInitial4Vector());
     tau2->setLowerFitLimitE(tau2->getInitial4Vector());
@@ -180,7 +180,7 @@ int main(int argc, char* argv[])
     //prepare constraints
     HHFitConstraint* invm = new HHFitConstraintEHardM(tau1, tau2, mass);
     HHFitConstraint* balance = new HHFitConstraint4Vector(higgs, true, true, false, false);
-    HHFitConstraint* Likelihood = new HHFitConstraintLikelihood(tau1,pdf1);
+
     
     //fit
     HHKinFit* singlefit = new HHKinFit();
@@ -204,30 +204,57 @@ int main(int argc, char* argv[])
     }
     h_FitFinalChi2.Fill(singlefit->getChi2());
     h_FitFinalChi2prob.Fill(TMath::Prob(singlefit->getChi2(),1));
-    h_TestEtaHiggsProbChi2.Fill(TMath::Prob(singlefit->getChi2(),1),testgenerator.getHiggs().Eta());
-    h_TestPtHiggsProbChi2.Fill(TMath::Prob(singlefit->getChi2(),1),testgenerator.getHiggs().Pt());
-	h_TestEtaIsrProbChi2.Fill(TMath::Prob(singlefit->getChi2(),1),testgenerator.getISR().Eta());
+    //h_TestEtaHiggsProbChi2.Fill(TMath::Prob(singlefit->getChi2(),1),testgenerator.getHiggs().Eta());
+    //h_TestPtHiggsProbChi2.Fill(TMath::Prob(singlefit->getChi2(),1),testgenerator.getHiggs().Pt());
+	//h_TestEtaIsrProbChi2.Fill(TMath::Prob(singlefit->getChi2(),1),testgenerator.getISR().Eta());
 
-//	if (TMath::Prob(singlefit->getChi2(),1)<0.95){
-//		std::cout << singlefit->getChi2() << std::endl;
-//		std::cout << TMath::Prob(singlefit->getChi2(),1) << std::endl;
-//		std::cout << tau1->getFit4Vector().E() << std::endl;
-//		//TGraph gr_chi2 = singlefit->getChi2Function(300);
-//		//TFile f2 ("chi2.root","RECREATE");
-//		//gr_chi2.Write();
-//		//f2.Close();
-//		//break;
-//	}
+	double  fitfractau1=tau1->getInitial4Vector().E()/tau1->getFit4Vector().E();
+    double genfractau1=testgenerator.getvisfrac1();
+    double comparefrac1=(genfractau1-fitfractau1)/genfractau1;
+    h_fracresulutiontau1.Fill(comparefrac1);
 
-    /*//fit with likelihood
+	//#######################testing#likelihood########################################
+
+    //prepare tau objects
+       HHFitObjectE* tau1likelihood = new HHFitObjectEConstM(testgenerator.getTau1Vis());//  visible Tau1-component from HHTauTauEventGenerator
+       HHFitObjectE* tau2likelihood = new HHFitObjectEConstM(testgenerator.getTau2Vis());//  visible Tau2-component from HHTauTauEventGenerator
+
+       //prepare MET object
+       HHFitObjectMET* metlikelihood = new HHFitObjectMET(TVector2(testgenerator.getMETwithsigma()[0],testgenerator.getMETwithsigma()[1]));//Use Met components from HHTauTauEventGenerator
+       //met->setCovMatrix(100,-100,50);// set Covarmatrix with Matrix in HHTauTauEventGenerator
+       metlikelihood->setCovMatrix(testgenerator.getCovarmatrix()[0][0],testgenerator.getCovarmatrix()[1][1],testgenerator.getCovarmatrix()[1][0]); // set Covarmatrix with Matrix inserted in HHTauTauEventGenerator
+
+       //prepare composite object: Higgs
+       HHFitObject* higgslikelihood  = new HHFitObjectComposite(tau1, tau2, met);
+
+       tau1likelihood->setLowerFitLimitE(tau1likelihood->getInitial4Vector());
+       tau1likelihood->setUpperFitLimitE(mass,tau2likelihood->getInitial4Vector());
+       tau2likelihood->setLowerFitLimitE(tau2likelihood->getInitial4Vector());
+       tau2likelihood->setUpperFitLimitE(mass,tau1likelihood->getInitial4Vector());
+
+
+       //prepare constraints
+       HHFitConstraint* invmlikelihood = new HHFitConstraintEHardM(tau1likelihood, tau2likelihood, mass);
+       HHFitConstraint* balancelikelihood = new HHFitConstraint4Vector(higgslikelihood, true, true, false, false);
+       HHFitConstraint* Likelihood = new HHFitConstraintLikelihood(tau1likelihood,pdf1);
+
+
+
+    //fit with likelihood
     HHKinFit* singlefitliekelihood = new HHKinFit();
-    singlefitliekelihood->addFitObjectE(tau1);
-    singlefitliekelihood->addConstraint(invm);
-    singlefitliekelihood->addConstraint(balance);
+    singlefitliekelihood->addFitObjectE(tau1likelihood);
+    singlefitliekelihood->addConstraint(invmlikelihood);
+    singlefitliekelihood->addConstraint(balancelikelihood);
     singlefitliekelihood->addConstraint(Likelihood);
     singlefitliekelihood->fit();
     h_FitlikelihoodFinalChi2.Fill(singlefitliekelihood->getChi2());
-    h_FitlikelihoodFinalChi2prob.Fill(TMath::Prob(singlefitliekelihood->getChi2(),1));*/
+    h_FitlikelihoodFinalChi2prob.Fill(TMath::Prob(singlefitliekelihood->getChi2(),1));
+
+    double  fitfractau1likelihood=tau1likelihood->getInitial4Vector().E()/tau1likelihood->getFit4Vector().E();
+        double genfractau1likelihood=testgenerator.getvisfrac1();
+        double comparefrac1likelihood=(genfractau1likelihood-fitfractau1likelihood)/genfractau1likelihood;
+        h_fracresulutiontau1likelihood.Fill(comparefrac1likelihood);
+        h_testingfraclikelihood.Fill(fitfractau1likelihood);
     
   }
   TFile controlplots("controlplots.root","RECREATE");
@@ -277,12 +304,15 @@ int main(int argc, char* argv[])
   h_PhiMETwithsigma.Write();
   h_FitFinalChi2.Write();
   h_FitFinalChi2prob.Write();
+  h_fracresulutiontau1.Write();
   h_FitlikelihoodFinalChi2.Write();
   h_FitlikelihoodFinalChi2prob.Write();
-  h_TestEtaHiggsProbChi2.Write();
-  h_TestPtHiggsProbChi2.Write();
-  h_TestEtaIsrProbChi2.Write();
-  gr_pt.Write();
+  h_fracresulutiontau1likelihood.Write();
+  h_testingfraclikelihood.Write();
+  //h_TestEtaHiggsProbChi2.Write();
+  //h_TestPtHiggsProbChi2.Write();
+  //h_TestEtaIsrProbChi2.Write();
+  //gr_pt.Write();
 
   controlplots.Close();
   
