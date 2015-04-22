@@ -10,6 +10,7 @@
 #include "PSMath.h"
 #include <iomanip>
 #include "TAxis.h"
+#include <iostream>
 
 HHKinFit2::HHKinFit::HHKinFit()
 : m_fitobjects(std::vector<HHFitObjectE*>()),
@@ -118,8 +119,12 @@ HHKinFit2::HHKinFit::fit(){
 double
 HHKinFit2::HHKinFit::getChi2() const{
   double chi2=0;
-  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it)
-    chi2 += (*it)->getChi2();
+  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it){
+	  //std::cout << (*it)->getChi2() << std::endl;
+  chi2 += (*it)->getChi2();
+  }
+  //std::cout << chi2 << std::endl;
+  //std::cout << "----------------------------------------------------------------------------------------------"<<std::endl;
   return(chi2);
 }
 
