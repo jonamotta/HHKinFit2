@@ -29,10 +29,10 @@ using namespace HHKinFit2;
 
 int main(int argc, char* argv[])
 {
-  TF1 PDF1("PDF1","2*x",0,2);
-  TF1 PDF2("PDF2","2*x",0,2);
+  TF1 PDF1("PDF1","2*x",0,1);
+  TF1 PDF2("PDF2","2-2*x",0,1);
   TF1* pdf1=&PDF1;
-  TF1* pdf2=&PDF1;
+  TF1* pdf2=&PDF2;
   TMatrixD covarmatrix(2,2);
   covarmatrix[0][0]=130;
   covarmatrix[0][1]=0;
