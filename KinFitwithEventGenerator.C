@@ -30,7 +30,9 @@ using namespace HHKinFit2;
 int main(int argc, char* argv[])
 {
   TF1 PDF1("PDF1","2*x",0,1);
+  PDF1.	SetNpx(100000);
   TF1 PDF2("PDF2","2-2*x",0,1);
+  PDF2.	SetNpx(100000);
   TF1* pdf1=&PDF1;
   TF1* pdf2=&PDF2;
   TMatrixD covarmatrix(2,2);
@@ -79,9 +81,15 @@ int main(int argc, char* argv[])
   TH1D h_PtTau2Vis("h_PtTau2Vis","Pt from the the visible component of Tau2",100,0,100);
   TH1D h_ETau2Vis("h_ETau2Vis","Energy from the the visible component of Tau2",100,0,100);
   TH1D h_AbsPtmiss("h_AbsPtmiss","Absolute Value of the missing transverse momentum",100,0,100);
-  TH1D h_PhiMET("h_PhiMET","Angle Phi of the missing transversal momentum vector",100,-3.2,3.2);
+  TH1D h_Pxmiss("h_Pxmiss","Missing momentum in x-direction",100,0,100);
+  TH1D h_Pymiss("h_Pymiss","Missing momentum in y-direction",100,0,100);
+  TH1D h_PhiMET("h_PhiMET","Angle Phi of the missing transversal momentum vector",100,0,6.4);
   TH1D h_AbsPtmisswithsigma("h_AbsPtmisswithsigma","Absolute Value of the missing transverse momentum with measurmental errors",100,0,100);
-  TH1D h_PhiMETwithsigma("h_PhiMETwithsigma","Angle Phi of the missing transversal momentum vector with measurmental errors",100,-3.2,3.2);
+  TH1D h_PhiMETwithsigma("h_PhiMETwithsigma","Angle Phi of the missing transversal momentum vector with measurmental errors",100,0,6.4);
+  TH1D h_Pxmisswithsigma("h_Pxmisswithsigma","Missing momentum in x-direction with measurmental errors ",100,0,100);
+  TH1D h_Pymisswithsigma("h_Pymisswithsigma","Missing momentum in y-direction with measurmental errors",100,0,100);
+
+
   TH1D h_FitFinalChi2("h_FitFinalChi2","The Final chi2 from the KinFit",50,-5,20);
   TH1D h_FitFinalChi2prob("h_FitFinalChi2prob","The Final chi2 from the KinFit",20,0,1);
   TH1D h_FitlikelihoodFinalChi2("h_FitFinalChi2likelihood","The Final chi2 from the KinFit",50,-5,20);
@@ -162,8 +170,12 @@ int main(int argc, char* argv[])
     h_PtTau2Vis.Fill(testgenerator.getTau2Vis().Pt());
     h_ETau2Vis.Fill(testgenerator.getTau2Vis().E());
     h_AbsPtmiss.Fill(testgenerator.getAbsPtMET());
+    h_Pxmiss.Fill(testgenerator.getMET()[0]);
+    h_Pymiss.Fill(testgenerator.getMET()[1]);
     h_PhiMET.Fill(testgenerator.getPhiMET());
     h_AbsPtmisswithsigma.Fill(testgenerator.getAbsPtMETwithsigma());
+    h_Pxmisswithsigma.Fill(testgenerator.getMETwithsigma()[0]);
+    h_Pymisswithsigma.Fill(testgenerator.getMETwithsigma()[1]);
     h_PhiMETwithsigma.Fill(testgenerator.getPhiMETwithsigma());
    // gr_pt.SetPoint(i,testgenerator.getMETwithsigma()[0],testgenerator.getMETwithsigma()[1]);
 
@@ -346,8 +358,12 @@ int main(int argc, char* argv[])
   h_PtTau2Vis.Write();
   h_ETau2Vis.Write();
   h_AbsPtmiss.Write();
+  h_Pxmiss.Write();
+  h_Pymiss.Write();
   h_PhiMET.Write();
   h_AbsPtmisswithsigma.Write();
+  h_Pxmisswithsigma.Write();
+  h_Pymisswithsigma.Write();
   h_PhiMETwithsigma.Write();
   h_FitFinalChi2.Write();
   h_FitFinalChi2prob.Write();

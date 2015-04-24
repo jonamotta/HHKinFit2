@@ -77,8 +77,8 @@ void HHKinFit2::HHTauTauEventGenerator::generateEvent() {
   //generate lorenzvector for tauvis
   //generate visfrac
 
-  m_visfrac1=m_PDF1.GetRandom(0,1);
-  m_visfrac2=m_PDF2.GetRandom(0,1);
+  m_visfrac1=m_PDF1.GetRandom();
+  m_visfrac2=m_PDF2.GetRandom();
   //tau1vis
 
   m_tau1vis=m_tau1boosted;
