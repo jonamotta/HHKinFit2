@@ -45,14 +45,14 @@ int main(int argc, char* argv[])
   TH1D h_EtaTau1("h_EtaTau1","Eta from Tau1",100,-5,5);
   TH1D h_CthTau1("h_CthTau1","Cth from Tau1",100,-1,1);
   TH1D h_PhiTau1("h_PhiTau1","Phi from Tau1",100,-3.2,3.2);
-  TH1D h_PtTau1("h_PtTau1","Pt from Tau1",100,0,65);
-  TH1D h_ETau1("h_ETau1","Energy from Tau1",10,60,65);
+  TH1D h_PtTau1("h_PtTau1","Pt from Tau1",100,0,100);
+  TH1D h_ETau1("h_ETau1","Energy from Tau1",100,0,100);
   TH1D h_EtaTau2("h_EtaTau2","Eta from Tau2",100,-5,5);
   TH1D h_CthTau2("h_CthTau2","Cth from Tau2",100,-1,1);
   TH1D h_PhiTau2("h_PhiTau2","Phi from Tau2",100,-3.2,3.2);
-  TH1D h_PtTau2("h_PtTau2","Pt from Tau2",100,0,65);
+  TH1D h_PtTau2("h_PtTau2","Pt from Tau2",100,0,100);
   TH1D h_invmassboosted("h_invmassboosted","invariant mass of the two boosted tau-vectors in GeV",100,125.5,126);
-  TH1D h_ETau2("h_ETau2","Energy from Tau2",10,60,65);
+  TH1D h_ETau2("h_ETau2","Energy from Tau2",100,0,100);
   TH1D h_EtaISR("h_EtaISR","Eta from the ISR-jet",100,-6,6);
   TH1D h_CthISR("h_CthISR","Cth from ISR-jet",100,-1,1);
   TH1D h_PhiISR("h_PhiISR","Phi from ISR-jet",100,-3.2,3.2);
@@ -65,12 +65,12 @@ int main(int argc, char* argv[])
   TH1D h_CthTau1boosted("h_CthTau1boosted","Cth from the boosted Tau1",100,-1,1);
   TH1D h_PhiTau1boosted("h_PhiTau1boosted","Phi from the boosted Tau1",100,-3.2,3.2);
   TH1D h_PtTau1boosted("h_PtTau1boosted","Pt from the boosted Tau1",100,0,100);
-  TH1D h_ETau1boosted("h_ETau1boosted","Energy from Tau1boosted",100,60,65);
+  TH1D h_ETau1boosted("h_ETau1boosted","Energy from Tau1boosted",100,0,100);
   TH1D h_EtaTau2boosted("h_EtaTau2boosted","Eta from the boosted Tau2",100,-5,5);
   TH1D h_CthTau2boosted("h_CthTau2boosted","Cth from the boosted Tau2",100,-1,1);
   TH1D h_PhiTau2boosted("h_PhiTau2boosted","Phi from the boosted Tau2",100,-3.2,3.2);
   TH1D h_PtTau2boosted("h_PtTau2boosted","Pt from the boosted Tau2",100,0,100);
-  TH1D h_ETau2boosted("h_ETau2boosted","Energy from Tau2boosted",100,60,65);
+  TH1D h_ETau2boosted("h_ETau2boosted","Energy from Tau2boosted",100,0,100);
   TH1D h_VisFracTau1("h_VisFracTau1","The Energy fraction from the visible Tau-Component form Tau1",100,0,1);
   TH1D h_VisFracTau2("h_VisFracTau2","The Energy fraction from the visible Tau-Component form Tau2",100,0,1);
   TH1D h_EtaTau1Vis("h_EtaTau1Vis","Eta from the visible component of Tau1",100,-5,5);
@@ -92,6 +92,10 @@ int main(int argc, char* argv[])
   TH1D h_Pxmisswithsigma("h_Pxmisswithsigma","Missing momentum in x-direction with measurmental errors ",200,-100,100);
   TH1D h_Pymisswithsigma("h_Pymisswithsigma","Missing momentum in y-direction with measurmental errors",200,-100,100);
 
+  TH1D h_EFracTau1Fit("h_EFracTau1Fit","h_EFracTau1Fit",100,0,1);
+  TH1D h_EFracTau2Fit("h_EFracTau2Fit","h_EFracTau2Fit",100,0,1);
+  TH1D h_EFracTau1Gen("h_EFracTau1Gen","h_EFracTau1Gen",100,0,1);
+  TH1D h_EFracTau2Gen("h_EFracTau2Gen","h_EFracTau2Gen",100,0,1);
 
   TH1D h_FitFinalChi2("h_FitFinalChi2","The Final chi2 from the KinFit",100,-6,6);
   TH1D h_FitFinalChi2prob("h_FitFinalChi2prob","The Final chi2 from the KinFit",20,0,1);
@@ -255,7 +259,10 @@ int main(int argc, char* argv[])
     h_fracresulutiontau2weighted.Fill(comparefrac2,TMath::Prob(singlefit->getChi2(),1));
     h_energyresulution1weighted.Fill((testgenerator.getTau1boosted().E()-tau1->getFit4Vector().E())/testgenerator.getTau1boosted().E(),TMath::Prob(singlefit->getChi2(),1));
     h_energyresulution2weighted.Fill((testgenerator.getTau2boosted().E()-tau2->getFit4Vector().E())/testgenerator.getTau2boosted().E(),TMath::Prob(singlefit->getChi2(),1));
-
+    h_EFracTau1Fit.Fill(tau1->getInitial4Vector().E()/tau1->getFit4Vector().E());
+    h_EFracTau1Fit.Fill(tau2->getInitial4Vector().E()/tau2->getFit4Vector().E());
+    h_EFracTau1Gen.Fill(testgenerator.getTau1Vis().E()/testgenerator.getTau1boosted().E());
+    h_EFracTau2Gen.Fill(testgenerator.getTau2Vis().E()/testgenerator.getTau2boosted().E());
 	//#######################testing#likelihood########################################
 
     //prepare tau objects
@@ -311,6 +318,7 @@ int main(int argc, char* argv[])
    // std::cout << "likelihood=" << Likelihood->getChi2()<< std::endl;
 	h_likelihoodconstraint.Fill(Likelihood->getChi2());
 
+
     double  fitfractau1likelihood=tau1likelihood->getInitial4Vector().E()/tau1likelihood->getFit4Vector().E();
         double genfractau1likelihood=testgenerator.getvisfrac1();
         double comparefrac1likelihood=(genfractau1likelihood-fitfractau1likelihood)/genfractau1likelihood;
@@ -357,6 +365,10 @@ int main(int argc, char* argv[])
   h_invmassboosted.Write();
   h_VisFracTau1.Write();
   h_VisFracTau2.Write();
+  h_EFracTau1Fit.Write();
+  h_EFracTau1Fit.Write();
+  h_EFracTau1Gen.Write();
+  h_EFracTau2Gen.Write();
   h_EtaTau1Vis.Write();
   h_CthTau1Vis.Write();
   h_PhiTau1Vis.Write();
