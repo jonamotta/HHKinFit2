@@ -3,10 +3,10 @@
 #include <iostream>
 #include "TVector3.h"
 
-HHKinFit2::HHTauTauEventGenerator::HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD c, int seed):
+HHKinFit2::HHTauTauEventGenerator::HHTauTauEventGenerator(TF1* a,TF1* b, TMatrixD c, int seed):
   m_seed(seed),
-  m_PDF1(a),
-  m_PDF2(b),
+  m_PDF1(*a),
+  m_PDF2(*b),
   m_randomnumber(m_seed),
   m_tau1(),
   m_tau2(),
@@ -77,8 +77,10 @@ void HHKinFit2::HHTauTauEventGenerator::generateEvent() {
   //generate lorenzvector for tauvis
   //generate visfrac
 
-  m_visfrac1=m_PDF1.GetRandom();
-  m_visfrac2=m_PDF2.GetRandom();
+  //m_visfrac1=m_PDF1.GetRandom();
+  m_visfrac1=m_PDF1(m_randomnumber.Uniform(0,1));
+  //m_visfrac2=m_PDF2.GetRandom();
+  m_visfrac2=m_PDF2(m_randomnumber.Uniform(0,1));
   //tau1vis
 
   m_tau1vis=m_tau1boosted;

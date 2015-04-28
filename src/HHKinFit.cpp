@@ -14,7 +14,11 @@
 
 HHKinFit2::HHKinFit::HHKinFit()
 : m_fitobjects(std::vector<HHFitObjectE*>()),
-  m_constraints(std::vector<HHFitConstraint*>()){
+  m_constraints(std::vector<HHFitConstraint*>()),
+  m_chi2(99999),
+  m_convergence(0),
+  m_printlevel(0),
+  m_maxloops(500){
 }
 
 ///TODO: make it more general!
@@ -72,42 +76,38 @@ HHKinFit2::HHKinFit::fit(){
 	    aMemory[ip][3] = -980.0;
 	  }
 
-	  double chi2(99999);
-	  int convergence(0);
-	  int printlevel(0);
-	  int m_maxloops(500);
 	  for (int iloop = 0; iloop < m_maxloops * 10 && iter < m_maxloops; iloop++) { // FIT loop
 	    m_fitobjects[0]->changeEandSave(a[0]);
-	    chi2=this->getChi2();
+	    m_chi2=this->getChi2();
 //	    std::cout << iloop << " a[0]: " << a[0] << " chi2: " << std::fixed << std::setprecision(8) << chi2 << std::endl;
 //	    m_fitobjects[0]->print();
 
 
 
-	    if (convergence != 0) break;
-	    convergence = PSMath::PSfit(iloop, iter, method, mode, noNewtonShifts, printlevel,
+	    if (m_convergence != 0) break;
+	    m_convergence = PSMath::PSfit(iloop, iter, method, mode, noNewtonShifts, m_printlevel,
 	                                  np, a, astart, alimit, aprec,
-	                                  daN, h, aMemory, chi2, chi2iter, g, H,
+	                                  daN, h, aMemory, m_chi2, chi2iter, g, H,
 	                                  Hinv);
 	  }
 	  // ------ end of FIT loop
 
-	  if(convergence != 0 && convergence != 5){
+	  if(m_convergence != 0 && m_convergence != 5){
 	    if(a[0] < (alimit[0][0] + 2*aprec[0]) ){
-	      if(convergence == 3)
-	        convergence = 5;
+	      if(m_convergence == 3)
+	        m_convergence = 5;
 	      else{
 //	        if (logLevel>1) std::cout << "Convergence at lower tau limit!" << std::endl;
-	        convergence = 4;
+	        m_convergence = 4;
 	      }
 	    }
 	    if(a[0] > (alimit[0][1] - 2*aprec[0]) ){
-	      if(convergence == 3)
-		convergence = 5;
+	      if(m_convergence == 3)
+		m_convergence = 5;
 	      else{
 //		if (logLevel>1)
 //		  std::cout << "Convergence at upper tau limit!" << std::endl;
-		convergence = 4;
+		m_convergence = 4;
 	      }
 	    }
 	  }
@@ -126,6 +126,11 @@ HHKinFit2::HHKinFit::getChi2() const{
   //std::cout << chi2 << std::endl;
   //std::cout << "----------------------------------------------------------------------------------------------"<<std::endl;
   return(chi2);
+}
+
+int
+HHKinFit2::HHKinFit::getConvergence() const{
+  return(m_convergence);
 }
 
 std::vector<HHKinFit2::HHFitObjectE*>

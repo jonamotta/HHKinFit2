@@ -23,18 +23,22 @@
 #include "TMath.h"
 #include "TH2D.h"
 #include "TGraph.h"
+#include "TRandom3.h"
+#include <cmath>
 
 
 using namespace HHKinFit2;
 
 int main(int argc, char* argv[])
 {
-  TF1 PDF1("PDF1","2*x",0,1);
-  PDF1.	SetNpx(100000);
-  TF1 PDF2("PDF2","2-2*x",0,1);
-  PDF2.	SetNpx(100000);
-  TF1* pdf1=&PDF1;
-  TF1* pdf2=&PDF2;
+  //TF1 PDF1("PDF1","2*x",0,1);
+  TF1 *PDF1 = new TF1("PDF1","sqrt(x)",0,2);
+  PDF1->SetNpx(100000);
+  //TF1 PDF2("PDF2","2-2*x",0,1);
+  TF1 *PDF2=new TF1("PDF2","1-sqrt(1-x)",0,2);
+  PDF2->SetNpx(100000);
+  TF1* pdf1=PDF1;
+  TF1* pdf2=PDF2;
   TMatrixD covarmatrix(2,2);
   covarmatrix[0][0]=130;
   covarmatrix[0][1]=0;
@@ -127,6 +131,9 @@ int main(int argc, char* argv[])
  // h_TestEtaIsrProbChi2.GetXaxis()->SetTitle("Prob of chi 2");
  // h_TestEtaIsrProbChi2.GetYaxis()->SetTitle("Eta from Isr-Jet");
  // TGraph gr_pt(100000);
+
+
+
   for(unsigned int i=0; i<250000; i++){
     try{
       testgenerator.generateEvent();
@@ -190,6 +197,8 @@ int main(int argc, char* argv[])
     h_invmassboosted.Fill(boostedsum.M());
    // gr_pt.SetPoint(i,testgenerator.getMETwithsigma()[0],testgenerator.getMETwithsigma()[1]);
 
+
+
     
 
     //KinFit:
@@ -207,7 +216,12 @@ int main(int argc, char* argv[])
     //prepare composite object: Higgs
     HHFitObject* higgs  = new HHFitObjectComposite(tau1, tau2, met);
 
-    tau1->setLowerFitLimitE(tau1->getInitial4Vector());
+//    tau1->setLowerFitLimitE(tau1->getInitial4Vector());
+//    tau1->setUpperFitLimitE(mass,tau2->getInitial4Vector());
+//    tau2->setLowerFitLimitE(tau2->getInitial4Vector());
+//    tau2->setUpperFitLimitE(mass,tau1->getInitial4Vector());
+
+    tau1->setLowerFitLimitE(tau1->getInitial4Vector().E());
     tau1->setUpperFitLimitE(mass,tau2->getInitial4Vector());
     tau2->setLowerFitLimitE(tau2->getInitial4Vector());
     tau2->setUpperFitLimitE(mass,tau1->getInitial4Vector());
@@ -225,6 +239,7 @@ int main(int argc, char* argv[])
     singlefit->addConstraint(balance);
     try {
     singlefit->fit();
+    if (!((singlefit->getConvergence()==1)||(singlefit->getConvergence()==2))) continue;
     }
     catch(HHEnergyRangeException const& e){
     	std::cout << i << std::endl;
@@ -260,9 +275,20 @@ int main(int argc, char* argv[])
     h_energyresulution1weighted.Fill((testgenerator.getTau1boosted().E()-tau1->getFit4Vector().E())/testgenerator.getTau1boosted().E(),TMath::Prob(singlefit->getChi2(),1));
     h_energyresulution2weighted.Fill((testgenerator.getTau2boosted().E()-tau2->getFit4Vector().E())/testgenerator.getTau2boosted().E(),TMath::Prob(singlefit->getChi2(),1));
     h_EFracTau1Fit.Fill(tau1->getInitial4Vector().E()/tau1->getFit4Vector().E());
-    h_EFracTau1Fit.Fill(tau2->getInitial4Vector().E()/tau2->getFit4Vector().E());
+    h_EFracTau2Fit.Fill(tau2->getInitial4Vector().E()/tau2->getFit4Vector().E());
     h_EFracTau1Gen.Fill(testgenerator.getTau1Vis().E()/testgenerator.getTau1boosted().E());
     h_EFracTau2Gen.Fill(testgenerator.getTau2Vis().E()/testgenerator.getTau2boosted().E());
+
+    if(tau2->getInitial4Vector().E()/tau2->getFit4Vector().E()==1)
+    {
+    TCanvas *chi2canvas=new TCanvas("chi2canvas","chi2canvas",1000,1000);
+    TGraph g = singlefit->getChi2Function(100);
+    g.Draw("APL");
+    chi2canvas->Print("chi2.pdf");
+    chi2canvas->Close();
+    singlefit->getChi2();
+    break;
+    };
 	//#######################testing#likelihood########################################
 
     //prepare tau objects
@@ -366,7 +392,7 @@ int main(int argc, char* argv[])
   h_VisFracTau1.Write();
   h_VisFracTau2.Write();
   h_EFracTau1Fit.Write();
-  h_EFracTau1Fit.Write();
+  h_EFracTau2Fit.Write();
   h_EFracTau1Gen.Write();
   h_EFracTau2Gen.Write();
   h_EtaTau1Vis.Write();
@@ -410,6 +436,7 @@ int main(int argc, char* argv[])
   //h_TestPtHiggsProbChi2.Write();
   //h_TestEtaIsrProbChi2.Write();
   //gr_pt.Write();
+
 
   controlplots.Close();
   

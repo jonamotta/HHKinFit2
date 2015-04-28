@@ -16,7 +16,7 @@ class HHTauTauEventGenerator {
 
 public:
 
-HHTauTauEventGenerator(TF1 a,TF1 b, TMatrixD c, int seed=4357);
+HHTauTauEventGenerator(TF1 *a,TF1 *b, TMatrixD c, int seed=4357);
  HHLorentzVector getTau1boosted();
  HHLorentzVector getTau2boosted();
  HHLorentzVector getISR();

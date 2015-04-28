@@ -24,12 +24,17 @@ class HHKinFit {
   void addConstraint(HHFitConstraint* constraint);
   
   TGraph getChi2Function(int steps);
+  int getConvergence() const;
 
 
  private:
   std::vector<HHFitObjectE*> m_fitobjects;
   std::vector<HHFitConstraint*> m_constraints;
 
+  double m_chi2;
+  int m_convergence;
+  int m_printlevel;
+  int m_maxloops;
 };
 }
 #endif /* HHKinFit_ */
