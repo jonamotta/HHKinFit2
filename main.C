@@ -5,6 +5,7 @@
 #include "HHFitConstraint.h"
 #include "HHFitConstraintLikelihood.h"
 #include "HHFitObjectEConstM.h"
+#include "HHFitObjectEConstBeta.h"
 #include "HHFitObjectE.h"
 #include "HHFitObjectMET.h"
 #include "HHFitObject.h"
@@ -20,43 +21,66 @@ using namespace HHKinFit2;
 
 int main(int argc, char* argv[])
 {
-  double mass = 125.0;
+  double mh1 = 111.0;
+  double mh2 = 222.0;
 
   //prepare tau objects
   HHFitObjectE* tau1 = new HHFitObjectEConstM(HHLorentzVector(71,0,0,80));
   HHFitObjectE* tau2 = new HHFitObjectEConstM(HHLorentzVector(0,58,0,60));
-  tau1->setLowerFitLimitE(tau1->getInitial4Vector());
-  tau1->setUpperFitLimitE(mass,tau2->getInitial4Vector());
-  tau2->setLowerFitLimitE(tau2->getInitial4Vector());
-  tau2->setUpperFitLimitE(mass,tau1->getInitial4Vector());
+  tau1->setFitLimitsE(tau1->getInitial4Vector(),mh1,tau2->getInitial4Vector());
+  tau2->setFitLimitsE(tau2->getInitial4Vector(),mh1,tau1->getInitial4Vector());
+
+  //prepare bjet objects
+  HHFitObjectE* b1 = new HHFitObjectEConstBeta(HHLorentzVector(71,0,0,80));
+  HHFitObjectE* b2 = new HHFitObjectEConstBeta(HHLorentzVector(0,58,0,60));
+  b1->setFitLimitsE(0,400);
+  b2->setFitLimitsE(0,400);
+  b1->setCovMatrix(100);
+  b2->setCovMatrix(100);
 
   //prepare MET object
   HHFitObjectMET* met = new HHFitObjectMET(TVector2(10,20));
-  //met->setCovMatrix(100,-100,50);
   met->setCovMatrix(100,100,0);
 
   //prepare composite object: Higgs
-  HHFitObject* higgs  = new HHFitObjectComposite(tau1, tau2, met);
+  HHFitObject* higgs  = new HHFitObjectComposite(tau1,tau2,b1,b2,met);
+  HHFitObject* higgs1  = new HHFitObjectComposite(tau1,tau2);
+  HHFitObject* higgs2  = new HHFitObjectComposite(b1,b2);
 
   //prepare constraints
-  HHFitConstraint* invm = new HHFitConstraintEHardM(tau1, tau2, mass);
-  HHFitConstraint* balance = new HHFitConstraint4Vector(higgs, true, true, false, false);
+  HHFitConstraint* c_invmh1 = new HHFitConstraintEHardM(tau1, tau2, mh1);
+  HHFitConstraint* c_invmh2 = new HHFitConstraintEHardM(b1, b2, mh2);
+  HHFitConstraint* c_b1 = new HHFitConstraint4Vector(b1, false, false, false, true);
+  HHFitConstraint* c_b2 = new HHFitConstraint4Vector(b2, false, false, false, true);
+  HHFitConstraint* c_balance = new HHFitConstraint4Vector(higgs, true, true, false, false);
 
   //fit
   HHKinFit* singlefit = new HHKinFit();
+
   singlefit->addFitObjectE(tau1);
-  singlefit->addConstraint(invm);
-  singlefit->addConstraint(balance);
+  singlefit->addFitObjectE(b1);
+
+  singlefit->addConstraint(c_invmh1);
+  singlefit->addConstraint(c_invmh2);
+  singlefit->addConstraint(c_b1);
+  singlefit->addConstraint(c_b2);
+  singlefit->addConstraint(c_balance);
+
   singlefit->fit();
+
+//  higgs->print();
+  higgs1->print();
+  higgs2->print();
+
   std::cout << "final chi2: " << singlefit->getChi2() << std::endl;
 
-  TGraph gr(singlefit->getChi2Function(100));
-  gr.Draw();
-
-  TFile f("out.root","UPDATE");
-  gr.Write();
-  f.Close();
-
+//  TGraph gr(singlefit->getChi2Function(100));
+//  gr.Draw();
+//
+//  TFile f("out.root","UPDATE");
+//  gr.Write();
+//  f.Close();
+//
 //
 //  try{
 //    std::cout << singlefit->getChi2() << std::endl;

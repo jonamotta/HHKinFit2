@@ -58,23 +58,25 @@ HHKinFit2::HHFitObject::print() const{
 
 void
 HHKinFit2::HHFitObject::printInitial4Vector() const{
-  std::cout <<  "initial vector (px,py,pz,E,m)"
+  std::cout <<  "initial vector (px,py,pz,E,m,beta)"
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getInitial4Vector().Px()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getInitial4Vector().Py()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getInitial4Vector().Pz()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getInitial4Vector().E()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getInitial4Vector().M()
+            << std::setw(10) << std::fixed<< std::setprecision(4) << this->getInitial4Vector().Beta()
             << std::endl;
 }
 
 void
 HHKinFit2::HHFitObject::printFit4Vector() const{
-  std::cout <<  "  final vector (px,py,pz,E,m)"
+  std::cout <<  "  final vector (px,py,pz,E,m,beta)"
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getFit4Vector().Px()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getFit4Vector().Py()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getFit4Vector().Pz()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getFit4Vector().E()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getFit4Vector().M()
+            << std::setw(10) << std::fixed<< std::setprecision(4) << this->getFit4Vector().Beta()
             << std::endl;
 }
 

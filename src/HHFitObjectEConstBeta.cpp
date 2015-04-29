@@ -8,8 +8,7 @@
 
 HHKinFit2::HHFitObjectEConstBeta::HHFitObjectEConstBeta(HHLorentzVector const& initial4vector)
   :HHFitObjectE(initial4vector){
-  //not yet implemented
-  assert(0);
+
 }
 
 HHKinFit2::HHLorentzVector

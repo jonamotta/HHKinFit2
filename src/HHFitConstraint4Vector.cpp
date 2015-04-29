@@ -21,10 +21,14 @@ HHKinFit2::HHFitConstraint4Vector::HHFitConstraint4Vector(HHFitObject* object, b
   for (int i=0; i<4; i++) if (m_components[i]) m_ncomp++;
   m_cov.ResizeTo(m_ncomp,m_ncomp);
 
+  int a=0;
   for (int i=0;i<4;i++){
+    int b=0;
     for (int j=0; j<4; j++){
-      if (m_components[i]&&m_components[j]) m_cov(i,j)=m_fitobject->getCovMatrix()(i,j);
+      if (m_components[i]&&m_components[j]) m_cov(a,b)=m_fitobject->getCovMatrix()(i,j);
+      if (m_components[j]) b++;
     }
+    if (m_components[i]) a++;
   }
 
   TMatrixDEigen eigenmatrix(m_cov);

@@ -32,7 +32,7 @@ HHKinFit2::HHFitObjectMET::print() const{
 
 void
 HHKinFit2::HHFitObjectMET::printInitial4Vector() const{
-  std::cout <<  "initial vector (px,py,pt)"
+  std::cout <<  "initial vector (px,py,pt)    "
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getInitial4Vector().Px()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getInitial4Vector().Py()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getInitial4Vector().Pt()
@@ -41,7 +41,7 @@ HHKinFit2::HHFitObjectMET::printInitial4Vector() const{
 
 void
 HHKinFit2::HHFitObjectMET::printFit4Vector() const{
-  std::cout <<  "  final vector (px,py,pt)"
+  std::cout <<  "  final vector (px,py,pt)    "
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getFit4Vector().Px()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getFit4Vector().Py()
             << std::setw(10) << std::fixed<< std::setprecision(1) << this->getFit4Vector().Pt()

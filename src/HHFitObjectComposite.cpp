@@ -5,11 +5,26 @@ HHKinFit2::HHFitObjectComposite::HHFitObjectComposite(std::vector<HHFitObject*> 
   : m_subobjects(subobjects){
 }
 
+HHKinFit2::HHFitObjectComposite::HHFitObjectComposite(HHFitObject* subobject1, HHFitObject* subobject2)
+  : m_subobjects(){
+  this->addSubobject(subobject1);
+  this->addSubobject(subobject2);
+}
+
 HHKinFit2::HHFitObjectComposite::HHFitObjectComposite(HHFitObject* subobject1, HHFitObject* subobject2, HHFitObject* subobject3)
   : m_subobjects(){
   this->addSubobject(subobject1);
   this->addSubobject(subobject2);
   this->addSubobject(subobject3);
+}
+
+HHKinFit2::HHFitObjectComposite::HHFitObjectComposite(HHFitObject* subobject1, HHFitObject* subobject2, HHFitObject* subobject3, HHFitObject* subobject4, HHFitObject* subobject5)
+  : m_subobjects(){
+  this->addSubobject(subobject1);
+  this->addSubobject(subobject2);
+  this->addSubobject(subobject3);
+  this->addSubobject(subobject4);
+  this->addSubobject(subobject5);
 }
 
 
@@ -59,6 +74,10 @@ HHKinFit2::HHFitObjectComposite::print() const{
   std::cout <<  "composite fit object:" << std::endl;
   this->printInitial4Vector();
   this->printFit4Vector();
+  std::cout <<  "-----------------" << std::endl;
+  for (std::vector<HHFitObject*>::const_iterator it = m_subobjects.begin() ; it != m_subobjects.end(); ++it){
+    (*it)->printInitial4Vector();
+  }
   std::cout <<  "-----------------" << std::endl;
   for (std::vector<HHFitObject*>::const_iterator it = m_subobjects.begin() ; it != m_subobjects.end(); ++it){
     (*it)->printFit4Vector();

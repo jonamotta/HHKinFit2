@@ -36,6 +36,20 @@ HHKinFit2::HHFitObjectE::getE() const{
   return(m_fit4vector.E());
 }
 
+
+void
+HHKinFit2::HHFitObjectE::setFitLimitsE(double const lowerlimit, double const upperlimit){
+  this->setLowerFitLimitE(lowerlimit);
+  this->setUpperFitLimitE(upperlimit);
+}
+
+void
+HHKinFit2::HHFitObjectE::setFitLimitsE(HHLorentzVector const& own4vectorMin, double const minv, HHLorentzVector const& other4vectorMin){
+	this->setLowerFitLimitE(own4vectorMin);
+	this->setUpperFitLimitE(minv,other4vectorMin);
+}
+
+
 double
 HHKinFit2::HHFitObjectE::getUpperFitLimitE() const{
   return(m_upperLimitE);
@@ -64,6 +78,13 @@ HHKinFit2::HHFitObjectE::setLowerFitLimitE(double lowerlimit){
 void
 HHKinFit2::HHFitObjectE::setLowerFitLimitE(HHLorentzVector const& lowerlimit){
   m_lowerLimitE = lowerlimit.E();
+}
+
+void
+HHKinFit2::HHFitObjectE::setCovMatrix(double dE){
+  TMatrixD cov(4,4);
+  cov(3,3)=dE;
+  m_covmatrix=cov;
 }
 
 void

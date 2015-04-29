@@ -25,10 +25,14 @@ class HHFitObjectE : public HHFitObject {
   double getUpperFitLimitE() const;
   double getLowerFitLimitE() const;
 
+  void setFitLimitsE(double const lowerlimit, double const upperlimit);
+  void setFitLimitsE(HHLorentzVector const& own4vectorMin, double const minv, HHLorentzVector const& other4vectorMin);
   void setUpperFitLimitE(double const upperlimit);
   void setUpperFitLimitE(double const minv, HHLorentzVector const& other4vectorMin);
   void setLowerFitLimitE(double const lowerlimit);
   void setLowerFitLimitE(HHLorentzVector const& other4vectorMin);
+
+  void setCovMatrix(double dE);
 
   virtual void print() const;
   void printLimits() const;
