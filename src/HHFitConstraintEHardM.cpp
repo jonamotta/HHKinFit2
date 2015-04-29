@@ -14,3 +14,8 @@ HHKinFit2::HHFitConstraintEHardM::getChi2() const{
   new4momentum2->constrainEtoMinvandSave(m_mass, m_fitobject->getFit4Vector());
   return(0);
 }
+
+double
+HHKinFit2::HHFitConstraintEHardM::getLikelihood() const{
+  return(0);
+}

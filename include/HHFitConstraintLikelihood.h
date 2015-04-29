@@ -16,6 +16,7 @@ class HHFitConstraintLikelihood : public HHFitConstraint {
   HHFitConstraintLikelihood(HHFitObject* object1,HHFitObject* object2, TF1* likelihood1, TF1* likelihood2 );
 
   Double_t getChi2() const;
+  double getLikelihood() const;
 
  private:
   TF1* const m_likelihood1;

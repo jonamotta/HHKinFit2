@@ -77,10 +77,10 @@ void HHKinFit2::HHTauTauEventGenerator::generateEvent() {
   //generate lorenzvector for tauvis
   //generate visfrac
 
-  //m_visfrac1=m_PDF1.GetRandom();
-  m_visfrac1=m_PDF1(m_randomnumber.Uniform(0,1));
-  //m_visfrac2=m_PDF2.GetRandom();
-  m_visfrac2=m_PDF2(m_randomnumber.Uniform(0,1));
+  m_visfrac1=m_PDF1.GetRandom(0,1);
+  //m_visfrac1=m_PDF1(m_randomnumber.Uniform(0,1));
+  m_visfrac2=m_PDF2.GetRandom(0,1);
+  //m_visfrac2=m_PDF2(m_randomnumber.Uniform(0,1));
   //tau1vis
 
   m_tau1vis=m_tau1boosted;
@@ -98,42 +98,13 @@ void HHKinFit2::HHTauTauEventGenerator::generateEvent() {
   Gausvector[1]=m_randomnumber.Gaus(0,1);
   m_METwithsigma=m_MET+m_L*Gausvector;
 
-/*  //######test######
-  m_isrwithsigma=m_isr;
-  TVectorD isr_pt(2);
-  isr_pt[0]=m_isr.Px();
-  isr_pt[1]=m_isr.Py();
-  isr_pt=isr_pt+m_L*Gausvector;
-  m_isrwithsigma.SetPx(isr_pt[0]);
-  m_isrwithsigma.SetPy(isr_pt[1]);
-  m_METwithsigma[0]= -(m_tau1vis.Px()+m_tau2vis.Px()+m_isrwithsigma.Px());
-  m_METwithsigma[1]= -(m_tau1vis.Py()+m_tau2vis.Py()+m_isrwithsigma.Py());
-  //######test######*/
 
-//  TVectorD isr_pt(2);
-//  isr_pt[0]=m_isr.Px();
-//  isr_pt[1]=m_isr.Py();
-//  TVectorD tauvis1_pt(2);
-//  tauvis1_pt[0]=m_tau1vis.Px();
-//  tauvis1_pt[1]=m_tau1vis.Py();
-//  TVectorD tauvis2_pt(2);
-//  tauvis2_pt[0]=m_tau2vis.Px();
-//  tauvis2_pt[1]=m_tau2vis.Py();
-//  m_METwithsigma=(isr_pt+(m_L*Gausvector))+tauvis1_pt+tauvis2_pt;
 
   HHLorentzVector sum=m_higgs+m_isr;
   if(sum.M()>13000){
 	  std::cout << "Ecm in Event "<<m_eventnumber<<"  over 13 TeV " << sum.M() <<std::endl;
       this->generateEvent();
   }
-//  if(m_tau1boosted.E()>3000){
-//    	  std::cout << "P_tau1  in Event "<<m_eventnumber<<" over 2 TeV" << std::endl;
-//    this->generateEvent();
-//  }
-//  if(m_tau2boosted.E()>3000){
-//      	  std::cout << "P_tau2 in Event "<<m_eventnumber<<" over 2 TeV" << std::endl;
-//      this->generateEvent();
-//    }
 }
 
 HHKinFit2::HHLorentzVector HHKinFit2::HHTauTauEventGenerator::getTau1(){

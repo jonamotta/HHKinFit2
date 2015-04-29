@@ -14,6 +14,7 @@ class HHFitConstraint {
   virtual ~HHFitConstraint() {};
 
   virtual double getChi2() const = 0;
+  virtual double getLikelihood() const = 0;
   
  protected:
   HHFitObject* const m_fitobject;

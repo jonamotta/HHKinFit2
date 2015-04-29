@@ -13,12 +13,12 @@ HHKinFit2::HHFitConstraintLikelihood::HHFitConstraintLikelihood(HHFitObject* obj
 
 Double_t 
 HHKinFit2::HHFitConstraintLikelihood::getChi2() const{
-	double frac1=m_fitobject->getInitial4Vector().E()/m_fitobject->getFit4Vector().E();
-	TF1 pdfunction1=*m_likelihood1;
-	double pdf1=pdfunction1(frac1);
-	double frac2=m_object2->getInitial4Vector().E()/m_object2->getFit4Vector().E();
-	TF1 pdfunction2=*m_likelihood2;
-	double pdf2=pdfunction2(frac2);
-	double chi2=-2*log(pdf1)-2*log(pdf2);
+	double chi2=-2*log(m_likelihood1->Eval(m_fitobject->getInitial4Vector().E()/m_fitobject->getFit4Vector().E()))-2*log(m_likelihood2->Eval(m_object2->getInitial4Vector().E()/m_object2->getFit4Vector().E()));
   return(chi2);
 }
+
+double
+HHKinFit2::HHFitConstraintLikelihood::getLikelihood() const{
+  return(m_likelihood1->Eval(m_fitobject->getInitial4Vector().E()/m_fitobject->getFit4Vector().E())*m_likelihood2->Eval(m_object2->getInitial4Vector().E()/m_object2->getFit4Vector().E()));
+}
+
