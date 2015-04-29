@@ -15,7 +15,6 @@ class HHFitObjectEConstM : public HHFitObjectE {
   HHFitObjectEConstM(HHLorentzVector const& initial4vector);
   HHLorentzVector constrainEtoMinv(double m, HHLorentzVector const& other4vector) const;
   HHLorentzVector changeE(double E) const;
-  HHLorentzVector scaleE(double scale) const;
 
   void print() const;
 

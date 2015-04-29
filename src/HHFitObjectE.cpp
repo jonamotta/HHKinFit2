@@ -10,6 +10,12 @@ HHKinFit2::HHFitObjectE::HHFitObjectE(HHLorentzVector const& initial4vector)
 
 }
 
+HHKinFit2::HHLorentzVector
+HHKinFit2::HHFitObjectE::scaleE(double scale) const{
+  return(this->changeE(scale*this->getFit4Vector().E()));
+}
+
+
 void
 HHKinFit2::HHFitObjectE::changeEandSave(double E){
   this->setFit4Vector(changeE(E));

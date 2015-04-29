@@ -17,7 +17,7 @@ class HHFitObjectE : public HHFitObject {
   double getE() const;
   virtual HHLorentzVector changeE(double E) const = 0;
   void changeEandSave(double E);
-  virtual HHLorentzVector scaleE(double scale) const = 0;
+  virtual HHLorentzVector scaleE(double scale) const;
   void scaleEandSave(double scale);
   virtual HHLorentzVector constrainEtoMinv(double minv, HHLorentzVector const& other4vector) const =0;
   void constrainEtoMinvandSave(double minv, HHLorentzVector const& other4vector);

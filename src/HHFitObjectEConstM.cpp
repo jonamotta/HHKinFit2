@@ -88,11 +88,6 @@ HHKinFit2::HHFitObjectEConstM::changeE(double E) const{
   return(temp);
 }
 
-HHKinFit2::HHLorentzVector
-HHKinFit2::HHFitObjectEConstM::scaleE(double scale) const{
-  return(this->changeE(scale*this->getFit4Vector().E()));
-}
-
 void
 HHKinFit2::HHFitObjectEConstM::print() const{
   std::cout << "---" << std::endl;

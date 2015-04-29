@@ -43,3 +43,10 @@ HHKinFit2::HHLorentzVector::SetEkeepM(double E){
   SetPtEtaPhiE(ptnew,Eta(),Phi(),E);
 
 }
+
+void
+HHKinFit2::HHLorentzVector::SetEkeepBeta(double E){
+  double pnew = Beta()*E;
+  double ptnew = pnew * sin(2.*atan(exp(-Eta())));
+  SetPtEtaPhiE(ptnew,Eta(),Phi(),E);
+}
