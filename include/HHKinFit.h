@@ -17,13 +17,15 @@ class HHKinFit {
 
   void fit();
   double getChi2() const;
+  double getL() const;
   std::vector<HHFitObjectE*> getListOfFitObjects() const;
   std::vector<HHFitConstraint*> getListOfConstraints() const;
   
   void addFitObjectE(HHFitObjectE* fitobject);
   void addConstraint(HHFitConstraint* constraint);
   
-  TGraph getChi2Function(int steps);
+  TGraph* getChi2Function(int steps);
+  TGraph* getLFunction(int steps);
   int getConvergence() const;
 
 

@@ -129,6 +129,19 @@ HHKinFit2::HHKinFit::getChi2() const{
   return(chi2);
 }
 
+double
+HHKinFit2::HHKinFit::getL() const{
+  double L=1;
+  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it){
+    //std::cout << (*it)->getChi2() << std::endl;
+    L *= (*it)->getLikelihood();
+  }
+  //std::cout << chi2 << std::endl;
+  //std::cout << "----------------------------------------------------------------------------------------------"<<std::endl;
+  return(L);
+}
+
+
 int
 HHKinFit2::HHKinFit::getConvergence() const{
   return(m_convergence);
@@ -154,21 +167,41 @@ HHKinFit2::HHKinFit::addConstraint(HHFitConstraint* constraint){
   m_constraints.push_back(constraint);
 }
 
-TGraph
+TGraph*
 HHKinFit2::HHKinFit::getChi2Function(int steps){
   int npoints(m_fitobjects.size()*steps);
-  TGraph gr(npoints);
-  gr.SetName("chi2function");
+  TGraph* gr = new TGraph(npoints);
+  gr->SetName("chi2function");
   double stepsize((m_fitobjects[0]->getUpperFitLimitE() - m_fitobjects[0]->getLowerFitLimitE())/steps);
   for (unsigned int i=0; i<npoints; i++){
-    double e = m_fitobjects[0]->getLowerFitLimitE()+ i*stepsize;
+    double e = 1.00001*m_fitobjects[0]->getLowerFitLimitE()+ i*stepsize;
     m_fitobjects[0]->changeEandSave(e);
     double chi2(this->getChi2());
     //    std::cout << i << " " << e << " " << chi2 << std::endl;
-    gr.SetPoint(i,e,chi2);
+    gr->SetPoint(i,e,chi2);
   }
-  gr.SetMinimum(0);
-  gr.GetXaxis()->SetTitle("E_{1}[GeV]");
-  gr.GetYaxis()->SetTitle("#chi^{2}");
+  gr->SetMinimum(0);
+  gr->GetXaxis()->SetTitle("E_{1}[GeV]");
+  gr->GetYaxis()->SetTitle("#chi^{2}");
+  return(gr);
+}
+
+
+TGraph*
+HHKinFit2::HHKinFit::getLFunction(int steps){
+  int npoints(m_fitobjects.size()*steps);
+  TGraph* gr = new TGraph(npoints);
+  gr->SetName("Lfunction");
+  double stepsize((m_fitobjects[0]->getUpperFitLimitE() - m_fitobjects[0]->getLowerFitLimitE())/steps);
+  for (unsigned int i=0; i<npoints; i++){
+    double e = 1.00001*m_fitobjects[0]->getLowerFitLimitE()+ i*stepsize;
+    m_fitobjects[0]->changeEandSave(e);
+    double L(this->getL());
+    //    std::cout << i << " " << e << " " << chi2 << std::endl;
+    gr->SetPoint(i,e,L);
+  }
+  gr->SetMinimum(0);
+  gr->GetXaxis()->SetTitle("E_{1}[GeV]");
+  gr->GetYaxis()->SetTitle("L");
   return(gr);
 }

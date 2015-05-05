@@ -62,7 +62,4 @@ double
 HHKinFit2::HHFitConstraint4Vector::getLikelihood() const{
     double likelihood=(1.0/pow(2*TMath::Pi(),m_ncomp*1.0/2.0))*(1.0/sqrt(m_cov.Determinant()))*exp(-0.5*this->getChi2());
     return(likelihood);
-
-
-
 }
