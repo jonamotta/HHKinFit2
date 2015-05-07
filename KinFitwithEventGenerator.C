@@ -135,10 +135,17 @@ int main(int argc, char* argv[])
   TH1D h_balanceconstraintwithlikelihood("h_balanceconstraintwithlikelihood","the chi2term for the balanceconstraint",50,-5,20);
   TH1D h_likelihoodconstraint("h_likelihoodconstraint","the chi2term for the likelihoodconstraint",100,-2,2);
 
+  TH2D h_comparemine1("h_comparemine1","blub",100,0,1500,100,0,1500);
+  TH2D h_L2D("h_L2D","h_L2D",100,0,0.005,100,0,0.005);
+
+
+
+
+
   //------------------------------------------------------------------------------------------------------------------------------------
   //------------------------------------------------------------------------------------------------------------------------------------
   // Generator and KinFit-Loop:
-  for(unsigned int i=0; i<250000; i++){
+  for(unsigned int i=0; i<1000000; i++){
     try{
       testgenerator.generateEvent();
     }
@@ -146,6 +153,8 @@ int main(int argc, char* argv[])
       i--;
       continue;
     }
+
+
     //Filling the Histograms for the eventgenerator
     h_invariantmass.Fill(testgenerator.getInveriantMass());
     h_EtaTau1.Fill(testgenerator.getTau1().Eta());
@@ -199,10 +208,12 @@ int main(int argc, char* argv[])
     HHLorentzVector boostedsum= (testgenerator.getTau1boosted()+testgenerator.getTau2boosted());
     h_invmassboosted.Fill(boostedsum.M());
 
+
  //-----------------------------------------------------------------------------------------------------------------------------------
  //normal KinFit:
     
-    double mass = testgenerator.getMhiggs();
+    //double mass = testgenerator.getMhiggs();
+    double mass = 91;
 
     //prepare tau objects
     HHFitObjectE* tau1 = new HHFitObjectEConstM(testgenerator.getTau1Vis());//  visible Tau1-component from HHTauTauEventGenerator
@@ -244,7 +255,7 @@ int main(int argc, char* argv[])
     	std::cout << testgenerator.m_seed << std::endl;
     	//throw(e);
     	std::cout << "-----------------------------------------------" << std::endl;
-    	continue;
+    	//continue;
     }
 
     //filling Fit-Histos
@@ -272,8 +283,8 @@ int main(int argc, char* argv[])
     if(tau2->getInitial4Vector().E()/tau2->getFit4Vector().E()==1)
     {
     TCanvas *chi2canvas=new TCanvas("chi2canvas","chi2canvas",1000,1000);
-    TGraph g = singlefit->getChi2Function(100);
-    g.Draw("APL");
+    TGraph* g = singlefit->getChi2Function(100);
+    g->Draw("APL");
     chi2canvas->Print("chi2.pdf");
     chi2canvas->Close();
     singlefit->getChi2();
@@ -304,7 +315,9 @@ int main(int argc, char* argv[])
        //prepare constraints
        HHFitConstraint* invmlikelihood = new HHFitConstraintEHardM(tau1likelihood, tau2likelihood, mass);
        HHFitConstraint* balancelikelihood = new HHFitConstraint4Vector(higgslikelihood, true, true, false, false);
-       HHFitConstraint* Likelihood = new HHFitConstraintLikelihood(tau1likelihood,tau2likelihood,PDF1,PDF2);
+       //HHFitConstraint* Likelihood = new HHFitConstraintLikelihood(tau1likelihood,tau2likelihood,PDF1,PDF2);
+       HHFitConstraint* Likelihood = new HHFitConstraintLikelihood(tau1likelihood,tau2likelihood,PDF1,PDF1);
+
 
     //fit with likelihood
     HHKinFit* singlefitliekelihood = new HHKinFit();
@@ -314,6 +327,7 @@ int main(int argc, char* argv[])
     singlefitliekelihood->addConstraint(Likelihood);
     try {
     	singlefitliekelihood->fit();
+    	 if (!((singlefitliekelihood->getConvergence()==1)||(singlefitliekelihood->getConvergence()==2))) continue;
         }
         catch(HHEnergyRangeException const& e){
         	std::cout << i << std::endl;
@@ -323,7 +337,7 @@ int main(int argc, char* argv[])
         	higgs->print();
         	std::cout << e.what() << std::endl;
         	std::cout << testgenerator.m_seed << std::endl;
-        	//throw(e);
+        	throw(e);
         	std::cout << "-----------------------------------------------" << std::endl;
         	continue;
         }
@@ -344,87 +358,99 @@ int main(int argc, char* argv[])
         h_testingfraclikelihood.Fill(fitfractau1likelihood);
         h_energyresulution1likelihood.Fill((testgenerator.getTau1boosted().E()-tau1likelihood->getFit4Vector().E())/testgenerator.getTau1boosted().E());
         h_energyresulution2likelihood.Fill((testgenerator.getTau2boosted().E()-tau2likelihood->getFit4Vector().E())/testgenerator.getTau2boosted().E());
+
+
+        h_comparemine1.Fill(tau1->getE(),tau1likelihood->getE());
+        h_L2D.Fill(singlefit->getL(),singlefitliekelihood->getL());
+
+
+
   }
 
   //------------------------------------------------------------------------------------------------------------------------------------
   //writing the Histos into a pdf-file
   TFile controlplots("controlplots.root","RECREATE");
   
+  h_L2D.Write();
+  h_comparemine1.Write();
   h_invariantmass.Write();
-  h_EtaTau1.Write();
-  h_CthTau1.Write();
-  h_PhiTau1.Write();
-  h_PtTau1.Write();
-  h_ETau1.Write();
-  h_EtaTau2.Write();
-  h_CthTau2.Write();
-  h_PhiTau2.Write();
-  h_PtTau2.Write();
-  h_ETau2.Write();
-  h_EtaISR.Write();
-  h_CthISR.Write();
-  h_PhiISR.Write();
-  h_PtISR.Write();
-  h_EtaHiggs.Write();
-  h_CthHiggs.Write();
-  h_PhiHiggs.Write();
-  h_PtHiggs.Write();
-  h_EtaTau1boosted.Write();
-  h_CthTau1boosted.Write();
-  h_PhiTau1boosted.Write();
-  h_PtTau1boosted.Write();
-  h_ETau1boosted.Write();
-  h_EtaTau2boosted.Write();
-  h_CthTau2boosted.Write();
-  h_PhiTau2boosted.Write();
-  h_PtTau2boosted.Write();
-  h_ETau2boosted.Write();
-  h_invmassboosted.Write();
-  h_VisFracTau1.Write();
-  h_VisFracTau2.Write();
-  h_EFracTau1Fit.Write();
-  h_EFracTau2Fit.Write();
-  h_EFracTau1Gen.Write();
-  h_EFracTau2Gen.Write();
-  h_EtaTau1Vis.Write();
-  h_CthTau1Vis.Write();
-  h_PhiTau1Vis.Write();
-  h_PtTau1Vis.Write();
-  h_ETau1Vis.Write();
-  h_EtaTau2Vis.Write();
-  h_CthTau2Vis.Write();
-  h_PhiTau2Vis.Write();
-  h_PtTau2Vis.Write();
-  h_ETau2Vis.Write();
-  h_AbsPtmiss.Write();
-  h_Pxmiss.Write();
-  h_Pymiss.Write();
-  h_PhiMET.Write();
-  h_AbsPtmisswithsigma.Write();
-  h_Pxmisswithsigma.Write();
-  h_Pymisswithsigma.Write();
-  h_PhiMETwithsigma.Write();
-  h_FitFinalChi2.Write();
-  h_FitFinalChi2prob.Write();
-  h_fracresulutiontau1.Write();
-  h_fracresulutiontau1weighted.Write();
-  h_fracresulutiontau2.Write();
-  h_fracresulutiontau2weighted.Write();
-  h_energyresulution1.Write();
-  h_energyresulution1weighted.Write();
-  h_energyresulution2.Write();
-  h_energyresulution2weighted.Write();
-  h_FitlikelihoodFinalChi2.Write();
-  h_FitlikelihoodFinalChi2prob.Write();
-  h_fracresulutiontau1likelihood.Write();
-  h_fracresulutiontau2likelihood.Write();
-  h_energyresulution1likelihood.Write();
-  h_energyresulution2likelihood.Write();
-  h_testingfraclikelihood.Write();
-  h_balanceconstraintwithlikelihood.Write();
-  h_likelihoodconstraint.Write();
+    h_EtaTau1.Write();
+    h_CthTau1.Write();
+    h_PhiTau1.Write();
+    h_PtTau1.Write();
+    h_ETau1.Write();
+    h_EtaTau2.Write();
+    h_CthTau2.Write();
+    h_PhiTau2.Write();
+    h_PtTau2.Write();
+    h_ETau2.Write();
+    h_EtaISR.Write();
+    h_CthISR.Write();
+    h_PhiISR.Write();
+    h_PtISR.Write();
+    h_EtaHiggs.Write();
+    h_CthHiggs.Write();
+    h_PhiHiggs.Write();
+    h_PtHiggs.Write();
+    h_EtaTau1boosted.Write();
+    h_CthTau1boosted.Write();
+    h_PhiTau1boosted.Write();
+    h_PtTau1boosted.Write();
+    h_ETau1boosted.Write();
+    h_EtaTau2boosted.Write();
+    h_CthTau2boosted.Write();
+    h_PhiTau2boosted.Write();
+    h_PtTau2boosted.Write();
+    h_ETau2boosted.Write();
+    h_invmassboosted.Write();
+    h_VisFracTau1.Write();
+    h_VisFracTau2.Write();
+    h_EFracTau1Fit.Write();
+    h_EFracTau2Fit.Write();
+    h_EFracTau1Gen.Write();
+    h_EFracTau2Gen.Write();
+    h_EtaTau1Vis.Write();
+    h_CthTau1Vis.Write();
+    h_PhiTau1Vis.Write();
+    h_PtTau1Vis.Write();
+    h_ETau1Vis.Write();
+    h_EtaTau2Vis.Write();
+    h_CthTau2Vis.Write();
+    h_PhiTau2Vis.Write();
+    h_PtTau2Vis.Write();
+    h_ETau2Vis.Write();
+    h_AbsPtmiss.Write();
+    h_Pxmiss.Write();
+    h_Pymiss.Write();
+    h_PhiMET.Write();
+    h_AbsPtmisswithsigma.Write();
+    h_Pxmisswithsigma.Write();
+    h_Pymisswithsigma.Write();
+    h_PhiMETwithsigma.Write();
+    h_FitFinalChi2.Write();
+    h_FitFinalChi2prob.Write();
+    h_fracresulutiontau1.Write();
+    h_fracresulutiontau1weighted.Write();
+    h_fracresulutiontau2.Write();
+    h_fracresulutiontau2weighted.Write();
+    h_energyresulution1.Write();
+    h_energyresulution1weighted.Write();
+    h_energyresulution2.Write();
+    h_energyresulution2weighted.Write();
+    h_FitlikelihoodFinalChi2.Write();
+    h_FitlikelihoodFinalChi2prob.Write();
+    h_fracresulutiontau1likelihood.Write();
+    h_fracresulutiontau2likelihood.Write();
+    h_energyresulution1likelihood.Write();
+    h_energyresulution2likelihood.Write();
+    h_testingfraclikelihood.Write();
+    h_balanceconstraintwithlikelihood.Write();
+    h_likelihoodconstraint.Write();
+
 
   controlplots.Close();
+
+
 
   //---------------------------------------------------------------------------------------------------------------------------------
   return(0);
