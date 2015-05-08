@@ -50,9 +50,9 @@ int main(int argc, char* argv[])
   double timer1=0;
   double timer2=0;
 
-  TF1 PDF1("PDF1","2*x",0,2);
-  TF1 PDF2("PDF2","2*x",0,2);
-  TF1* pdf1=&PDF1;
+  TF1* PDF1 = new TF1("PDF1","2*x",0,2);
+  TF1* PDF2 = new TF1("PDF2","2*x",0,2);
+
   TMatrixD covarmatrix(2,2);
   covarmatrix[0][0]=130;
   covarmatrix[0][1]=0;

@@ -1,16 +1,15 @@
-#!/bin/bash
-echo "removing old files"
-rm -f libHHKinFit.so run
-
-echo "creating shared library"
-g++ -fPIC -shared src/*.cpp `root-config --cflags --glibs` -I ./include -o libHHKinFit.so
-
-echo "creating executable"
-#g++ main.C `root-config --cflags --glibs` -I ./include -L . -lHHKinFit  -o runHHKinFit
-#g++ mainTorbenTest.C `root-config --cflags --glibs` -I ./include -L . -lHHKinFit  -o runHHTauTauEventGenerator
-#g++ controlplots.C `root-config --cflags --glibs` -I ./include -L . -lHHKinFit  -o createcontrolplots
-#g++ KinFitwithEventGenerator.C `root-config --cflags --glibs` -I ./include -L . -lHHKinFit  -o KinFitwithEventGenerator
-g++ backgroundtest.C `root-config --cflags --glibs` -I ./include -L . -lHHKinFit  -o BackgroundTest
-#g++ -std=c++11 compareKinFits.C `root-config --cflags --glibs` -I ./include -I ../HHKinFit/interface -L . -L ../HHKinFit -lHHKinFit2 -lHHKinFit -o compareKinFits
-g++ newmain.C `root-config --cflags --glibs` -I ./include -L . -lHHKinFit  -o multiplefit
+if [[ -z "$KINFIT2PATH" ]]
+then
+    echo "Environment not initialized "
+else
+    echo "removing old files"
+    rm -f libHHKinFit.so
+    
+    echo "creating shared library"
+    g++ -fPIC -shared src/*.cpp `root-config --cflags --glibs` -I ./include -o libHHKinFit2.so
+    
+    echo "creating executable"
+    #g++ examples/main.C `root-config --cflags --glibs` -I $KINFIT2PATH/include -L $KINFIT2PATH -lHHKinFit2  -o runHHKinFit
+    g++ -std=c++11 examples/compareKinFits.C `root-config --cflags --glibs` -I $KINFIT2PATH/include -I $KINFIT1PATH/interface -L $KINFIT2PATH -lHHKinFit2 -L $KINFIT1PATH -lHHKinFit1 -o compareKinFits
+fi
 
