@@ -11,6 +11,7 @@
 #include <iomanip>
 #include "TAxis.h"
 #include <iostream>
+#include "exceptions/HHEnergyRangeException.h"
 
 HHKinFit2::HHKinFit::HHKinFit()
 : m_fitobjects(std::vector<HHFitObjectE*>()),
@@ -36,26 +37,37 @@ HHKinFit2::HHKinFit::fit(){
   double chi2iter[1], aMemory[np][5], g[np], H[np * np], Hinv[np * np];
   bool noNewtonShifts = false;
   
+  double chi2before;
+  double abefore[np];
+  double daNbefore[np];
+  double hbefore[np];
+  double chi2iterbefore[1], aMemorybefore[np][5], gbefore[np], Hbefore[np * np], Hinvbefore[np * np];
+
+
   int iter = 0;             //  number of iterations
   int method = 1;           //  initial fit method, see PSfit()
   int mode = 1;             //  mode =1 for start of a new fit by PSfit()
   //   int icallNewton = -1;     //  init start of Newton Method
   //   int iloop = 0;            // counter for falls to fit function
   
-  
+  int iterbefore = 0;             //  number of iterations
+  int methodbefore = 1;           //  initial fit method, see PSfit()
+  int modebefore = 1;             //  mode =1 for start of a new fit by PSfit()
   
   for (unsigned int i=0; i<m_fitobjects.size(); i++){
-    // fill initial tau fit parameters
-    astart[i] = m_fitobjects[i]->getE();    // energy of first tau
-    aprec[i]  = 0.1;                        //0.1                 // precision for fit
-    // fill initial step width
-    h[i] = 0.2*(m_fitobjects[i]->getUpperFitLimitE()-m_fitobjects[i]->getLowerFitLimitE());   //
-    daN[i] = 1.0;   //0.0                 // initial search direction
-    
-    
-    
-    alimit[i][0] = 1.00001* m_fitobjects[0]->getLowerFitLimitE();              // tau: minimum is visible tau1 energy
-    alimit[i][1] = 0.99999* m_fitobjects[0]->getUpperFitLimitE();              //      maximum as computed above
+    //// fill initial tau fit parameters
+    //astart[i] = m_fitobjects[i]->getE();    // energy of first tau
+    //aprec[i]  = 0.1;                        //0.1                 // precision for fit
+    //// fill initial step width
+    //h[i] = 0.2*(m_fitobjects[i]->getUpperFitLimitE()-m_fitobjects[i]->getLowerFitLimitE());   //
+    //daN[i] = 1.0;   //0.0                 // initial search direction
+
+    astart[i]    = m_fitobjects[i]->getInitStart();
+    aprec[i]     = m_fitobjects[i]->getInitPrecision();
+    h[i]         = m_fitobjects[i]->getInitStepWidth();
+    daN[i]       = m_fitobjects[i]->getInitDirection();
+    alimit[i][0] = 1.00001* m_fitobjects[i]->getLowerFitLimitE();
+    alimit[i][1] = 0.99999* m_fitobjects[i]->getUpperFitLimitE();
     
     // tau: check initial values against fit range
     if (astart[i] - h[i] < alimit[i][0]) {
@@ -76,7 +88,42 @@ HHKinFit2::HHKinFit::fit(){
   
   for (int iloop = 0; iloop < m_maxloops * 10 && iter < m_maxloops; iloop++) { // FIT loop
     for (unsigned int i=0; i<m_fitobjects.size();i++){
-      m_fitobjects[i]->changeEandSave(a[i]);
+      try{
+        m_fitobjects[i]->changeEandSave(a[i]);
+      }
+      catch(HHKinFit2::HHEnergyRangeException const& e){
+        std::cout << e.what() << std::endl;
+
+        std::cout << "iloop =" << iloop << std::endl;
+        std::cout << "iter  ="<< iterbefore << " " << iter << std::endl;
+        std::cout << "method="<< methodbefore << " " << method << std::endl;
+        std::cout << "mode  ="<< modebefore << " " << mode << std::endl;
+        std::cout << "noNewtonShifts="<< noNewtonShifts << std::endl;
+        std::cout << "printlevel="<< m_printlevel << std::endl;
+        std::cout << "np="<< np << std::endl;
+        std::cout << "chi2="<< chi2before << " " << m_chi2 << std::endl;
+        std::cout << "chi2iter[0]="<< chi2iterbefore[0] << " " << chi2iter[0] << std::endl;
+
+        for (unsigned int i=0; i<m_fitobjects.size();i++) std::cout << "a[" << i << "]      ="<< abefore[i] << " " << a[i] << std::endl;
+        for (unsigned int i=0; i<m_fitobjects.size();i++) std::cout << "astart[" << i << "] ="<< astart[i] << std::endl;
+        for (unsigned int i=0; i<m_fitobjects.size();i++) std::cout << "aprec[" << i << "]  ="<< aprec[i] << std::endl;
+        for (unsigned int i=0; i<m_fitobjects.size();i++) std::cout << "daN[" << i << "]    ="<< daNbefore[i] << " " << daN[i] << std::endl;
+        for (unsigned int i=0; i<m_fitobjects.size();i++) std::cout << "h[" << i << "]      ="<< hbefore[i] << " " << h[i] << std::endl;
+        for (unsigned int i=0; i<m_fitobjects.size();i++) std::cout << "aMemory[" << i << "]="<< aMemorybefore[i][0] << " "
+            << aMemorybefore[i][1] << " "
+            << aMemorybefore[i][2] << " "
+            << aMemorybefore[i][3] << " "
+            << aMemorybefore[i][4] << std::endl;
+        for (unsigned int i=0; i<m_fitobjects.size();i++) std::cout << "after: aMemory[" << i << "]="<< aMemorybefore[i][0] << " "
+            << aMemory[i][1] << " "
+            << aMemory[i][2] << " "
+            << aMemory[i][3] << " "
+            << aMemory[i][4] << std::endl;
+        for (unsigned int i=0; i<m_fitobjects.size();i++) std::cout << "g[" << i << "]      =" << gbefore[i] << " " << g[i] << std::endl;
+        for (unsigned int i=0; i<m_fitobjects.size()*m_fitobjects.size();i++) std::cout << "H[" << i << "]      =" << Hbefore[i] << " " << H[i] << std::endl;
+        for (unsigned int i=0; i<m_fitobjects.size()*m_fitobjects.size();i++) std::cout << "Hinv[" << i << "]   =" << Hinvbefore[i] <<  " " << Hinv[i] <<std::endl;
+        throw(e);
+      }
     }
     
     m_chi2=this->getChi2();
@@ -84,6 +131,28 @@ HHKinFit2::HHKinFit::fit(){
     //	    m_fitobjects[0]->print();
     
     
+    chi2before = m_chi2;
+    chi2iterbefore[0]=chi2iter[0];
+    iterbefore = iter;
+    methodbefore = method;
+    modebefore = mode;
+    for (unsigned int i=0; i<m_fitobjects.size();i++){
+      abefore[i]=a[i];
+      daNbefore[i]=daN[i];
+      hbefore[i]=h[i];
+      aMemorybefore[i][0]=aMemory[i][0];
+      aMemorybefore[i][1]=aMemory[i][1];
+      aMemorybefore[i][2]=aMemory[i][2];
+      aMemorybefore[i][3]=aMemory[i][3];
+      aMemorybefore[i][4]=aMemory[i][4];
+      gbefore[i]=g[i];
+      Hbefore[i]=H[i];
+      Hinvbefore[i]=Hinv[i];
+    }
+
+
+
+
     
     if (m_convergence != 0) break;
     m_convergence = PSMath::PSfit(iloop, iter, method, mode, noNewtonShifts, m_printlevel,
@@ -127,6 +196,18 @@ HHKinFit2::HHKinFit::getChi2() const{
   //std::cout << chi2 << std::endl;
   //std::cout << "----------------------------------------------------------------------------------------------"<<std::endl;
   return(chi2);
+}
+
+void
+HHKinFit2::HHKinFit::printChi2() const{
+  double chi2=0;
+  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it){
+    std::cout << (*it)->getChi2() << std::endl;
+    chi2 += (*it)->getChi2();
+    (*it)->printChi2();
+  }
+  std::cout << chi2 << std::endl;
+  std::cout << "----------------------------------------------------------------------------------------------"<<std::endl;
 }
 
 double

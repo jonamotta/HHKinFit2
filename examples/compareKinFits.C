@@ -41,7 +41,6 @@ using HHKinFit2::HHLorentzVector;
 #include <iostream>
 #include <chrono>
 
-
 int main(int argc, char* argv[])
 {
   auto start = std::chrono::high_resolution_clock::now();
@@ -60,10 +59,13 @@ int main(int argc, char* argv[])
   covarmatrix[1][1]=130;
   HHTauTauEventGenerator testgenerator(PDF1,PDF2,covarmatrix);
 
-  int events = 100000;
-  TGraph gr_ptmiss(events);
-  TH1D h_chi2("chi2","chi2",20,0,10);
-  TH1D h_prob("prob","prob",20,0,1);
+  int events = 1000000;
+  TH1D h_deltachi2("h_dchi2","deltachi2",200,-1,1);
+  TH1D h_deltaE("h_dE","deltaE",200,-0.1,0.1);
+  TH1D h_chi2_1("h_chi2_1","chi2 HHKinFit1",200,0,20);
+  TH1D h_chi2_2("h_chi2_2","chi2 HHKinFit2",200,0,20);
+  TH1D h_prob_1("h_prob_1","P(chi2) HHKinFit1",50,0,1);
+  TH1D h_prob_2("h_prob_2","P(chi2) HHKinFit2",50,0,1);
 
 
   for(unsigned int i=0; i<events; i++){
@@ -89,12 +91,10 @@ int main(int argc, char* argv[])
     TVector2 ptmiss (testgenerator.getMETwithsigma()[0],testgenerator.getMETwithsigma()[1]);
     TLorentzVector ptmissLV  = TLorentzVector(ptmiss.Px(),ptmiss.Py(),0,sqrt(ptmiss.Px()*ptmiss.Px()+ptmiss.Py()*ptmiss.Py()));
 
-    gr_ptmiss.SetPoint(i,ptmiss.Px(),ptmiss.Py());
-
-//    std::cout << "input energies:" << std::endl;
-//    std::cout << gentauvis1.E() << std::endl;
-//    std::cout << gentauvis2.E() << std::endl;
-//    std::cout << "........................" << std::endl;
+    // std::cout << "input energies:" << std::endl;
+    // std::cout << gentauvis1.E() << std::endl;
+    // std::cout << gentauvis2.E() << std::endl;
+    // std::cout << "........................" << std::endl;
 
     //prepare tau objects
     start = std::chrono::high_resolution_clock::now();
@@ -117,17 +117,34 @@ int main(int argc, char* argv[])
     HHFitConstraint* balance = new HHFitConstraint4Vector(higgs, true, true, false, false);
     
     //fit
-    HHKinFit2::HHKinFit* singlefit = new HHKinFit2::HHKinFit();
-    singlefit->addFitObjectE(tau1);
-    singlefit->addConstraint(invm);
-    singlefit->addConstraint(balance);
+    HHKinFit2::HHKinFit singlefit;
+    singlefit.addFitObjectE(tau1);
+    singlefit.addConstraint(invm);
+    singlefit.addConstraint(balance);
 
-    singlefit->fit();
+    try{
+      singlefit.fit();
+    }
+    catch(HHKinFit2::HHEnergyRangeException const& e){ // can happen due to derivative calculation...
+      std::cout << e.what() << std::endl;
+      i--;
+      continue;
+    }
     timer1+= std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()-start).count();
 
-    double chi2 = singlefit->getChi2();
-    h_chi2.Fill(chi2);
-    h_prob.Fill(TMath::Prob(chi2,1));
+    double chi2 = singlefit.getChi2();
+    double e = tau1->getFit4Vector().E();
+    delete(tau1);
+    delete(tau2);
+    delete(met);
+    delete(higgs);
+    delete(invm);
+    delete(balance);
+
+    if (!((singlefit.getConvergence()==1)||(singlefit.getConvergence()==2))) {
+      i--;
+      continue;
+    }
 
     //std::cout << "........................" << std::endl;
 
@@ -140,26 +157,34 @@ int main(int argc, char* argv[])
     oldkinfit.doFullFit();
     timer2+= std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now()-start).count();
 
-    
     double oldchi2 = oldkinfit.getBestChi2FullFit();
+    double olde = oldkinfit.m_tau1_fitted.E();
     //-----------------------------------------------------------
-//    std::cout << "........................" << std::endl;
-//
-//
-//    std::cout << "new chi2:  " << chi2 << std::endl;
-//    std::cout << "old chi2:  " << oldchi2 << std::endl;
-//    std::cout << "new Etau1: " << tau1->getFit4Vector().E() << std::endl;
-//    std::cout << "old Etau1: " << oldkinfit.m_tau1_fitted.E() << std::endl;
-//    std::cout << "new Etau2: " << tau2->getFit4Vector().E() << std::endl;
-//    std::cout << "old Etau2: " << oldkinfit.m_tau2_fitted.E() << std::endl;
+    // std::cout << "........................" << std::endl;
+    // std::cout << "new chi2:  " << chi2 << std::endl;
+    // std::cout << "old chi2:  " << oldchi2 << std::endl;
+    // std::cout << "new Etau1: " << tau1->getFit4Vector().E() << std::endl;
+    // std::cout << "old Etau1: " << oldkinfit.m_tau1_fitted.E() << std::endl;
+    // std::cout << "new Etau2: " << tau2->getFit4Vector().E() << std::endl;
+    // std::cout << "old Etau2: " << oldkinfit.m_tau2_fitted.E() << std::endl;
 
-
+    h_deltachi2.Fill((chi2-oldchi2)/oldchi2);
+    h_deltaE.Fill((e-olde)/olde);
+    h_chi2_1.Fill(oldchi2);
+    h_chi2_2.Fill(chi2);
+    h_prob_1.Fill(TMath::Prob(oldchi2,1));
+    h_prob_2.Fill(TMath::Prob(chi2,1));
+    if (i%10000==0) std::cout << i << std::endl;
   }
 
   TFile f("out.root","RECREATE");
-  gr_ptmiss.Write();
-  h_chi2.Write();
-  h_prob.Write();
+  h_deltachi2.Write();
+  h_deltaE.Write();
+  h_chi2_1.Write();
+  h_chi2_2.Write();
+  h_prob_1.Write();
+  h_prob_2.Write();
+
   f.Close();
 
   std::cout << "event generation: " << timer0/events << "us/event." << std::endl;

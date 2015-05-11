@@ -12,6 +12,7 @@ public:
 	void SetEEtaPhiM(double E,double Eta,double Phi,double M);
     void SetEkeepM(double E);
     void SetEkeepBeta(double E);
+    void SetMkeepE(double m);
 	HHLorentzVector operator+(HHLorentzVector const& rhs) const;
 	HHLorentzVector operator-(HHLorentzVector const& rhs) const;
 };

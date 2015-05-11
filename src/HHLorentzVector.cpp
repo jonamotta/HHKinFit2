@@ -30,6 +30,7 @@ HHKinFit2::HHLorentzVector::operator-(HHLorentzVector const& rhs) const{
 }
 
 
+
 void
 HHKinFit2::HHLorentzVector::SetEkeepM(double E){
   if(E<M()){
@@ -39,10 +40,30 @@ HHKinFit2::HHLorentzVector::SetEkeepM(double E){
   }
   
   double pnew = sqrt(pow(E,2)-pow(M(),2));
+  if (isnan(pnew)) {
+      std::cout << "WARNING: SetEkeepM(): Targeted E is smaller than m. Set P=1, E=sqrt(m**2+1**2)" << std::endl;
+      E=sqrt(pow(M(),2)+1.0);
+      pnew = 1.0;
+  }
   double ptnew = pnew * sin(2.*atan(exp(-Eta())));
   SetPtEtaPhiE(ptnew,Eta(),Phi(),E);
 
 }
+
+
+void
+HHKinFit2::HHLorentzVector::SetMkeepE(double m){
+  double energy=E();
+  if(energy<m){
+    std::cout << "SetMkeepE()::energy is smaller than the particle mass: "<<"m(set)="<<m<<" "<<"E="<<energy << std::endl;
+    energy = 1.1*m;
+  }
+
+  double pnew = sqrt(pow(energy,2)-pow(m,2));
+  double ptnew = pnew * sin(2.*atan(exp(-Eta())));
+  SetPtEtaPhiE(ptnew,Eta(),Phi(),energy);
+}
+
 
 void
 HHKinFit2::HHLorentzVector::SetEkeepBeta(double E){

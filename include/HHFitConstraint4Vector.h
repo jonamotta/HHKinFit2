@@ -16,11 +16,14 @@ class HHFitConstraint4Vector : public HHFitConstraint {
   double getChi2() const;
   double getLikelihood() const;
 
+  void printChi2() const;
+
  private:
   bool m_components[4];
   TMatrixD m_cov;
   TMatrixD m_invcov;
   int m_ncomp;
+  std::vector<int> m_indices;
 };
 }
 #endif /* HHFitConstraint4Vector_ */

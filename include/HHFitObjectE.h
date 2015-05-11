@@ -32,6 +32,15 @@ class HHFitObjectE : public HHFitObject {
   void setLowerFitLimitE(double const lowerlimit);
   void setLowerFitLimitE(HHLorentzVector const& other4vectorMin);
 
+  void setInitStart(double start);
+  void setInitPrecision(double prec);
+  void setInitDirection(double daN);
+  void setInitStepWidth(double h);
+  double getInitStart();
+  double getInitPrecision();
+  double getInitDirection();
+  double getInitStepWidth();
+
   void setCovMatrix(double dE);
 
   virtual void print() const;
@@ -40,6 +49,10 @@ class HHFitObjectE : public HHFitObject {
  private:
   double m_upperLimitE;
   double m_lowerLimitE;
+  double m_initstart;
+  double m_initprec;
+  double m_initstep;
+  double m_initdirection;
 };
 }
 #endif /* HHFitObjectE_ */

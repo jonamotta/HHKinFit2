@@ -2,12 +2,18 @@
 #include <iostream>
 #include <iomanip>
 
+#include "exceptions/HHEnergyRangeException.h"
+#include "exceptions/HHLimitSettingException.h"
+
 
 HHKinFit2::HHFitObjectE::HHFitObjectE(HHLorentzVector const& initial4vector)
   :HHFitObject(initial4vector),
-   m_upperLimitE(9999999),
-   m_lowerLimitE(0){
-
+   m_upperLimitE(pow(10,10)),
+   m_lowerLimitE(0),
+   m_initstart(-pow(10,10)),
+   m_initprec(-pow(10,10)),
+   m_initstep(-pow(10,10)),
+   m_initdirection(-pow(10,10)){
 }
 
 HHKinFit2::HHLorentzVector
@@ -45,8 +51,8 @@ HHKinFit2::HHFitObjectE::setFitLimitsE(double const lowerlimit, double const upp
 
 void
 HHKinFit2::HHFitObjectE::setFitLimitsE(HHLorentzVector const& own4vectorMin, double const minv, HHLorentzVector const& other4vectorMin){
-	this->setLowerFitLimitE(own4vectorMin);
-	this->setUpperFitLimitE(minv,other4vectorMin);
+  this->setLowerFitLimitE(own4vectorMin);
+  this->setUpperFitLimitE(minv,other4vectorMin);
 }
 
 
@@ -67,7 +73,12 @@ HHKinFit2::HHFitObjectE::setUpperFitLimitE(double upperlimit){
 
 void
 HHKinFit2::HHFitObjectE::setUpperFitLimitE(double minv, HHLorentzVector const& other4vectorMin){
-  this->setUpperFitLimitE(constrainEtoMinv(minv,other4vectorMin).E());
+  try{
+    this->setUpperFitLimitE(constrainEtoMinv(minv,other4vectorMin).E());
+  }
+  catch(HHEnergyRangeException const& e){
+    throw(HHLimitSettingException(e.what()));
+  }
 }
 
 void
@@ -85,6 +96,46 @@ HHKinFit2::HHFitObjectE::setCovMatrix(double dE){
   TMatrixD cov(4,4);
   cov(3,3)=dE;
   m_covmatrix=cov;
+}
+
+void
+HHKinFit2::HHFitObjectE::setInitPrecision(double prec){
+  m_initprec=prec;
+}
+
+void
+HHKinFit2::HHFitObjectE::setInitDirection(double daN){
+  m_initdirection=daN;
+}
+
+void
+HHKinFit2::HHFitObjectE::setInitStepWidth(double h){
+  m_initstep=h;
+}
+
+void
+HHKinFit2::HHFitObjectE::setInitStart(double start){
+  m_initstart=start;
+}
+
+double
+HHKinFit2::HHFitObjectE::getInitPrecision(){
+  return(m_initprec);
+}
+
+double
+HHKinFit2::HHFitObjectE::getInitDirection(){
+  return(m_initdirection);
+}
+
+double
+HHKinFit2::HHFitObjectE::getInitStepWidth(){
+  return(m_initstep);
+}
+
+double
+HHKinFit2::HHFitObjectE::getInitStart(){
+  return(m_initstart);
 }
 
 void

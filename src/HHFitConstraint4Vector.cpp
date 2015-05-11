@@ -12,24 +12,26 @@ HHKinFit2::HHFitConstraint4Vector::HHFitConstraint4Vector(HHFitObject* object, b
   : HHFitConstraint(object),
     m_ncomp(0),
     m_cov(),
-    m_invcov()
+    m_invcov(),
+    m_indices()
 {
   m_components[0]=px;
   m_components[1]=py;
   m_components[2]=pz;
   m_components[3]=E;
-  for (int i=0; i<4; i++) if (m_components[i]) m_ncomp++;
+  for (int i=0; i<4; i++) {
+    if (m_components[i]) {
+      m_indices.push_back(i);
+      m_ncomp++;
+    }
+  }
   m_cov.ResizeTo(m_ncomp,m_ncomp);
 
   int a=0;
-  for (int i=0;i<4;i++){
-    int b=0;
-    for (int j=0; j<4; j++){
-      if (m_components[i]&&m_components[j]) m_cov(a,b)=m_fitobject->getCovMatrix()(i,j);
-      if (m_components[j]) b++;
-    }
-    if (m_components[i]) a++;
-  }
+  for (int i=0; i<m_ncomp; i++)
+    for (int j=0; j<m_ncomp; j++)
+      m_cov(i,j)=m_fitobject->getCovMatrix()(m_indices[i],m_indices[j]);
+
 
   TMatrixDEigen eigenmatrix(m_cov);
   for (int i=0; i<m_ncomp; i++){
@@ -43,6 +45,9 @@ HHKinFit2::HHFitConstraint4Vector::HHFitConstraint4Vector(HHFitObject* object, b
   m_invcov.ResizeTo(m_ncomp,m_ncomp);
   m_invcov = m_cov;
   m_invcov.Invert();
+
+//  m_cov.Print();
+//  m_invcov.Print();
 }
 
 double
@@ -51,11 +56,26 @@ HHKinFit2::HHFitConstraint4Vector::getChi2() const{
 	      double chi2sum=0;
 	      for(int i=0; i<m_ncomp; i++){
 	        for(int j=0;j<m_ncomp;j++){
-	          chi2sum+=res(i)*res(j)*m_invcov(i,j);
+	          chi2sum+=res(m_indices[i])*res(m_indices[j])*m_invcov(i,j);
 	          //std::cout << res(i) << "*" <<res(j) << "*" << invcov(i,j) << "=" << res(i)*res(j)*invcov(i,j) << std::endl;
 	        }
 	      }
   return(chi2sum);
+}
+
+void
+HHKinFit2::HHFitConstraint4Vector::printChi2() const{
+  HHLorentzVector res = m_fitobject->getFit4Vector()-m_fitobject->getInitial4Vector();
+  m_fitobject->getFit4Vector().Print();
+  m_fitobject->getInitial4Vector().Print();
+  res.Print();
+  double chi2sum=0;
+  for(int i=0; i<m_ncomp; i++){
+    for(int j=0;j<m_ncomp;j++){
+      chi2sum+=res(m_indices[i])*res(m_indices[j])*m_invcov(i,j);
+      std::cout << res(m_indices[i]) << "*" <<res(m_indices[j]) << "*" << m_invcov(i,j) << "=" << res(m_indices[i])*res(m_indices[j])*m_invcov(i,j) << std::endl;
+    }
+  }
 }
 
 double

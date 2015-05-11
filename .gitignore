@@ -9,3 +9,6 @@ doc
 *.root
 runHHTauTauEventGenerator
 runHHKinFit
+compare2DKinFits
+compareKinFits
+gensimHH

@@ -39,7 +39,7 @@ HHKinFit2::HHFitObjectEConstBeta::constrainEtoMinv(double m, HHLorentzVector con
   double c=(1-pow(b1c,2))*pow(E1,2)-pow(m,2);
   double E2new = (1./(2*a))*(-b+sqrt(pow(b,2)-4*a*c));
 
-  if (isnan(E2new)||isinf(E2new)){
+  if (isnan(E2new)||isinf(E2new)||E2new<0){
     std::stringstream msg;
     msg << "problem in constraining energy to inv. mass: minv="<<m<< " E(set)="<<E2new;
     throw(HHEnergyConstraintException(msg.str()));
@@ -72,6 +72,7 @@ HHKinFit2::HHFitObjectEConstBeta::print() const{
   this->printInitial4Vector();
   this->printFit4Vector();
   this->printCovMatrix();
+  this->printLimits();
 }
 
 

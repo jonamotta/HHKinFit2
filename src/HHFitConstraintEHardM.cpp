@@ -1,5 +1,7 @@
 #include "HHFitConstraintEHardM.h"
 #include "HHFitObjectE.h"
+#include "exceptions/HHEnergyRangeException.h"
+#include "exceptions/HHInvMConstraintException.h"
 
 HHKinFit2::HHFitConstraintEHardM::HHFitConstraintEHardM(HHFitObject* fitobject, HHFitObject* constrainedobject, double mass)
   : HHFitConstraint(fitobject),
@@ -11,7 +13,14 @@ HHKinFit2::HHFitConstraintEHardM::HHFitConstraintEHardM(HHFitObject* fitobject, 
 double
 HHKinFit2::HHFitConstraintEHardM::getChi2() const{
   HHFitObjectE* new4momentum2 = static_cast<HHFitObjectE*>(m_constrainedobject);
-  new4momentum2->constrainEtoMinvandSave(m_mass, m_fitobject->getFit4Vector());
+  try{
+    new4momentum2->constrainEtoMinvandSave(m_mass, m_fitobject->getFit4Vector());
+  }
+  catch(HHEnergyRangeException const& e){
+    m_fitobject->print();
+    new4momentum2->print();
+    throw(HHInvMConstraintException(e.what()));
+  }
   return(0);
 }
 

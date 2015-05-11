@@ -29,6 +29,9 @@ class HHKinFit {
   int getConvergence() const;
 
 
+  void printChi2() const;
+
+
  private:
   std::vector<HHFitObjectE*> m_fitobjects;
   std::vector<HHFitConstraint*> m_constraints;
