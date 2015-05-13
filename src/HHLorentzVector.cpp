@@ -29,6 +29,19 @@ HHKinFit2::HHLorentzVector::operator-(HHLorentzVector const& rhs) const{
   return(HHLorentzVector(rhs.Px()-this->Px(),rhs.Py()-this->Py(),rhs.Pz()-this->Pz(),rhs.E()-this->E()));
 }
 
+HHKinFit2::HHLorentzVector
+HHKinFit2::HHLorentzVector::operator-() const
+{
+  return(HHLorentzVector(-this->Px(), -this->Py(), -this->Pz(), -this->E() ) );
+}
+
+HHKinFit2::HHLorentzVector&
+HHKinFit2::HHLorentzVector::operator=(const HHLorentzVector& other)
+{
+  SetPxPyPzE(other.Px(), other.Py(), other.Pz(), other.E() );
+  return *this;
+}
+
 
 
 void
