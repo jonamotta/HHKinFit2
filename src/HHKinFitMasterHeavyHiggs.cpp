@@ -22,8 +22,105 @@
 #include <cstdlib>
 #include <iterator>
 
+
+
+
+
+
+HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(TLorentzVector* bjet1, TLorentzVector* bjet2, TLorentzVector* tauvis1, TLorentzVector* tauvis2, Bool_t truthinput, TLorentzVector* heavyhiggsgen):
+    m_mh1(std::vector<Int_t>()),
+    m_mh2(std::vector<Int_t>()),
+
+    m_bjet1(bjet1),
+    m_bjet2(bjet2),
+    m_tauvis1(tauvis1),
+    m_tauvis2(tauvis2),
+
+    m_MET(NULL),
+    m_MET_COV(TMatrixD(2,2)),
+
+    m_truthInput(truthinput),
+    m_advancedBalance(false),
+    m_simpleBalancePt(0.0),
+    m_simpleBalanceUncert(10.0),
+    m_fullFitResultChi2(std::map< std::pair<Int_t,Int_t> , Double_t>()),
+    m_fullFitResultMH(std::map< std::pair<Int_t,Int_t> , Double_t>()),
+    m_bestChi2FullFit(999),
+    m_bestMHFullFit(-1),
+    m_bestHypoFullFit(std::pair<Int_t, Int_t>(-1,-1) )
+{
+  if (m_truthInput){
+    TRandom3 r(0);
+
+    m_bjet1Smear = GetBjetResolution(bjet1->Eta(), bjet1->Et());
+    Double_t bjet1_E  = r.Gaus(bjet1->E(), m_bjet1Smear);
+    Double_t bjet1_P  = sqrt(pow(bjet1_E,2) - pow(bjet1->M(),2));
+    Double_t bjet1_Pt = sin(bjet1->Theta())*bjet1_P;
+
+    std::cout << "Jet1 smeared by: " <<   (bjet1_E - bjet1->E())/m_bjet1Smear << std::endl;
+
+    bjet1->SetPtEtaPhiE(bjet1_Pt, bjet1->Eta(), bjet1->Phi(), bjet1_E);
+
+    TMatrixD bjet1Cov(2,2);
+    Double_t bjet1_dpt = sin(bjet1->Theta())*bjet1->E()/bjet1->P()*m_bjet1Smear;  // error propagation p=sqrt(e^2-m^2)
+    bjet1Cov(0,0) = pow(cos(bjet1->Phi())*bjet1_dpt,2);                           bjet1Cov(0,1) = sin(bjet1->Phi())*cos(bjet1->Phi())*bjet1_dpt*bjet1_dpt;
+    bjet1Cov(1,0) = sin(bjet1->Phi())*cos(bjet1->Phi())*bjet1_dpt*bjet1_dpt;      bjet1Cov(1,1) = pow(sin(bjet1->Phi())*bjet1_dpt,2);
+
+    m_bjet2Smear = GetBjetResolution(bjet2->Eta(), bjet2->Et());
+    Double_t bjet2_E  = r.Gaus(bjet2->E(), m_bjet2Smear);
+    Double_t bjet2_P  = sqrt(pow(bjet2_E,2) - pow(bjet2->M(),2));
+    Double_t bjet2_Pt = sin(bjet2->Theta())*bjet2_P;
+
+    std::cout << "Jet1 smeared by: " <<   (bjet2_E - bjet2->E())/m_bjet2Smear << std::endl;
+
+    bjet2->SetPtEtaPhiE(bjet2_Pt, bjet2->Eta(), bjet2->Phi(), bjet2_E);
+
+    TMatrixD bjet2Cov(2,2);
+    Double_t bjet2_dpt = sin(bjet2->Theta())*bjet2->E()/bjet2->P()*m_bjet2Smear;  // error propagation p=sqrt(e^2-m^2)
+    bjet2Cov(0,0) = pow(cos(bjet2->Phi())*bjet2_dpt,2);                           bjet2Cov(0,1) = sin(bjet2->Phi())*cos(bjet2->Phi())*bjet2_dpt*bjet2_dpt;
+    bjet2Cov(1,0) = sin(bjet2->Phi())*cos(bjet2->Phi())*bjet2_dpt*bjet2_dpt;      bjet2Cov(1,1) = pow(sin(bjet2->Phi())*bjet2_dpt,2);
+
+
+    TLorentzVector* recoil;
+    if(heavyhiggsgen != NULL){
+       Double_t pxRecoil = r.Gaus(-(heavyhiggsgen->Px() ), 10.0);
+       Double_t pyRecoil = r.Gaus(-(heavyhiggsgen->Py() ), 10.0);
+       std::cout << "Higgs Recoil X smeared by: " << pxRecoil + heavyhiggsgen->Px() << std::endl;
+       std::cout << "Higgs Recoil Y smeared by: " << pyRecoil + heavyhiggsgen->Py() << std::endl;
+       recoil = new TLorentzVector(pxRecoil,pyRecoil,0,sqrt(pxRecoil*pxRecoil+pyRecoil*pyRecoil));
+    }
+    else{
+      recoil = new TLorentzVector(0,0,0,0);
+      std::cout << "WARNING! Truthinput mode active but no Heavy Higgs gen-information given! Setting Recoil to Zero!" << std::endl;
+    }
+
+    TMatrixD recoilCov(2,2);
+    recoilCov(0,0)=100;  recoilCov(0,1)=0;
+    recoilCov(1,0)=0;    recoilCov(1,1)=100;
+
+    TLorentzVector* met = new TLorentzVector(-(*bjet1 + *bjet2 + *tauvis1 + *tauvis2 + *recoil));
+
+    TMatrixD metCov(2,2);
+    metCov = recoilCov + bjet1Cov + bjet2Cov;
+
+    setAdvancedBalance(met, metCov);
+
+    m_bjet1_smeared = *bjet1;
+    m_bjet2_smeared = *bjet2;
+    m_met_smeared = *met;
+
+    delete recoil;
+  }
+}
+
+
+
+
+
+
+
 void
-HHKinFitMasterHeavyHiggs::doFullFit()
+HHKinFit2::HHKinFitMasterHeavyHiggs::fit()
 {
   //Setup event
   HHParticleList* particlelist = new HHParticleList();
@@ -180,216 +277,9 @@ HHKinFitMasterHeavyHiggs::doFullFit()
 
 
 
-HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(TLorentzVector* bjet1, TLorentzVector* bjet2, TLorentzVector* tauvis1, TLorentzVector* tauvis2, Bool_t truthinput, TLorentzVector* heavyhiggsgen):
-    m_mh1(std::vector<Int_t>()),
-    m_mh2(std::vector<Int_t>()),
-
-    m_bjet1(bjet1),
-    m_bjet2(bjet2),
-    m_tauvis1(tauvis1),
-    m_tauvis2(tauvis2),
-
-    m_MET(NULL),
-    m_MET_COV(TMatrixD(2,2)),
-
-    m_truthInput(truthinput),
-    m_advancedBalance(false),
-    m_simpleBalancePt(0.0),
-    m_simpleBalanceUncert(10.0),
-    m_fullFitResultChi2(std::map< std::pair<Int_t,Int_t> , Double_t>()),
-    m_fullFitResultMH(std::map< std::pair<Int_t,Int_t> , Double_t>()),
-    m_bestChi2FullFit(999),
-    m_bestMHFullFit(-1),
-    m_bestHypoFullFit(std::pair<Int_t, Int_t>(-1,-1) )
-{
-  if (m_truthInput){
-    TRandom3 r(0);   
-    
-    m_bjet1Smear = GetBjetResolution(bjet1->Eta(), bjet1->Et());
-    Double_t bjet1_E  = r.Gaus(bjet1->E(), m_bjet1Smear);
-    Double_t bjet1_P  = sqrt(pow(bjet1_E,2) - pow(bjet1->M(),2));
-    Double_t bjet1_Pt = sin(bjet1->Theta())*bjet1_P;
-
-    std::cout << "Jet1 smeared by: " <<   (bjet1_E - bjet1->E())/m_bjet1Smear << std::endl;
-
-    bjet1->SetPtEtaPhiE(bjet1_Pt, bjet1->Eta(), bjet1->Phi(), bjet1_E);
-    
-    TMatrixD bjet1Cov(2,2);
-    Double_t bjet1_dpt = sin(bjet1->Theta())*bjet1->E()/bjet1->P()*m_bjet1Smear;  // error propagation p=sqrt(e^2-m^2)
-    bjet1Cov(0,0) = pow(cos(bjet1->Phi())*bjet1_dpt,2);                           bjet1Cov(0,1) = sin(bjet1->Phi())*cos(bjet1->Phi())*bjet1_dpt*bjet1_dpt;
-    bjet1Cov(1,0) = sin(bjet1->Phi())*cos(bjet1->Phi())*bjet1_dpt*bjet1_dpt;      bjet1Cov(1,1) = pow(sin(bjet1->Phi())*bjet1_dpt,2);
-   
-    m_bjet2Smear = GetBjetResolution(bjet2->Eta(), bjet2->Et());
-    Double_t bjet2_E  = r.Gaus(bjet2->E(), m_bjet2Smear);
-    Double_t bjet2_P  = sqrt(pow(bjet2_E,2) - pow(bjet2->M(),2));
-    Double_t bjet2_Pt = sin(bjet2->Theta())*bjet2_P;
-
-    std::cout << "Jet1 smeared by: " <<   (bjet2_E - bjet2->E())/m_bjet2Smear << std::endl;
-
-    bjet2->SetPtEtaPhiE(bjet2_Pt, bjet2->Eta(), bjet2->Phi(), bjet2_E);
-    
-    TMatrixD bjet2Cov(2,2);
-    Double_t bjet2_dpt = sin(bjet2->Theta())*bjet2->E()/bjet2->P()*m_bjet2Smear;  // error propagation p=sqrt(e^2-m^2)
-    bjet2Cov(0,0) = pow(cos(bjet2->Phi())*bjet2_dpt,2);                           bjet2Cov(0,1) = sin(bjet2->Phi())*cos(bjet2->Phi())*bjet2_dpt*bjet2_dpt;
-    bjet2Cov(1,0) = sin(bjet2->Phi())*cos(bjet2->Phi())*bjet2_dpt*bjet2_dpt;      bjet2Cov(1,1) = pow(sin(bjet2->Phi())*bjet2_dpt,2);
-
-
-    TLorentzVector* recoil;
-    if(heavyhiggsgen != NULL){
-       Double_t pxRecoil = r.Gaus(-(heavyhiggsgen->Px() ), 10.0);
-       Double_t pyRecoil = r.Gaus(-(heavyhiggsgen->Py() ), 10.0);
-       std::cout << "Higgs Recoil X smeared by: " << pxRecoil + heavyhiggsgen->Px() << std::endl;
-       std::cout << "Higgs Recoil Y smeared by: " << pyRecoil + heavyhiggsgen->Py() << std::endl;
-       recoil = new TLorentzVector(pxRecoil,pyRecoil,0,sqrt(pxRecoil*pxRecoil+pyRecoil*pyRecoil));
-    }
-    else{
-      recoil = new TLorentzVector(0,0,0,0);
-      std::cout << "WARNING! Truthinput mode active but no Heavy Higgs gen-information given! Setting Recoil to Zero!" << std::endl;  
-    }
-    
-    TMatrixD recoilCov(2,2);
-    recoilCov(0,0)=100;  recoilCov(0,1)=0;
-    recoilCov(1,0)=0;    recoilCov(1,1)=100;
-
-    TLorentzVector* met = new TLorentzVector(-(*bjet1 + *bjet2 + *tauvis1 + *tauvis2 + *recoil));
-    
-    TMatrixD metCov(2,2);
-    metCov = recoilCov + bjet1Cov + bjet2Cov;
-    
-    setAdvancedBalance(met, metCov);
-
-    m_bjet1_smeared = *bjet1;
-    m_bjet2_smeared = *bjet2;
-    m_met_smeared = *met;
-
-    delete recoil;
-  }
-}
-
-Double_t
-HHKinFitMasterHeavyHiggs::getBestChi2FullFit()
-{
-  return m_bestChi2FullFit;
-}
-
-Double_t
-HHKinFitMasterHeavyHiggs::getBestMHFullFit()
-{
-  return m_bestMHFullFit;
-}
-
-std::map< std::pair< Int_t, Int_t >, Double_t >
-HHKinFitMasterHeavyHiggs::getChi2FullFit(){
-  return m_fullFitResultChi2;
-}
-
-std::map< std::pair< Int_t, Int_t >, Double_t >
-HHKinFitMasterHeavyHiggs::getFitProbFullFit(){
-  return m_fullFitResultFitProb;
-}
-
-std::map< std::pair< Int_t, Int_t >, Double_t >
-HHKinFitMasterHeavyHiggs::getMHFullFit(){
-  return m_fullFitResultMH;
-}
-
-std::map< std::pair< Int_t, Int_t >, Double_t >
-HHKinFitMasterHeavyHiggs::getPullB1FullFit(){
-  return m_fullFitPullB1;
-}
-
-std::map< std::pair< Int_t, Int_t >, Double_t >
-HHKinFitMasterHeavyHiggs::getPullB2FullFit(){
-  return m_fullFitPullB2;
-}
-
-std::map< std::pair< Int_t, Int_t >, Double_t >
-HHKinFitMasterHeavyHiggs::getPullBalanceFullFit(){
-  return m_fullFitPullBalance;
-}
-
-std::map< std::pair< Int_t, Int_t >, Double_t >
-HHKinFitMasterHeavyHiggs::getPullBalanceFullFitX(){
-  return m_fullFitPullBalanceX;
-}
-
-std::map< std::pair< Int_t, Int_t >, Double_t >
-HHKinFitMasterHeavyHiggs::getPullBalanceFullFitY(){
-  return m_fullFitPullBalanceY;
-}
-
-std::map< std::pair< Int_t, Int_t >, Int_t >
-HHKinFitMasterHeavyHiggs::getConvergenceFullFit(){
-  return m_fullFitConvergence;
-}
-
-std::pair<Int_t, Int_t>
-HHKinFitMasterHeavyHiggs::getBestHypoFullFit()
-{
-  return m_bestHypoFullFit;
-}
-
-
-void
-HHKinFitMasterHeavyHiggs::addMh1Hypothesis(Double_t m1, Double_t m2, Double_t m3, Double_t m4, Double_t m5, Double_t m6, Double_t m7, Double_t m8, Double_t m9, Double_t m10)
-{
-  if (m1 != 0) m_mh1.push_back(m1);
-  if (m2 != 0) m_mh1.push_back(m2);
-  if (m3 != 0) m_mh1.push_back(m3);
-  if (m4 != 0) m_mh1.push_back(m4);
-  if (m5 != 0) m_mh1.push_back(m5);
-  if (m6 != 0) m_mh1.push_back(m6);
-  if (m7 != 0) m_mh1.push_back(m7);
-  if (m8 != 0) m_mh1.push_back(m8);
-  if (m9 != 0) m_mh1.push_back(m9);
-  if (m10 != 0) m_mh1.push_back(m10);
-}
-
-void
-HHKinFitMasterHeavyHiggs::addMh1Hypothesis(std::vector<Int_t> v)
-{
-  m_mh1 = v;
-}
-
-void
-HHKinFitMasterHeavyHiggs::addMh2Hypothesis(Double_t m1, Double_t m2, Double_t m3, Double_t m4, Double_t m5, Double_t m6, Double_t m7, Double_t m8, Double_t m9, Double_t m10)
-{
-  if (m1 != 0) m_mh2.push_back(m1);
-  if (m2 != 0) m_mh2.push_back(m2);
-  if (m3 != 0) m_mh2.push_back(m3);
-  if (m4 != 0) m_mh2.push_back(m4);
-  if (m5 != 0) m_mh2.push_back(m5);
-  if (m6 != 0) m_mh2.push_back(m6);
-  if (m7 != 0) m_mh2.push_back(m7);
-  if (m8 != 0) m_mh2.push_back(m8);
-  if (m9 != 0) m_mh2.push_back(m9);
-  if (m10 != 0) m_mh2.push_back(m10);
-}
-
-void
-HHKinFitMasterHeavyHiggs::addMh2Hypothesis(std::vector<Int_t> v)
-{
-  m_mh2 = v;
-}
-
-void
-HHKinFitMasterHeavyHiggs::setAdvancedBalance(TLorentzVector* met, TMatrixD met_cov)
-{
-  m_advancedBalance = true;
-  m_MET = met;
-  m_MET_COV = met_cov;
-}
-
-void
-HHKinFitMasterHeavyHiggs::setSimpleBalance(Double_t balancePt, Double_t balanceUncert)
-{
-  m_advancedBalance = false;
-  m_simpleBalancePt = balancePt;
-  m_simpleBalanceUncert = balanceUncert;
-}
 
 double
-HHKinFitMasterHeavyHiggs::GetBjetResolution(double eta, double et){
+HHKinFit2::HHKinFitMasterHeavyHiggs::GetBjetResolution(double eta, double et){
   double det=0;
   double de=10;
 

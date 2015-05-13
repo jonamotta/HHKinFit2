@@ -5,78 +5,82 @@
 #include <TMatrixD.h>
 #include <TVector2.h>
 
+#include "HHLorentzVector.h"
+#include "HHKinFit.h"
+
 #include <stdio.h>
 #include <map>
 #include <utility>
 #include <vector>
 #include <sstream>
 
-
 namespace HHKinFit2{
 
-  typedef std::pair< int, int > HHFitHypothesis;
-  typedef std::map< HHFitHypothesis, double > HHFitResultD;
-  typedef std::map< HHFitHypothesis, int > HHFitResultI;
-  typedef std::map< HHFitHypothesis, bool > HHFitResultB;
+typedef std::pair< int, int > HHFitHypothesisHeavyHiggs;
+typedef std::map< HHFitHypothesisHeavyHiggs, double > HHFitResultD;
+typedef std::map< HHFitHypothesisHeavyHiggs, int > HHFitResultI;
+typedef std::map< HHFitHypothesisHeavyHiggs, bool > HHFitResultB;
+typedef std::map< HHFitHypothesisHeavyHiggs, HHKinFit* > HHFitterMap;
 
-  class HHKinFitMasterHeavyHiggs
-  {
+class HHKinFitMasterHeavyHiggs{
   public:
-  HHKinFitMasterHeavyHiggs();
+  HHKinFitMasterHeavyHiggs(TLorentzVector &bjet1, double sigmaEbjet1,
+                           TLorentzVector &bjet2, double sigmaEbjet2,
+                           TLorentzVector &tauvis1,
+                           TLorentzVector &tauvis2,
+                           TVector2 &met, TMatrixD &met_cov, bool istruth=false);
 
+  //the main action, runs over all hypotheses and performs the fit
   void fit();
   
-  //Setters
-  void setBjet1(TLorentzVector &bjet1, double sigmaE);
-  void setBjet2(TLorentzVector &bjet2, double sigmaE);
-  void setTauvis1(TLorentzVector &tauvis1);
-  void setTauvis2(TLorentzVector &tauvis2);
-  void setMET(TVector2 &met, TMatrixD &met_cov);
-  
-  //Getters for fit results
-  HHFitHypothesis getBestHypothesis();
-  double getBestFitProb();
-  double getBestChi2();
-  double getBestChi2BJet1();
-  double getBestChi2BJet2();
-  double getBestChi2Balance();
-  double getBestMH();
-  double getConvergence();
-
-  HHFitResultD getChi2();
-  HHFitResultD getChi2BJet1();
-  HHFitResultD getChi2BJet2();
-  HHFitResultD getChi2Balance();
-  HHFitResultD getFitProb();
-  HHFitResultD getMH();
-  HHFitResultI getConvergence();
+  //Getters
+  HHFitHypothesisHeavyHiggs getBestHypothesis();
+  HHFitHypothesisHeavyHiggs getHypothesis(int mh1, int mh2);
+  HHKinFit* getKinFit(HHFitHypothesisHeavyHiggs hypo);
 
   //Hypotheses
-  void addMh1Hypothesis(std::vector<int> v);
-  void addMh1Hypothesis(double m1, double m2=0, double m3=0, double m4=0, double m5=0, double m6=0, double m7=0, double m8=0, double m9=0, double m10=0);
-  void addMh2Hypothesis(std::vector<int> v);
-  void addMh2Hypothesis(double m1, double m2=0, double m3=0, double m4=0, double m5=0, double m6=0, double m7=0, double m8=0, double m9=0, double m10=0);
+  void addMh1Mh2Hypothesis(int mh1, int mh2);
 
+  //Getters for fit results
+  double getChi2(HHFitHypothesisHeavyHiggs hypo);
+  double getChi2(int mh1, int mh2);
+
+  double getChi2BJet1(HHFitHypothesisHeavyHiggs hypo);
+  double getChi2BJet1(int mh1, int mh2);
+
+  double getChi2BJet2(HHFitHypothesisHeavyHiggs hypo);
+  double getChi2Balance(HHFitHypothesisHeavyHiggs hypo);
+  double getFitProb(HHFitHypothesisHeavyHiggs hypo);
+  double getMH(HHFitHypothesisHeavyHiggs hypo);
+  int getConvergence(HHFitHypothesisHeavyHiggs hypo);
+  double getChi2BJet2(int mh1, int mh2);
+  double getChi2Balance(int mh1, int mh2);
+  double getFitProb(int mh1, int mh2);
+  double getMH(int mh1, int mh2);
+  int getConvergence(int mh1, int mh2);
 
 private:
-  //hypotheses
-  std::vector< int > m_mh1;
-  std::vector< int > m_mh2;
+  //flag and variables needed for truth input
+  bool m_truthInput;
+  HHLorentzVector m_bjet1Smear;
+  HHLorentzVector m_bjet2Smear;
 
   //input vectors
-  TLorentzVector* m_bjet1;
-  TLorentzVector* m_bjet2;
-  TLorentzVector* m_tauvis1;
-  TLorentzVector* m_tauvis2;
+  HHLorentzVector m_bjet1;
+  HHLorentzVector m_bjet2;
+  HHLorentzVector m_tauvis1;
+  HHLorentzVector m_tauvis2;
 
-  TLorentzVector* m_MET;
+  TVector2 m_MET;
   TMatrixD m_MET_COV;
 
-  //full event fit
-  bool m_truthInput;
-  bool m_advancedBalance;
-  double m_simpleBalancePt;
-  double m_simpleBalanceUncert;
+  //fitters
+  HHFitterMap m_map_kinfits;
+
+  //hypotheses
+  std::vector< HHFitHypothesisHeavyHiggs > m_hypos;
+
+  //fit result
   HHFitResultD m_map_chi2;
   HHFitResultD m_map_chi2BJet1;
   HHFitResultD m_map_chi2BJet2;
@@ -84,13 +88,7 @@ private:
   HHFitResultD m_map_prob;
   HHFitResultD m_map_mH;
 
-  HHFitHypothesis m_bestHypo;
-  double m_bestChi2;
-  double m_bestChi2BJet1;
-  double m_bestChi2BJet2;
-  double m_bestChi2Balance;
-  double m_bestProb;
-  double m_bestMH;
+  HHFitHypothesisHeavyHiggs m_bestHypo;
 };
 }
 #endif
