@@ -33,12 +33,14 @@ HHKinFit2::HHFitConstraint4Vector::HHFitConstraint4Vector(HHFitObject* object, b
       m_cov(i,j)=m_fitobject->getCovMatrix()(m_indices[i],m_indices[j]);
 
 
-  TMatrixDEigen eigenmatrix(m_cov);
-  for (int i=0; i<m_ncomp; i++){
-    if (eigenmatrix.GetEigenValues()(i,i)<0){
-      std::stringstream msg;
-      msg << "covariance matrix is not positive-definite, but has at least one negative eigenvalue";
-      throw(HHCovarianceMatrixException(msg.str()));
+  if(m_ncomp>1){
+    TMatrixDEigen eigenmatrix(m_cov);
+    for (int i=0; i<m_ncomp; i++){
+      if (eigenmatrix.GetEigenValues()(i,i)<0){
+        std::stringstream msg;
+        msg << "covariance matrix is not positive-definite, but has at least one negative eigenvalue";
+        throw(HHCovarianceMatrixException(msg.str()));
+      }
     }
   }
 

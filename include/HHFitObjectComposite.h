@@ -9,6 +9,7 @@
 #include "TMatrixD.h"
 
 #include "HHFitObject.h"
+#include "TMatrixD.h"
 
 namespace HHKinFit2{
 class HHFitObjectComposite : public HHFitObject {
@@ -21,6 +22,7 @@ class HHFitObjectComposite : public HHFitObject {
  protected:
   HHLorentzVector getFit4Vector() const;
   HHLorentzVector getInitial4Vector() const;
+  void setCovMatrix(TMatrixD const cov);
   TMatrixD getCovMatrix() const;
 
   void setSubobjects(std::vector<HHFitObject*> const& subobjects);
@@ -30,6 +32,7 @@ class HHFitObjectComposite : public HHFitObject {
 
  private:
   std::vector<HHFitObject*> m_subobjects;
+  bool m_cov_set;
 };
 }
 #endif /* HHFitObjectComposite_ */

@@ -2,11 +2,13 @@
 #include <iostream>
 
 HHKinFit2::HHFitObjectComposite::HHFitObjectComposite(std::vector<HHFitObject*> const& subobjects)
-  : m_subobjects(subobjects){
+  : m_subobjects(subobjects),
+    m_cov_set(false){
 }
 
 HHKinFit2::HHFitObjectComposite::HHFitObjectComposite(HHFitObject* subobject1, HHFitObject* subobject2)
-  : m_subobjects(){
+  : m_subobjects(),
+    m_cov_set(false){
   this->addSubobject(subobject1);
   this->addSubobject(subobject2);
 }
@@ -49,13 +51,37 @@ HHKinFit2::HHFitObjectComposite::getInitial4Vector() const {
 
 TMatrixD
 HHKinFit2::HHFitObjectComposite::getCovMatrix() const{
-  TMatrixD cov(4,4);
-  for (std::vector<HHFitObject*>::const_iterator it = m_subobjects.begin() ; it != m_subobjects.end(); ++it)
-    cov += (*it)->getCovMatrix();
-//  m_covmatrix=cov;
-  return(cov);
+  if(m_cov_set){
+    return(m_covmatrix);
+  }
+  else{
+    TMatrixD cov(4,4);
+    //int i=m_subobjects.size();
+    for (std::vector<HHFitObject*>::const_iterator it = m_subobjects.begin() ; it != m_subobjects.end(); ++it){
+      //i--;
+      //if(i==0){
+      cov += (*it)->getCovMatrix();
+      (*it)->getCovMatrix().Print();
+      //}
+      //else{
+      //cov -= (*it)->getCovMatrix();
+      //cov += (*it)->getCovMatrix();
+      //(*it)->getCovMatrix().Print();
+      //  m_covmatrix=cov;
+      // }
+    }
+    cov.Print();
+    std::cout << "--------" << std::endl;
+    return(cov);
+  }
 }
 
+
+void
+HHKinFit2::HHFitObjectComposite::setCovMatrix(TMatrixD const cov){ 
+  m_covmatrix=cov;
+  m_cov_set=true;
+}
 
 void
 HHKinFit2::HHFitObjectComposite::setSubobjects(std::vector<HHFitObject*> const& subobjects){

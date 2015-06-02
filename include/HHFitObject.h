@@ -12,15 +12,15 @@ namespace HHKinFit2{
 class HHFitObject {
  public:
   HHFitObject();
-  HHFitObject(HHLorentzVector const& initial4vector);
+  HHFitObject(HHLorentzVector const initial4vector);
   virtual ~HHFitObject(){};
 
   virtual HHLorentzVector getInitial4Vector() const;
   virtual HHLorentzVector getFit4Vector() const;
   virtual TMatrixD getCovMatrix() const;
 
-  void setFit4Vector(HHLorentzVector const& vec);
-  void setCovMatrix(TMatrixD const& covmatrix);
+  void setFit4Vector(HHLorentzVector const vec);
+  virtual void setCovMatrix(TMatrixD const covmatrix);
 
   void reset();
 

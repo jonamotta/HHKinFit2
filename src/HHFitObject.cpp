@@ -10,7 +10,7 @@ HHKinFit2::HHFitObject::HHFitObject()
 
 }
 
-HHKinFit2::HHFitObject::HHFitObject(HHLorentzVector const& initial4vector)
+HHKinFit2::HHFitObject::HHFitObject(HHLorentzVector const initial4vector)
   :m_fit4vector(initial4vector),
    m_initial4vector(initial4vector),
    m_covmatrix(TMatrixD(4,4)){
@@ -33,12 +33,12 @@ HHKinFit2::HHFitObject::getCovMatrix() const{
 }
 
 void
-HHKinFit2::HHFitObject::setFit4Vector(HHLorentzVector const& vec){
+HHKinFit2::HHFitObject::setFit4Vector(HHLorentzVector const vec){
   this->m_fit4vector=vec;
 }
 
 void
-HHKinFit2::HHFitObject::setCovMatrix(TMatrixD const& covmatrix){
+HHKinFit2::HHFitObject::setCovMatrix(TMatrixD const covmatrix){
   this->m_covmatrix=covmatrix;
 }
 

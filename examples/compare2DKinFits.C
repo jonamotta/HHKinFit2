@@ -237,7 +237,21 @@ int main(int argc, char* argv[])
     HHFitConstraint* c_invmh2 = new HHFitConstraintEHardM(b1, b2, mh2);
     HHFitConstraint* c_b1 = new HHFitConstraint4Vector(b1, false, false, false, true);
     HHFitConstraint* c_b2 = new HHFitConstraint4Vector(b2, false, false, false, true);
-    HHFitConstraint* c_balance = new HHFitConstraint4Vector(higgs, true, true, false, false);
+    HHFitConstraint* c_balance;
+    try{
+      c_balance = new HHFitConstraint4Vector(higgs, true, true, false, false);
+    }
+    catch(HHKinFit2::HHCovarianceMatrixException const& e){
+      std::cout << e.what() << std::endl;
+      std::cout << "replace covariance matrix by diag(100,100)" << std::endl;
+      TMatrixD replace(4,4);
+      replace(0,0)=100;
+      replace(1,1)=100;
+      replace.Print();
+      higgs->setCovMatrix(replace);
+      higgs->print();
+      c_balance = new HHFitConstraint4Vector(higgs, true, true, false, false);
+    }
 
     //fit
     HHKinFit2::HHKinFit* singlefit = new HHKinFit2::HHKinFit();

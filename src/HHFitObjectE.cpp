@@ -94,6 +94,20 @@ HHKinFit2::HHFitObjectE::setLowerFitLimitE(HHLorentzVector const& lowerlimit){
 void
 HHKinFit2::HHFitObjectE::setCovMatrix(double dE){
   TMatrixD cov(4,4);
+  
+  //NOTE: only dE is used for Cov calculation!
+  double p=m_initial4vector.P();
+  double e=m_initial4vector.E();
+  double phi=m_initial4vector.Phi();
+  double theta=m_initial4vector.Theta();
+  double dp = e/p*dE; // error propagation p=sqrt(e^2-m^2)
+  double dpt = sin(theta)*dp;
+
+  cov(0,0) = pow(cos(phi)*dpt,2);
+  cov(1,1) = pow(sin(phi)*dpt,2);
+  cov(0,1) = sin(phi)*cos(phi)*dpt*dpt;
+  cov(1,0) = sin(phi)*cos(phi)*dpt*dpt;
+
   cov(3,3)=dE;
   m_covmatrix=cov;
 }
