@@ -45,6 +45,7 @@ HHKinFit2::HHFitObject::setCovMatrix(TMatrixD const covmatrix){
 void
 HHKinFit2::HHFitObject::reset(){
   this->m_fit4vector=this->m_initial4vector;
+  m_covmatrix=TMatrixD(4,4);
 }
 
 void

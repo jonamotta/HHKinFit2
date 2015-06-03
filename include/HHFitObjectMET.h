@@ -15,6 +15,7 @@ class HHFitObjectMET : public HHFitObject {
   HHFitObjectMET(TVector2 const& initialvector,TVector2 const& fitvector=TVector2(0,0));
   
   void setCovMatrix(double xx, double yy, double xy);
+  void setCovMatrix(TMatrixD const covmat);
 
   virtual void print() const;
   virtual void printInitial4Vector() const;

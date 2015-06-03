@@ -19,6 +19,11 @@ HHKinFit2::HHFitObjectMET::setCovMatrix(double xx, double yy, double xy){
   m_covmatrix=cov;
 }
 
+void
+HHKinFit2::HHFitObjectMET::setCovMatrix(TMatrixD const covmat){
+  m_covmatrix=covmat;
+}
+
 
 void
 HHKinFit2::HHFitObjectMET::print() const{

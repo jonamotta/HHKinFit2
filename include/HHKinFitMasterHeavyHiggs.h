@@ -80,8 +80,8 @@ class HHKinFitMasterHeavyHiggs{
   TLorentzVector getFittedBJet2(int mh1, int mh2);
     
   //For Gen Studies to check smearing
-  TLorentzVector getUnfittedBjet1(){return m_bjet1;};
-  TLorentzVector getUnfittedBjet2(){return m_bjet2;};
+  TLorentzVector getUnfittedBjet1(){return(m_bjet1);};
+  TLorentzVector getUnfittedBjet2(){return(m_bjet2);};
   
 private:  
   //hypotheses
