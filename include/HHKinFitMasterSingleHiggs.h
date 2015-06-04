@@ -37,15 +37,11 @@ class HHKinFitMasterSingleHiggs{
 
   //Getters
   HHFitHypothesisSingleHiggs getBestHypothesis();
-
-  //Hypotheses
-  void addMh1Mh2Hypothesis(HHFitHypothesisSingleHiggs hypo);
+  double getBestChi2();
 
   //Getters for fit results
   double getChi2(HHFitHypothesisSingleHiggs hypo);
-    
-  double getChi2Balance(HHFitHypothesisSingleHiggs hypo);
-  
+ 
   double getFitProb(HHFitHypothesisSingleHiggs hypo);
 
 

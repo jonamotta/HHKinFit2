@@ -117,6 +117,7 @@ HHKinFit2::HHKinFitMasterSingleHiggs::HHKinFitMasterSingleHiggs(
 						    TMatrixD met_cov, 
 						    bool istruth,
 						    TLorentzVector* higgsgen)
+  :m_MET_COV(TMatrixD(4,4))
 {
   
   m_tauvis1 = HHLorentzVector(tauvis1.Px(), tauvis1.Py(), tauvis1.Pz(), tauvis1.E());  
@@ -158,4 +159,32 @@ HHKinFit2::HHKinFitMasterSingleHiggs::HHKinFitMasterSingleHiggs(
 //    m_MET_COV = recoilCov + bjet1Cov + bjet2Cov;
 //
 //  }
+}
+
+ HHKinFit2::HHFitHypothesisSingleHiggs HHKinFit2::HHKinFitMasterSingleHiggs::getBestHypothesis(){
+  return(m_bestHypo);
+}
+
+double HHKinFit2::HHKinFitMasterSingleHiggs::getBestChi2(){
+  return(m_chi2_best);
+}
+
+double HHKinFit2::HHKinFitMasterSingleHiggs::getChi2(HHFitHypothesisSingleHiggs hypo){
+  return(m_map_chi2[hypo]);
+}
+
+double HHKinFit2::HHKinFitMasterSingleHiggs::getFitProb(HHFitHypothesisSingleHiggs hypo){
+  return(m_map_prob[hypo]);
+}
+
+int HHKinFit2::HHKinFitMasterSingleHiggs::getConvergence(HHFitHypothesisSingleHiggs hypo){
+  return(m_map_convergence[hypo]);
+}
+
+TLorentzVector HHKinFit2::HHKinFitMasterSingleHiggs::getFittedTau1(HHFitHypothesisSingleHiggs hypo){
+  return(m_map_fittedTau1[hypo]);
+}
+
+TLorentzVector HHKinFit2::HHKinFitMasterSingleHiggs::getFittedTau2(HHFitHypothesisSingleHiggs hypo){
+  return(m_map_fittedTau2[hypo]);
 }
