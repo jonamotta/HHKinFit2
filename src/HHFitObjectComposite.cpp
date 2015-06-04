@@ -14,14 +14,16 @@ HHKinFit2::HHFitObjectComposite::HHFitObjectComposite(HHFitObject* subobject1, H
 }
 
 HHKinFit2::HHFitObjectComposite::HHFitObjectComposite(HHFitObject* subobject1, HHFitObject* subobject2, HHFitObject* subobject3)
-  : m_subobjects(){
+  : m_subobjects(),
+    m_cov_set(false){
   this->addSubobject(subobject1);
   this->addSubobject(subobject2);
   this->addSubobject(subobject3);
 }
 
 HHKinFit2::HHFitObjectComposite::HHFitObjectComposite(HHFitObject* subobject1, HHFitObject* subobject2, HHFitObject* subobject3, HHFitObject* subobject4, HHFitObject* subobject5)
-  : m_subobjects(){
+  : m_subobjects(),
+    m_cov_set(false){
   this->addSubobject(subobject1);
   this->addSubobject(subobject2);
   this->addSubobject(subobject3);
@@ -61,7 +63,7 @@ HHKinFit2::HHFitObjectComposite::getCovMatrix() const{
       //i--;
       //if(i==0){
       cov += (*it)->getCovMatrix();
-      (*it)->getCovMatrix().Print();
+      //      (*it)->getCovMatrix().Print();
       //}
       //else{
       //cov -= (*it)->getCovMatrix();
@@ -70,8 +72,8 @@ HHKinFit2::HHFitObjectComposite::getCovMatrix() const{
       //  m_covmatrix=cov;
       // }
     }
-    cov.Print();
-    std::cout << "--------" << std::endl;
+    //    cov.Print();
+    //    std::cout << "--------" << std::endl;
     return(cov);
   }
 }
