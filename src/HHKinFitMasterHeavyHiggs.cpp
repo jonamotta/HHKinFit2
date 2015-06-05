@@ -63,6 +63,12 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::fit()
       std::cout << "Exception while setting tau limits:" << std::endl;
       std::cout << e.what() << std::endl;
       std::cout << "Tau energies are not compatible with invariant mass constraint." << std::endl;
+
+      m_map_chi2[m_hypos[i]] = -pow(10,10);
+      m_map_prob[m_hypos[i]] = -pow(10,10);
+      m_bestHypo = HHFitHypothesisHeavyHiggs(-pow(10,10),-pow(10,10));
+      m_chi2_best = -pow(10,10);
+      m_mH_best = -pow(10,10);
       continue;
     }
   
@@ -75,6 +81,11 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::fit()
       std::cout << "Exception while setting b-jet limits" << std::endl;
       std::cout << e.what() << std::endl;
       std::cout << "Bjet energies are not compatible within 5 sigma with invariant mass constraint." << std::endl;
+      m_map_chi2[m_hypos[i]] = -pow(10,10);
+      m_map_prob[m_hypos[i]] = -pow(10,10);
+      m_bestHypo = HHFitHypothesisHeavyHiggs(-pow(10,10),-pow(10,10));
+      m_chi2_best = -pow(10,10);
+      m_mH_best = -pow(10,10);
       continue;
     }
     b1Fit->setCovMatrix(pow(m_sigma_bjet1,2));

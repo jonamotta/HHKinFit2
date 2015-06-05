@@ -46,6 +46,11 @@ void HHKinFit2::HHKinFitMasterSingleHiggs::fit()
       std::cout << "Exception while setting tau limits:" << std::endl;
       std::cout << e.what() << std::endl;
       std::cout << "Tau energies are not compatible with invariant mass constraint." << std::endl;
+
+      m_map_chi2[m_hypos[i]] = -pow(10,10);
+      m_map_prob[m_hypos[i]] = -pow(10,10);
+      m_bestHypo =HHFitHypothesisSingleHiggs (-pow(10,10));
+      m_chi2_best = -pow(10,10);
       continue;
     }
   
@@ -72,9 +77,11 @@ void HHKinFit2::HHKinFitMasterSingleHiggs::fit()
 
     m_map_convergence[m_hypos[i]] = fitObject->getConvergence();    
     
+
+
     double chi2 = fitObject->getChi2();
     m_map_chi2[m_hypos[i]] = chi2;
-    m_map_prob[m_hypos[i]] = TMath::Prob(chi2, 2);
+    m_map_prob[m_hypos[i]] = TMath::Prob(chi2, 1);
 
     if(chi2 < m_chi2_best)
     {
