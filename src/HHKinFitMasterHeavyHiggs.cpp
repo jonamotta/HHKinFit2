@@ -255,6 +255,7 @@ HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(
 						    TMatrixD met_cov, 
 						    bool istruth, 
 						    TLorentzVector* heavyhiggsgen)
+  :m_MET_COV(TMatrixD(4,4))
 {
   
   m_bjet1 = HHLorentzVector(bjet1.Px(), bjet1.Py(), bjet1.Pz(), bjet1.E());
@@ -332,3 +333,75 @@ HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(
 
   }  
 }
+
+
+//Getters
+HHKinFit2::HHFitHypothesisHeavyHiggs HHKinFit2::HHKinFitMasterHeavyHiggs::getBestHypothesis(){
+  return(m_bestHypo);
+}
+
+
+//Getters for fit results
+
+double HHKinFit2::HHKinFitMasterHeavyHiggs::getChi2(int mh1, int mh2){
+HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+return(m_map_chi2[hypo]);
+}
+
+  
+double HHKinFit2::HHKinFitMasterHeavyHiggs::getChi2BJet1(int mh1, int mh2){
+HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+return(m_map_chi2BJet1[hypo]);
+}
+
+
+
+double HHKinFit2::HHKinFitMasterHeavyHiggs::getChi2BJet2(int mh1, int mh2){
+HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+return(m_map_chi2BJet2[hypo]);
+}
+    
+
+double HHKinFit2::HHKinFitMasterHeavyHiggs::getChi2Balance(int mh1, int mh2){
+HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+return(m_map_chi2Balance[hypo]);
+}
+  
+double HHKinFit2::HHKinFitMasterHeavyHiggs::getFitProb(int mh1, int mh2){
+HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+return( m_map_prob[hypo]);
+}
+  
+double HHKinFit2::HHKinFitMasterHeavyHiggs::getMH(int mh1, int mh2){
+HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+return(m_map_mH[hypo]);
+}
+
+
+int HHKinFit2::HHKinFitMasterHeavyHiggs::getConvergence(int mh1, int mh2){
+HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+return(m_map_convergence[hypo]);
+}
+
+TLorentzVector HHKinFit2::HHKinFitMasterHeavyHiggs::getFittedTau1(int mh1, int mh2){
+HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+return(m_map_fittedTau1[hypo]);
+}
+
+
+TLorentzVector HHKinFit2::HHKinFitMasterHeavyHiggs::getFittedTau2(int mh1, int mh2){
+HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+return(m_map_fittedTau2[hypo]);
+}
+
+TLorentzVector HHKinFit2::HHKinFitMasterHeavyHiggs::getFittedBJet1(int mh1, int mh2){
+HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+return(m_map_fittedB1[hypo]);
+}
+  
+
+TLorentzVector HHKinFit2::HHKinFitMasterHeavyHiggs::getFittedBJet2(int mh1, int mh2){
+HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+return(m_map_fittedB2[hypo]);
+}
+    
