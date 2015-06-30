@@ -19,6 +19,7 @@ HHKinFit2::HHLorentzVector::SetEEtaPhiM(double E, double eta, double phi, double
   this->SetPtEtaPhiE(pt,eta,phi,E);
 }
 
+
 HHKinFit2::HHLorentzVector
 HHKinFit2::HHLorentzVector::operator+(HHLorentzVector const& rhs) const{
   return(HHLorentzVector(rhs.Px()+this->Px(),rhs.Py()+this->Py(),rhs.Pz()+this->Pz(),rhs.E()+this->E()));
@@ -26,7 +27,7 @@ HHKinFit2::HHLorentzVector::operator+(HHLorentzVector const& rhs) const{
 
 HHKinFit2::HHLorentzVector
 HHKinFit2::HHLorentzVector::operator-(HHLorentzVector const& rhs) const{
-  return(HHLorentzVector(rhs.Px()-this->Px(),rhs.Py()-this->Py(),rhs.Pz()-this->Pz(),rhs.E()-this->E()));
+  return(HHLorentzVector(this->Px()-rhs.Px(),this->Py()-rhs.Py(),this->Pz()-rhs.Pz(),this->E()-rhs.E()));
 }
 
 HHKinFit2::HHLorentzVector
