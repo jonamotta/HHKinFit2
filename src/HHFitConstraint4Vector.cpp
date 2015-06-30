@@ -54,14 +54,14 @@ HHKinFit2::HHFitConstraint4Vector::HHFitConstraint4Vector(HHFitObject* object, b
 
 double
 HHKinFit2::HHFitConstraint4Vector::getChi2() const{
-	 HHLorentzVector res = m_fitobject->getFit4Vector()-m_fitobject->getInitial4Vector();
-	      double chi2sum=0;
-	      for(int i=0; i<m_ncomp; i++){
-	        for(int j=0;j<m_ncomp;j++){
-	          chi2sum+=res(m_indices[i])*res(m_indices[j])*m_invcov(i,j);
-	          //std::cout << res(i) << "*" <<res(j) << "*" << invcov(i,j) << "=" << res(i)*res(j)*invcov(i,j) << std::endl;
-	        }
-	      }
+  HHLorentzVector res = m_fitobject->getFit4Vector()-m_fitobject->getInitial4Vector();
+  double chi2sum=0;
+  for(int i=0; i<m_ncomp; i++){
+    for(int j=0;j<m_ncomp;j++){
+      chi2sum+=res(m_indices[i])*res(m_indices[j])*m_invcov(i,j);
+      //std::cout << res(i) << "*" <<res(j) << "*" << invcov(i,j) << "=" << res(i)*res(j)*invcov(i,j) << std::endl;
+    }
+  }
   return(chi2sum);
 }
 
