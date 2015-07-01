@@ -108,7 +108,12 @@ HHKinFit2::HHFitObjectE::setCovMatrix(double dE){
   cov(0,1) = sin(phi)*cos(phi)*dpt*dpt;
   cov(1,0) = sin(phi)*cos(phi)*dpt*dpt;
 
-  cov(3,3)=dE;
+  cov(3,3)=dE*dE;
+  m_covmatrix=cov;
+}
+
+void
+HHKinFit2::HHFitObjectE::setCovMatrix(TMatrixD cov){
   m_covmatrix=cov;
 }
 

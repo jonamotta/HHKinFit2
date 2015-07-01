@@ -42,6 +42,7 @@ class HHFitObjectE : public HHFitObject {
   double getInitStepWidth();
 
   void setCovMatrix(double dE);
+  void setCovMatrix(TMatrixD cov);
 
   virtual void print() const;
   void printLimits() const;
