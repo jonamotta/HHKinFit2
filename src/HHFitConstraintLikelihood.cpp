@@ -1,7 +1,7 @@
 #include "HHFitConstraintLikelihood.h"
 #include <cmath>
 #include <iostream>
-#include "TSpline3.h"
+#include "TSpline.h"
 
 HHKinFit2::HHFitConstraintLikelihood::HHFitConstraintLikelihood(HHFitObject* object1,HHFitObject* object2, TF1* likelihood1,TF1* likelihood2 )
   : HHFitConstraint(object1),
