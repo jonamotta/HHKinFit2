@@ -1,7 +1,7 @@
 #include "HHFitConstraintLikelihood.h"
 #include <cmath>
 #include <iostream>
-
+#include "TSpline3.h"
 
 HHKinFit2::HHFitConstraintLikelihood::HHFitConstraintLikelihood(HHFitObject* object1,HHFitObject* object2, TF1* likelihood1,TF1* likelihood2 )
   : HHFitConstraint(object1),
@@ -51,7 +51,9 @@ HHKinFit2::HHFitConstraintLikelihood::getChi2() const{
     return(chi2);
 	}
 	if(mode==2){
-  double chi2=-2*log(m_likelihoodhisto1->GetBinContent(m_likelihoodhisto1->FindBin(m_fitobject->getInitial4Vector().E()/m_fitobject->getFit4Vector().E())))-2*log(m_likelihoodhisto2->GetBinContent(m_likelihoodhisto2->FindBin(m_object2->getInitial4Vector().E()/m_object2->getFit4Vector().E())));
+		TSpline3 temp1(m_likelihoodhisto1);
+		TSpline3 temp2(m_likelihoodhisto2);
+  double chi2=-2*log(temp1.Eval(temp1.FindX(m_fitobject->getInitial4Vector().E()/m_fitobject->getFit4Vector().E())))-2*log(temp2.Eval(temp2.FindX(m_object2->getInitial4Vector().E()/m_object2->getFit4Vector().E())));
   return(chi2);
 	}
 	if(mode==3){
@@ -66,11 +68,13 @@ HHKinFit2::HHFitConstraintLikelihood::getLikelihood() const{
 
 double
 HHKinFit2::HHFitConstraintLikelihood::getLikelihood() const{
+	TSpline3 temp1(m_likelihoodhisto1);
+	TSpline3 temp2(m_likelihoodhisto2);
 	if(mode==1){
 		return(m_likelihood1->Eval(m_fitobject->getInitial4Vector().E()/m_fitobject->getFit4Vector().E())*m_likelihood2->Eval(m_object2->getInitial4Vector().E()/m_object2->getFit4Vector().E()));
 	}
 	if(mode==2){
-        return(m_likelihoodhisto1->GetBinContent(m_likelihoodhisto1->FindBin(m_fitobject->getInitial4Vector().E()/m_fitobject->getFit4Vector().E()))*m_likelihoodhisto2->GetBinContent(m_likelihoodhisto2->FindBin(m_object2->getInitial4Vector().E()/m_object2->getFit4Vector().E())));
+        return(temp1.Eval(temp1.FindX(m_fitobject->getInitial4Vector().E()/m_fitobject->getFit4Vector().E()))*temp2.Eval(temp2.FindX(m_object2->getInitial4Vector().E()/m_object2->getFit4Vector().E())));
 	}
 	if(mode==3){
 		return(m_likelihoodhisto->GetBinContent(m_likelihoodhisto->FindBin(m_fitobject->getInitial4Vector().E()/m_fitobject->getFit4Vector().E(),m_object2->getInitial4Vector().E()/m_object2->getFit4Vector().E() )));
