@@ -101,8 +101,6 @@ HHKinFit2::HHFitConstraintLikelihood::getLikelihood() const{
 
 double
 HHKinFit2::HHFitConstraintLikelihood::getLikelihood() const{
-	TSpline3 temp1(m_likelihoodhisto1);
-	TSpline3 temp2(m_likelihoodhisto2);
 	if(mode==1){
 		return(m_likelihood1->Eval(m_fitobject->getInitial4Vector().E()/m_fitobject->getFit4Vector().E())*m_likelihood2->Eval(m_object2->getInitial4Vector().E()/m_object2->getFit4Vector().E()));
 	}
