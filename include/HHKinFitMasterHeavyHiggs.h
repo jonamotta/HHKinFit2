@@ -24,66 +24,77 @@ typedef std::map< HHFitHypothesisHeavyHiggs, TLorentzVector > HHFitResultTLor;
 
 class HHKinFitMasterHeavyHiggs{
   public:
-  HHKinFitMasterHeavyHiggs(TLorentzVector bjet1, double sigmaEbjet1,
-                           TLorentzVector bjet2, double sigmaEbjet2,
-                           TLorentzVector tauvis1,
-                           TLorentzVector tauvis2,
-                           TVector2 met, TMatrixD met_cov, 
-			   bool istruth=false, TLorentzVector* heavyhiggsgen=0);
+  HHKinFitMasterHeavyHiggs(const TLorentzVector* bjet1,
+		 const TLorentzVector* bjet2,
+		 const TLorentzVector* tauvis1,
+		 const TLorentzVector* tauvis2,
+		 const TLorentzVector* met = 0, TMatrixD met_cov = TMatrixD(4,4), 
+		 double sigmaEbjet1 = -1.0, double sigmaEbjet2 = -1.0,
+		 bool istruth=false, TLorentzVector* heavyhiggsgen=0);
 
   //the main action, runs over all hypotheses and performs the fit
-  void fit();
+  void doFit();
 
   void addHypo(HHFitHypothesisHeavyHiggs hypo);
   void addHypo(int mh1, int mh2);
 
   //Getters
-  HHFitHypothesisHeavyHiggs getBestHypothesis();
-  HHFitHypothesisHeavyHiggs getHypothesis(int mh1, int mh2);
-
-  //Hypotheses
-  void addMh1Mh2Hypothesis(HHFitHypothesisHeavyHiggs hypo);
-  void addMh1Mh2Hypothesis(int mh1, int mh2);
+  HHFitHypothesisHeavyHiggs getLowestChi2Hypothesis();
 
   //Getters for fit results
   double getChi2(HHFitHypothesisHeavyHiggs hypo);
-  double getChi2(int mh1, int mh2);
+  double getChi2(int mh1 = 125, int mh2 = 125);
 
   double getChi2BJet1(HHFitHypothesisHeavyHiggs hypo);
-  double getChi2BJet1(int mh1, int mh2);
+  double getChi2BJet1(int mh1 = 125, int mh2 = 125);
 
   double getChi2BJet2(HHFitHypothesisHeavyHiggs hypo);
-  double getChi2BJet2(int mh1, int mh2);
+  double getChi2BJet2(int mh1 = 125, int mh2 = 125);
     
   double getChi2Balance(HHFitHypothesisHeavyHiggs hypo);
-  double getChi2Balance(int mh1, int mh2);
+  double getChi2Balance(int mh1 = 125, int mh2 = 125);
   
   double getFitProb(HHFitHypothesisHeavyHiggs hypo);
-  double getFitProb(int mh1, int mh2);
+  double getFitProb(int mh1 = 125, int mh2 = 125);
   
   double getMH(HHFitHypothesisHeavyHiggs hypo);
-  double getMH(int mh1, int mh2);
+  double getMH(int mh1 = 125, int mh2 = 125);
 
   int getConvergence(HHFitHypothesisHeavyHiggs hypo);
-  int getConvergence(int mh1, int mh2);
+  int getConvergence(int mh1 = 125, int mh2 = 125);
 
   TLorentzVector getFittedTau1(HHFitHypothesisHeavyHiggs hypo);
-  TLorentzVector getFittedTau1(int mh1, int mh2);
+  TLorentzVector getFittedTau1(int mh1 = 125, int mh2 = 125);
 
   TLorentzVector getFittedTau2(HHFitHypothesisHeavyHiggs hypo);
-  TLorentzVector getFittedTau2(int mh1, int mh2);
+  TLorentzVector getFittedTau2(int mh1 = 125, int mh2 = 125);
 
   TLorentzVector getFittedBJet1(HHFitHypothesisHeavyHiggs hypo);
-  TLorentzVector getFittedBJet1(int mh1, int mh2);
+  TLorentzVector getFittedBJet1(int mh1 = 125, int mh2 = 125);
   
   TLorentzVector getFittedBJet2(HHFitHypothesisHeavyHiggs hypo);
-  TLorentzVector getFittedBJet2(int mh1, int mh2);
+  TLorentzVector getFittedBJet2(int mh1 = 125, int mh2 = 125);
     
   //For Gen Studies to check smearing
-  TLorentzVector getUnfittedBjet1(){return(m_bjet1);};
-  TLorentzVector getUnfittedBjet2(){return(m_bjet2);};
+  TLorentzVector getUnfittedBJet1(){return(m_bjet1);};
+  TLorentzVector getUnfittedBJet2(){return(m_bjet2);};
   
-private:  
+  double getBJet1Resolution(){return m_sigma_bjet1;};
+  double getBJet2Resolution(){return m_sigma_bjet2;};
+
+  //For Backwards compatibility
+  void setAdvancedBalance(const TLorentzVector* met, TMatrixD met_cov);
+
+  TLorentzVector neutrinos;
+  TVector2 smearedMET;
+  
+  TLorentzVector initialHH;
+  TLorentzVector finalHH;
+  double b1Px_standardDevs;
+
+private:
+  double GetPFBJetRes(double eta, double et);
+
   //hypotheses
   std::vector< HHFitHypothesisHeavyHiggs > m_hypos;
 
@@ -115,8 +126,11 @@ private:
   HHFitResultTLor m_map_fittedB2;
 
   HHFitHypothesisHeavyHiggs m_bestHypo;
-  double m_chi2_best;
-  double m_mH_best;
+  double m_bestChi2;
+
+  //For ToyMC Studies
+  TMatrixD m_bjet1_COV;
+  TMatrixD m_bjet2_COV;
 };
 }
 #endif
