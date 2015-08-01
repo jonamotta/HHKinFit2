@@ -34,6 +34,13 @@ class HHFitConstraintLikelihood : public HHFitConstraint {
   HHFitObject* m_object2;
   int mode;
 
+  //for splines
+  double m_zmax1;
+  double m_zcutleft1;
+  double m_zcutright1;
+  double m_zmax2;
+  double m_zcutleft2;
+  double m_zcutright2;
 };
 }
 #endif /* HHFitConstraintLikelihood_ */
