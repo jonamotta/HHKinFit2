@@ -12,4 +12,5 @@ runHHKinFit
 compare2DKinFits
 compareKinFits
 gensimHH
+fitSingleEvent1DKinFit
 fitSingleEvent2DKinFit

@@ -14,5 +14,6 @@
 #     #g++ -std=c++11 examples/gensimHH.C `root-config --cflags --glibs` -I $KINFIT2PATH/include -I $KINFIT1PATH/interface -L $KINFIT2PATH -lHHKinFit2 -o gensimHH
 #     #g++ -std=c++11 examples/example.C `root-config --cflags --glibs` -I $KINFIT2PATH/include -I $KINFIT1PATH/interface -L $KINFIT2PATH -lHHKinFit2 -o example
     g++ examples/fitSingleEvent2DKinFit.C `root-config --cflags --glibs` -I $KINFIT2PATH/include -L $KINFIT2PATH -lHHKinFit2 -o fitSingleEvent2DKinFit
+    g++ examples/fitSingleEvent1DKinFit.C `root-config --cflags --glibs` -I $KINFIT2PATH/include -L $KINFIT2PATH -lHHKinFit2 -o fitSingleEvent1DKinFit
  fi
 

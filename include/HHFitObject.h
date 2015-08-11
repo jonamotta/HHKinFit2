@@ -22,7 +22,7 @@ class HHFitObject {
   void setFit4Vector(HHLorentzVector const vec);
   virtual void setCovMatrix(TMatrixD const covmatrix);
 
-  void reset();
+  virtual void reset();
 
   virtual void printInitial4Vector() const;
   virtual void printFit4Vector() const;

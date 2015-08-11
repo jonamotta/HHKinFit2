@@ -23,154 +23,155 @@
 
 void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
 {
-  HHFitObjectE* tau1Fit = new HHFitObjectEConstM(m_tauvis1);
-  HHFitObjectE* tau2Fit = new HHFitObjectEConstM(m_tauvis2);
-
-  HHLorentzVector bJet1min = m_bjet1;
-  if (m_bjet1.E() - 5.0*m_sigma_bjet1 <= 0) bJet1min.SetEkeepBeta(10);
-  else bJet1min.SetEkeepBeta(m_bjet1.E() - 5.0*m_sigma_bjet1);
-  
-  HHLorentzVector bJet2min = m_bjet2;
-  if (m_bjet2.E() - 5.0*m_sigma_bjet2 <= 0) bJet2min.SetEkeepBeta(10);
-  else bJet2min.SetEkeepBeta(m_bjet2.E() - 5.0*m_sigma_bjet2);
-
-  HHFitObjectE* b1Fit = new HHFitObjectEConstBeta(m_bjet1);
-  HHFitObjectE* b2Fit = new HHFitObjectEConstBeta(m_bjet2);
-  
-  //prepare MET object
-  HHFitObjectMET* metFit = new HHFitObjectMET(m_MET);
-  metFit->setCovMatrix(m_MET_COV);
-
-  //prepare composite object: Higgs
-  HHFitObject* heavyHiggs  = new HHFitObjectComposite(tau1Fit, tau2Fit, 
-						      b1Fit, b2Fit,
-						      metFit);
-  HHFitObject* higgs1  = new HHFitObjectComposite(tau1Fit, tau2Fit);  
-  HHFitObject* higgs2  = new HHFitObjectComposite(b1Fit, b2Fit);
-
-  if(m_hypos.size() == 0)
-  {
-    addHypo(125, 125);
-  }
-
   for(unsigned int i = 0; i < m_hypos.size(); ++i)
-  { 
-    int mh1 = m_hypos[i].first;
-    int mh2 = m_hypos[i].second;
+    { 
+      HHFitObjectE* tau1Fit = new HHFitObjectEConstM(m_tauvis1);
+      HHFitObjectE* tau2Fit = new HHFitObjectEConstM(m_tauvis2);
+
+      HHLorentzVector bJet1min = m_bjet1;
+      if (m_bjet1.E() - 5.0*m_sigma_bjet1 <= 0) bJet1min.SetEkeepBeta(10);
+      else bJet1min.SetEkeepBeta(m_bjet1.E() - 5.0*m_sigma_bjet1);
   
-    try{
-      tau1Fit->setFitLimitsE(tau1Fit->getInitial4Vector(),mh1,tau2Fit->getInitial4Vector());
-      tau2Fit->setFitLimitsE(tau2Fit->getInitial4Vector(),mh1,tau1Fit->getInitial4Vector());
-    }
-    catch(HHLimitSettingException const& e){
-      std::cout << "Exception while setting tau limits:" << std::endl;
-      std::cout << e.what() << std::endl;
-      std::cout << "Tau energies are not compatible with invariant mass constraint." << std::endl;
+      HHLorentzVector bJet2min = m_bjet2;
+      if (m_bjet2.E() - 5.0*m_sigma_bjet2 <= 0) bJet2min.SetEkeepBeta(10);
+      else bJet2min.SetEkeepBeta(m_bjet2.E() - 5.0*m_sigma_bjet2);
 
-      m_map_chi2[m_hypos[i]] = -pow(10,10);
-      m_map_prob[m_hypos[i]] = -pow(10,10);
-      m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
-      m_bestChi2 = -pow(10,10);
-      continue;
-    }
+      HHFitObjectE* b1Fit = new HHFitObjectEConstBeta(m_bjet1);
+      HHFitObjectE* b2Fit = new HHFitObjectEConstBeta(m_bjet2);
   
-    try{
-      b1Fit->setFitLimitsE(bJet1min, mh2, bJet2min);
-      b2Fit->setFitLimitsE(bJet2min, mh2, bJet1min);
-    }
-    catch(HHLimitSettingException const& e){
-      std::cout << "Exception while setting b-jet limits" << std::endl;
-      std::cout << e.what() << std::endl;
-      std::cout << "Bjet energies are not compatible within 5 sigma with invariant mass constraint." << std::endl;
-      m_map_chi2[m_hypos[i]] = -pow(10,10);
-      m_map_prob[m_hypos[i]] = -pow(10,10);
-      m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
-      m_bestChi2 = -pow(10,10);
-      continue;
-    }
-    if(fabs(m_bjet1_COV(0,0)) < 0.001)
-    {
-      b1Fit->setCovMatrix(m_sigma_bjet1);
-      b2Fit->setCovMatrix(m_sigma_bjet2);
+      //prepare MET object
+      HHFitObjectMET* metFit = new HHFitObjectMET(m_MET);
+      metFit->setCovMatrix(m_MET_COV);
 
-      b1Fit->printCovMatrix();
-      b2Fit->printCovMatrix();
-    }
-    else
-    {
-      std::cout << "Cov MATRIX set manually for ToyMC study." << std::endl;      
-      b1Fit->setCovMatrix(m_bjet1_COV);
-      b2Fit->setCovMatrix(m_bjet2_COV);
-    }
+      //prepare composite object: Higgs
+      HHFitObject* heavyHiggs  = new HHFitObjectComposite(tau1Fit, tau2Fit, 
+                                                          b1Fit, b2Fit,
+                                                          metFit);
+      HHFitObject* higgs1  = new HHFitObjectComposite(tau1Fit, tau2Fit);  
+      HHFitObject* higgs2  = new HHFitObjectComposite(b1Fit, b2Fit);
+
+      if(m_hypos.size() == 0)
+        {
+          addHypo(125, 125);
+        }
+
+
+      int mh1 = m_hypos[i].first;
+      int mh2 = m_hypos[i].second;
+  
+      try{
+        tau1Fit->setFitLimitsE(tau1Fit->getInitial4Vector(),mh1,tau2Fit->getInitial4Vector());
+        tau2Fit->setFitLimitsE(tau2Fit->getInitial4Vector(),mh1,tau1Fit->getInitial4Vector());
+      }
+      catch(HHLimitSettingException const& e){
+        std::cout << "Exception while setting tau limits:" << std::endl;
+        std::cout << e.what() << std::endl;
+        std::cout << "Tau energies are not compatible with invariant mass constraint." << std::endl;
+
+        m_map_chi2[m_hypos[i]] = -pow(10,10);
+        m_map_prob[m_hypos[i]] = -pow(10,10);
+        m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
+        m_bestChi2 = -pow(10,10);
+        continue;
+      }
+  
+      try{
+        b1Fit->setFitLimitsE(bJet1min, mh2, bJet2min);
+        b2Fit->setFitLimitsE(bJet2min, mh2, bJet1min);
+      }
+      catch(HHLimitSettingException const& e){
+        std::cout << "Exception while setting b-jet limits" << std::endl;
+        std::cout << e.what() << std::endl;
+        std::cout << "Bjet energies are not compatible within 5 sigma with invariant mass constraint." << std::endl;
+        m_map_chi2[m_hypos[i]] = -pow(10,10);
+        m_map_prob[m_hypos[i]] = -pow(10,10);
+        m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
+        m_bestChi2 = -pow(10,10);
+        continue;
+      }
+      if(fabs(m_bjet1_COV(0,0)) < 0.001)
+        {
+          b1Fit->setCovMatrix(m_sigma_bjet1);
+          b2Fit->setCovMatrix(m_sigma_bjet2);
+
+          b1Fit->printCovMatrix();
+          b2Fit->printCovMatrix();
+        }
+      else
+        {
+          std::cout << "Cov MATRIX set manually for ToyMC study." << std::endl;      
+          b1Fit->setCovMatrix(m_bjet1_COV);
+          b2Fit->setCovMatrix(m_bjet2_COV);
+        }
     
 
-    //prepare constraints
-    HHFitConstraint* c_invmh1 = new HHFitConstraintEHardM(tau1Fit, tau2Fit, mh1);
-    HHFitConstraint* c_invmh2 = new HHFitConstraintEHardM(b1Fit, b2Fit, mh2);
+      //prepare constraints
+      HHFitConstraint* c_invmh1 = new HHFitConstraintEHardM(tau1Fit, tau2Fit, mh1);
+      HHFitConstraint* c_invmh2 = new HHFitConstraintEHardM(b1Fit, b2Fit, mh2);
     
-    HHFitConstraint* c_b1 = new HHFitConstraint4Vector(b1Fit, false, false, 
-						       false, true);
-    HHFitConstraint* c_b2 = new HHFitConstraint4Vector(b2Fit, false, false, 
-						       false, true);
-    HHFitConstraint* c_balance = new HHFitConstraint4Vector(heavyHiggs, true, true, 
-							    false, false);
+      HHFitConstraint* c_b1 = new HHFitConstraint4Vector(b1Fit, false, false, 
+                                                         false, true);
+      HHFitConstraint* c_b2 = new HHFitConstraint4Vector(b2Fit, false, false, 
+                                                         false, true);
+      HHFitConstraint* c_balance = new HHFitConstraint4Vector(heavyHiggs, true, true, 
+                                                              false, false);
 
-    //fit
-    HHKinFit2::HHKinFit* fitObject = new HHKinFit2::HHKinFit();
+      //fit
+      HHKinFit2::HHKinFit* fitObject = new HHKinFit2::HHKinFit();
 
-    tau1Fit->setInitStart((tau1Fit->getUpperFitLimitE()+tau1Fit->getLowerFitLimitE())/2);
-    tau1Fit->setInitPrecision(0.1);
-    tau1Fit->setInitStepWidth(0.1*(tau1Fit->getUpperFitLimitE() - tau1Fit->getLowerFitLimitE()));
-    tau1Fit->setInitDirection(1.0);
+      tau1Fit->setInitStart((tau1Fit->getUpperFitLimitE()+tau1Fit->getLowerFitLimitE())/2);
+      tau1Fit->setInitPrecision(0.1);
+      tau1Fit->setInitStepWidth(0.1*(tau1Fit->getUpperFitLimitE() - tau1Fit->getLowerFitLimitE()));
+      tau1Fit->setInitDirection(1.0);
 
-    b1Fit->setInitStart(b1Fit->getInitial4Vector().E());
-    b1Fit->setInitPrecision(0.002*b1Fit->getInitial4Vector().E());
-    b1Fit->setInitStepWidth(0.1*(b1Fit->getUpperFitLimitE() - b1Fit->getLowerFitLimitE()));
-    //b1Fit->setInitStepWidth(0.5*m_sigma_bjet1);
-    b1Fit->setInitDirection(1.0);
+      b1Fit->setInitStart(b1Fit->getInitial4Vector().E());
+      b1Fit->setInitPrecision(0.002*b1Fit->getInitial4Vector().E());
+      b1Fit->setInitStepWidth(0.1*(b1Fit->getUpperFitLimitE() - b1Fit->getLowerFitLimitE()));
+      //b1Fit->setInitStepWidth(0.5*m_sigma_bjet1);
+      b1Fit->setInitDirection(1.0);
 
-    fitObject->addFitObjectE(tau1Fit);
-    fitObject->addFitObjectE(b1Fit);
+      fitObject->addFitObjectE(tau1Fit);
+      fitObject->addFitObjectE(b1Fit);
 
-    fitObject->addConstraint(c_invmh1);
-    fitObject->addConstraint(c_invmh2);
-    fitObject->addConstraint(c_b1);
-    fitObject->addConstraint(c_b2);
-    fitObject->addConstraint(c_balance);
+      fitObject->addConstraint(c_invmh1);
+      fitObject->addConstraint(c_invmh2);
+      fitObject->addConstraint(c_b1);
+      fitObject->addConstraint(c_b2);
+      fitObject->addConstraint(c_balance);
 
-    fitObject->fit();
+      fitObject->fit();
 
-    initialHH = (TLorentzVector)heavyHiggs->getInitial4Vector();
-    finalHH = (TLorentzVector)heavyHiggs->getFit4Vector();
+      initialHH = (TLorentzVector)heavyHiggs->getInitial4Vector();
+      finalHH = (TLorentzVector)heavyHiggs->getFit4Vector();
 
-    m_map_convergence[m_hypos[i]] = fitObject->getConvergence();    
+      m_map_convergence[m_hypos[i]] = fitObject->getConvergence();    
     
-    double chi2 = fitObject->getChi2();
-    m_map_chi2[m_hypos[i]] = chi2;
-    m_map_prob[m_hypos[i]] = TMath::Prob(chi2, 2);
+      double chi2 = fitObject->getChi2();
+      m_map_chi2[m_hypos[i]] = chi2;
+      m_map_prob[m_hypos[i]] = TMath::Prob(chi2, 2);
 
-    if(chi2 < m_bestChi2)
-    {
-      m_bestHypo = m_hypos[i];
-      m_bestChi2 = chi2;
-    }
+      if(chi2 < m_bestChi2)
+        {
+          m_bestHypo = m_hypos[i];
+          m_bestChi2 = chi2;
+        }
     
-    m_map_mH[m_hypos[i]] = heavyHiggs->getFit4Vector().M();
-    m_map_chi2BJet1[m_hypos[i]] = c_b1->getChi2();
-    m_map_chi2BJet2[m_hypos[i]] = c_b2->getChi2();
-    m_map_chi2Balance[m_hypos[i]] = c_balance->getChi2();
+      m_map_mH[m_hypos[i]] = heavyHiggs->getFit4Vector().M();
+      m_map_chi2BJet1[m_hypos[i]] = c_b1->getChi2();
+      m_map_chi2BJet2[m_hypos[i]] = c_b2->getChi2();
+      m_map_chi2Balance[m_hypos[i]] = c_balance->getChi2();
     
-    TLorentzVector fittedTau1 =  ( (TLorentzVector)tau1Fit->getFit4Vector()  );
-    m_map_fittedTau1[m_hypos[i]] = fittedTau1;
-    TLorentzVector fittedTau2 =  ( (TLorentzVector)tau2Fit->getFit4Vector()  );
-    m_map_fittedTau2[m_hypos[i]] = fittedTau2;
-    TLorentzVector fittedB1 =  ( (TLorentzVector)b1Fit->getFit4Vector() ) ;
-    m_map_fittedB1[m_hypos[i]] = fittedB1;
-    TLorentzVector fittedB2 =  ( (TLorentzVector)b2Fit->getFit4Vector() ) ;
-    m_map_fittedB2[m_hypos[i]]= fittedB2;
+      TLorentzVector fittedTau1 =  ( (TLorentzVector)tau1Fit->getFit4Vector()  );
+      m_map_fittedTau1[m_hypos[i]] = fittedTau1;
+      TLorentzVector fittedTau2 =  ( (TLorentzVector)tau2Fit->getFit4Vector()  );
+      m_map_fittedTau2[m_hypos[i]] = fittedTau2;
+      TLorentzVector fittedB1 =  ( (TLorentzVector)b1Fit->getFit4Vector() ) ;
+      m_map_fittedB1[m_hypos[i]] = fittedB1;
+      TLorentzVector fittedB2 =  ( (TLorentzVector)b2Fit->getFit4Vector() ) ;
+      m_map_fittedB2[m_hypos[i]]= fittedB2;
     
-    /*
-      if( entry_convergence_full.second == 0 ){
+      /*
+        if( entry_convergence_full.second == 0 ){
       	Chi2Map chi2Map = advancedfitter.CreateChi2Map(15, 100);
 	
 	TCanvas* c1 = new TCanvas("canvas1");
@@ -178,8 +179,8 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
 	
 	int pointN = 0;
 	for(Chi2Map::iterator iter = chi2Map.begin(); iter != chi2Map.end(); iter++){
-	  graph2d->SetPoint(pointN, iter->first.first, iter->first.second, iter->second);
-	  pointN++;
+        graph2d->SetPoint(pointN, iter->first.first, iter->first.second, iter->second);
+        pointN++;
 	}
 	
 	std::stringstream fileNameStream;
@@ -198,8 +199,8 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
 	
 	pointN = 0;
 	for(Chi2Map::iterator iter = chi2MapAroundStartvalues.begin(); iter != chi2MapAroundStartvalues.end(); iter++){
-	  graph2dAroundStartvalues->SetPoint(pointN, iter->first.first, iter->first.second, iter->second);
-	  pointN++;
+        graph2dAroundStartvalues->SetPoint(pointN, iter->first.first, iter->first.second, iter->second);
+        pointN++;
 	}
 	
 	graph2dAroundStartvalues->Draw("Cont3COLZ");
@@ -212,8 +213,8 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
 	
 	pointN = 0;
 	for(Chi2Map::iterator iter = chi2MapTauValues.begin(); iter != chi2MapTauValues.end(); iter++){
-	  graph1dTauValues->SetPoint(pointN, iter->first.second, iter->second);
-	  pointN++;
+        graph1dTauValues->SetPoint(pointN, iter->first.second, iter->second);
+        pointN++;
 	}
 
 	graph1dTauValues->Draw("AC*");
@@ -229,34 +230,25 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
 	delete c1;
 	delete graph2d;
 	}
-    */
+      */
 
-    delete c_invmh1;
-    delete c_invmh2;
-    delete c_b1;
-    delete c_b2;
-    delete c_balance;
+      delete c_invmh1;
+      delete c_invmh2;
+      delete c_b1;
+      delete c_b2;
+      delete c_balance;
     
-    delete fitObject;
+      delete fitObject;
    
-    tau1Fit->reset();
-    tau2Fit->reset();
-    b1Fit->reset();
-    b2Fit->reset();
-    metFit->reset();
-    heavyHiggs->reset();
-    higgs1->reset();
-    higgs2->reset();
-  }
-  
-  delete tau1Fit;
-  delete tau2Fit;
-  delete b1Fit;
-  delete b2Fit;
-  delete metFit;
-  delete heavyHiggs;
-  delete higgs1;
-  delete higgs2;
+      delete tau1Fit;
+      delete tau2Fit;
+      delete b1Fit;
+      delete b2Fit;
+      delete metFit;
+      delete heavyHiggs;
+      delete higgs1;
+      delete higgs2;
+    }
 }
 
 void HHKinFit2::HHKinFitMasterHeavyHiggs::addHypo(HHFitHypothesisHeavyHiggs hypo)
@@ -271,15 +263,15 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::addHypo(int mh1, int mh2)
 }
 
 HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(const TLorentzVector* bjet1, 
-					  const TLorentzVector* bjet2, 
-					  const TLorentzVector* tauvis1,
-					  const TLorentzVector* tauvis2,
-					  const TLorentzVector* met, 
-					  TMatrixD met_cov, 
-					  double sigmaEbjet1,
-					  double sigmaEbjet2,
-					  bool istruth, 
-					  TLorentzVector* heavyhiggsgen)
+                                                              const TLorentzVector* bjet2, 
+                                                              const TLorentzVector* tauvis1,
+                                                              const TLorentzVector* tauvis2,
+                                                              const TLorentzVector* met, 
+                                                              TMatrixD met_cov, 
+                                                              double sigmaEbjet1,
+                                                              double sigmaEbjet2,
+                                                              bool istruth, 
+                                                              TLorentzVector* heavyhiggsgen)
   :m_MET_COV(TMatrixD(4,4)), m_bjet1_COV(TMatrixD(4,4)), m_bjet2_COV(TMatrixD(4,4))
 					  
 {
@@ -296,31 +288,31 @@ HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(const TLorentzVect
   m_tauvis2.SetMkeepE(1.77682);
    
   if(met != 0)
-  {
-    m_MET = TVector2(met->Px(), met->Py());
-  }
+    {
+      m_MET = TVector2(met->Px(), met->Py());
+    }
   m_MET_COV(0,0) = met_cov(0,0);
   m_MET_COV(1,0) = met_cov(1,0);
   m_MET_COV(0,1) = met_cov(0,1);
   m_MET_COV(1,1) = met_cov(1,1);
 
   if(sigmaEbjet1 >= 0.0)
-  {
-    m_sigma_bjet1 = sigmaEbjet1;
-  }
+    {
+      m_sigma_bjet1 = sigmaEbjet1;
+    }
   else
-  {
-    m_sigma_bjet1 = GetPFBJetRes(m_bjet1.Eta(), m_bjet1.Et());
-  }
+    {
+      m_sigma_bjet1 = GetPFBJetRes(m_bjet1.Eta(), m_bjet1.Et());
+    }
   
   if(sigmaEbjet2 >= 0.0)
-  {
-    m_sigma_bjet2 = sigmaEbjet2;
-  }
+    {
+      m_sigma_bjet2 = sigmaEbjet2;
+    }
   else
-  {
-    m_sigma_bjet2 = GetPFBJetRes(m_bjet2.Eta(), m_bjet2.Et());
-  }
+    {
+      m_sigma_bjet2 = GetPFBJetRes(m_bjet2.Eta(), m_bjet2.Et());
+    }
 
   m_bestChi2 = 99999.0;
   m_bestHypo = HHFitHypothesisHeavyHiggs(0,0);
@@ -329,34 +321,34 @@ HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(const TLorentzVect
     TRandom3 r(0);  
     /*
       if(heavyhiggsgen != NULL)
-    {
+      {
       Double_t pxHeavyH = heavyhiggsgen->Px();
       Double_t pyHeavyH = heavyhiggsgen->Py();
       Double_t transEnergyHeavyH = sqrt(pxHeavyH*pxHeavyH+pyHeavyH*pyHeavyH);
       
-    }
-    else
-    {
+      }
+      else
+      {
       heavyH = HHLorentzVector(0,0,0,0);
       std::cout << "WARNING! Truthinput mode active but no Heavy Higgs gen-information given! Setting HH to Zero!" << std::endl;
-    }*/   
+      }*/   
 
     /*
-    HHLorentzVector MET4 = heavyH - (m_bjet1 + m_bjet2 + m_tauvis1 + m_tauvis2);
-    neutrinos = (TLorentzVector)MET4;
+      HHLorentzVector MET4 = heavyH - (m_bjet1 + m_bjet2 + m_tauvis1 + m_tauvis2);
+      neutrinos = (TLorentzVector)MET4;
 
-    Double_t METXSmeared = r.Gaus(MET4.Px(), 10.0);
-    Double_t METYSmeared = r.Gaus(MET4.Py(), 10.0);
+      Double_t METXSmeared = r.Gaus(MET4.Px(), 10.0);
+      Double_t METYSmeared = r.Gaus(MET4.Py(), 10.0);
 
-    std::cout << "Met smeared by: " <<  MET4.Px() - METXSmeared << "  " 
-	      << MET4.Py() - METYSmeared << std::endl;
+      std::cout << "Met smeared by: " <<  MET4.Px() - METXSmeared << "  " 
+      << MET4.Py() - METYSmeared << std::endl;
 	      
-    m_MET = TVector2(METXSmeared, METYSmeared);
-    smearedMET = m_MET;
+      m_MET = TVector2(METXSmeared, METYSmeared);
+      smearedMET = m_MET;
 
-    m_MET_COV = TMatrixD(4,4);
-    m_MET_COV(0,0)=100;    m_MET_COV(0,1)=0;
-    m_MET_COV(1,0)=0;      m_MET_COV(1,1)=100;
+      m_MET_COV = TMatrixD(4,4);
+      m_MET_COV(0,0)=100;    m_MET_COV(0,1)=0;
+      m_MET_COV(1,0)=0;      m_MET_COV(1,1)=100;
     */
 
 
@@ -441,74 +433,74 @@ HHKinFit2::HHFitHypothesisHeavyHiggs HHKinFit2::HHKinFitMasterHeavyHiggs::getLow
 //Getters for fit results
 
 double HHKinFit2::HHKinFitMasterHeavyHiggs::getChi2(int mh1, int mh2){
-HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
-return(m_map_chi2[hypo]);
+  HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+  return(m_map_chi2[hypo]);
 }
 
   
 double HHKinFit2::HHKinFitMasterHeavyHiggs::getChi2BJet1(int mh1, int mh2){
-HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
-return(m_map_chi2BJet1[hypo]);
+  HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+  return(m_map_chi2BJet1[hypo]);
 }
 
 
 
 double HHKinFit2::HHKinFitMasterHeavyHiggs::getChi2BJet2(int mh1, int mh2){
-HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
-return(m_map_chi2BJet2[hypo]);
+  HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+  return(m_map_chi2BJet2[hypo]);
 }
     
 
 double HHKinFit2::HHKinFitMasterHeavyHiggs::getChi2Balance(int mh1, int mh2){
-HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
-return(m_map_chi2Balance[hypo]);
+  HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+  return(m_map_chi2Balance[hypo]);
 }
   
 double HHKinFit2::HHKinFitMasterHeavyHiggs::getFitProb(int mh1, int mh2){
-HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
-return( m_map_prob[hypo]);
+  HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+  return( m_map_prob[hypo]);
 }
   
 double HHKinFit2::HHKinFitMasterHeavyHiggs::getMH(int mh1, int mh2){
-HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
-return(m_map_mH[hypo]);
+  HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+  return(m_map_mH[hypo]);
 }
 
 
 int HHKinFit2::HHKinFitMasterHeavyHiggs::getConvergence(int mh1, int mh2){
-HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
-return(m_map_convergence[hypo]);
+  HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+  return(m_map_convergence[hypo]);
 }
 
 TLorentzVector HHKinFit2::HHKinFitMasterHeavyHiggs::getFittedTau1(int mh1, int mh2){
-HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
-return(m_map_fittedTau1[hypo]);
+  HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+  return(m_map_fittedTau1[hypo]);
 }
 
 
 TLorentzVector HHKinFit2::HHKinFitMasterHeavyHiggs::getFittedTau2(int mh1, int mh2){
-HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
-return(m_map_fittedTau2[hypo]);
+  HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+  return(m_map_fittedTau2[hypo]);
 }
 
 TLorentzVector HHKinFit2::HHKinFitMasterHeavyHiggs::getFittedBJet1(int mh1, int mh2){
-HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
-return(m_map_fittedB1[hypo]);
+  HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+  return(m_map_fittedB1[hypo]);
 }
   
 
 TLorentzVector HHKinFit2::HHKinFitMasterHeavyHiggs::getFittedBJet2(int mh1, int mh2){
-HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
-return(m_map_fittedB2[hypo]);
+  HHFitHypothesisHeavyHiggs hypo(mh1, mh2);
+  return(m_map_fittedB2[hypo]);
 }
 
 void HHKinFit2::HHKinFitMasterHeavyHiggs::setAdvancedBalance(const TLorentzVector* met, 
-						   TMatrixD met_cov)
+                                                             TMatrixD met_cov)
 {
   if(met != 0)
-  {
-    m_MET = TVector2(met->Px(), met->Py());
-  }
+    {
+      m_MET = TVector2(met->Px(), met->Py());
+    }
   m_MET_COV = met_cov;
 }
 double HHKinFit2::HHKinFitMasterHeavyHiggs::GetPFBJetRes(double eta, double et){
@@ -516,133 +508,133 @@ double HHKinFit2::HHKinFitMasterHeavyHiggs::GetPFBJetRes(double eta, double et){
   double de=10;
 
   if(0.000<=abs(eta) && abs(eta)<0.087){
-  det = et * (sqrt(0.0686*0.0686 + (1.03/sqrt(et))*(1.03/sqrt(et)) + (1.68/et)*(1.68/et)));
-  de = 1.0/sin(2 * atan(exp(-(0.000+0.087)/2))) * det;
+    det = et * (sqrt(0.0686*0.0686 + (1.03/sqrt(et))*(1.03/sqrt(et)) + (1.68/et)*(1.68/et)));
+    de = 1.0/sin(2 * atan(exp(-(0.000+0.087)/2))) * det;
   }
 
   if(0.087<=abs(eta) && abs(eta)<0.174){
-  det = et * (sqrt(0.0737*0.0737 + (1.01/sqrt(et))*(1.01/sqrt(et)) + (1.74/et)*(1.74/et)));
-  de = 1.0/sin(2 * atan(exp(-(0.087+0.174)/2))) * det;
+    det = et * (sqrt(0.0737*0.0737 + (1.01/sqrt(et))*(1.01/sqrt(et)) + (1.74/et)*(1.74/et)));
+    de = 1.0/sin(2 * atan(exp(-(0.087+0.174)/2))) * det;
   }
 
   if(0.174<=abs(eta) && abs(eta)<0.261){
-  det = et * (sqrt(0.0657*0.0657 + (1.07/sqrt(et))*(1.07/sqrt(et)) + (5.16e-06/et)*(5.16e-06/et)));
-  de = 1.0/sin(2 * atan(exp(-(0.174+0.261)/2))) * det;
+    det = et * (sqrt(0.0657*0.0657 + (1.07/sqrt(et))*(1.07/sqrt(et)) + (5.16e-06/et)*(5.16e-06/et)));
+    de = 1.0/sin(2 * atan(exp(-(0.174+0.261)/2))) * det;
   }
 
   if(0.261<=abs(eta) && abs(eta)<0.348){
-  det = et * (sqrt(0.062*0.062 + (1.07/sqrt(et))*(1.07/sqrt(et)) + (0.000134/et)*(0.000134/et)));
-  de = 1.0/sin(2 * atan(exp(-(0.261+0.348)/2))) * det;
+    det = et * (sqrt(0.062*0.062 + (1.07/sqrt(et))*(1.07/sqrt(et)) + (0.000134/et)*(0.000134/et)));
+    de = 1.0/sin(2 * atan(exp(-(0.261+0.348)/2))) * det;
   }
 
   if(0.348<=abs(eta) && abs(eta)<0.435){
-  det = et * (sqrt(0.0605*0.0605 + (1.07/sqrt(et))*(1.07/sqrt(et)) + (1.84e-07/et)*(1.84e-07/et)));
-  de = 1.0/sin(2 * atan(exp(-(0.348+0.435)/2))) * det;
+    det = et * (sqrt(0.0605*0.0605 + (1.07/sqrt(et))*(1.07/sqrt(et)) + (1.84e-07/et)*(1.84e-07/et)));
+    de = 1.0/sin(2 * atan(exp(-(0.348+0.435)/2))) * det;
   }
 
   if(0.435<=abs(eta) && abs(eta)<0.522){
-  det = et * (sqrt(0.059*0.059 + (1.08/sqrt(et))*(1.08/sqrt(et)) + (9.06e-09/et)*(9.06e-09/et)));
-  de = 1.0/sin(2 * atan(exp(-(0.435+0.522)/2))) * det;
+    det = et * (sqrt(0.059*0.059 + (1.08/sqrt(et))*(1.08/sqrt(et)) + (9.06e-09/et)*(9.06e-09/et)));
+    de = 1.0/sin(2 * atan(exp(-(0.435+0.522)/2))) * det;
   }
 
   if(0.522<=abs(eta) && abs(eta)<0.609){
-  det = et * (sqrt(0.0577*0.0577 + (1.08/sqrt(et))*(1.08/sqrt(et)) + (5.46e-06/et)*(5.46e-06/et)));
-  de = 1.0/sin(2 * atan(exp(-(0.522+0.609)/2))) * det;
+    det = et * (sqrt(0.0577*0.0577 + (1.08/sqrt(et))*(1.08/sqrt(et)) + (5.46e-06/et)*(5.46e-06/et)));
+    de = 1.0/sin(2 * atan(exp(-(0.522+0.609)/2))) * det;
   }
 
   if(0.609<=abs(eta) && abs(eta)<0.696){
-  det = et * (sqrt(0.0525*0.0525 + (1.09/sqrt(et))*(1.09/sqrt(et)) + (4.05e-05/et)*(4.05e-05/et)));
-  de = 1.0/sin(2 * atan(exp(-(0.609+0.696)/2))) * det;
+    det = et * (sqrt(0.0525*0.0525 + (1.09/sqrt(et))*(1.09/sqrt(et)) + (4.05e-05/et)*(4.05e-05/et)));
+    de = 1.0/sin(2 * atan(exp(-(0.609+0.696)/2))) * det;
   }
 
   if(0.696<=abs(eta) && abs(eta)<0.783){
-  det = et * (sqrt(0.0582*0.0582 + (1.09/sqrt(et))*(1.09/sqrt(et)) + (1.17e-05/et)*(1.17e-05/et)));
-  de = 1.0/sin(2 * atan(exp(-(0.696+0.783)/2))) * det;
+    det = et * (sqrt(0.0582*0.0582 + (1.09/sqrt(et))*(1.09/sqrt(et)) + (1.17e-05/et)*(1.17e-05/et)));
+    de = 1.0/sin(2 * atan(exp(-(0.696+0.783)/2))) * det;
   }
 
   if(0.783<=abs(eta) && abs(eta)<0.870){
-  det = et * (sqrt(0.0649*0.0649 + (1.08/sqrt(et))*(1.08/sqrt(et)) + (7.85e-06/et)*(7.85e-06/et)));
-  de = 1.0/sin(2 * atan(exp(-(0.783+0.870)/2))) * det;
+    det = et * (sqrt(0.0649*0.0649 + (1.08/sqrt(et))*(1.08/sqrt(et)) + (7.85e-06/et)*(7.85e-06/et)));
+    de = 1.0/sin(2 * atan(exp(-(0.783+0.870)/2))) * det;
   }
 
   if(0.870<=abs(eta) && abs(eta)<0.957){
-  det = et * (sqrt(0.0654*0.0654 + (1.1/sqrt(et))*(1.1/sqrt(et)) + (1.09e-07/et)*(1.09e-07/et)));
-  de = 1.0/sin(2 * atan(exp(-(0.870+0.957)/2))) * det;
+    det = et * (sqrt(0.0654*0.0654 + (1.1/sqrt(et))*(1.1/sqrt(et)) + (1.09e-07/et)*(1.09e-07/et)));
+    de = 1.0/sin(2 * atan(exp(-(0.870+0.957)/2))) * det;
   }
 
   if(0.957<=abs(eta) && abs(eta)<1.044){
-  det = et * (sqrt(0.0669*0.0669 + (1.11/sqrt(et))*(1.11/sqrt(et)) + (1.87e-06/et)*(1.87e-06/et)));
-  de = 1.0/sin(2 * atan(exp(-(0.957+1.044)/2))) * det;
+    det = et * (sqrt(0.0669*0.0669 + (1.11/sqrt(et))*(1.11/sqrt(et)) + (1.87e-06/et)*(1.87e-06/et)));
+    de = 1.0/sin(2 * atan(exp(-(0.957+1.044)/2))) * det;
   }
 
   if(1.044<=abs(eta) && abs(eta)<1.131){
-  det = et * (sqrt(0.0643*0.0643 + (1.15/sqrt(et))*(1.15/sqrt(et)) + (2.76e-05/et)*(2.76e-05/et)));
-  de = 1.0/sin(2 * atan(exp(-(1.044+1.131)/2))) * det;
+    det = et * (sqrt(0.0643*0.0643 + (1.15/sqrt(et))*(1.15/sqrt(et)) + (2.76e-05/et)*(2.76e-05/et)));
+    de = 1.0/sin(2 * atan(exp(-(1.044+1.131)/2))) * det;
   }
 
   if(1.131<=abs(eta) && abs(eta)<1.218){
-  det = et * (sqrt(0.0645*0.0645 + (1.16/sqrt(et))*(1.16/sqrt(et)) + (1.04e-06/et)*(1.04e-06/et)));
-  de = 1.0/sin(2 * atan(exp(-(1.131+1.218)/2))) * det;
+    det = et * (sqrt(0.0645*0.0645 + (1.16/sqrt(et))*(1.16/sqrt(et)) + (1.04e-06/et)*(1.04e-06/et)));
+    de = 1.0/sin(2 * atan(exp(-(1.131+1.218)/2))) * det;
   }
 
   if(1.218<=abs(eta) && abs(eta)<1.305){
-  det = et * (sqrt(0.0637*0.0637 + (1.19/sqrt(et))*(1.19/sqrt(et)) + (1.08e-07/et)*(1.08e-07/et)));
-  de = 1.0/sin(2 * atan(exp(-(1.218+1.305)/2))) * det;
+    det = et * (sqrt(0.0637*0.0637 + (1.19/sqrt(et))*(1.19/sqrt(et)) + (1.08e-07/et)*(1.08e-07/et)));
+    de = 1.0/sin(2 * atan(exp(-(1.218+1.305)/2))) * det;
   }
 
   if(1.305<=abs(eta) && abs(eta)<1.392){
-  det = et * (sqrt(0.0695*0.0695 + (1.21/sqrt(et))*(1.21/sqrt(et)) + (5.75e-06/et)*(5.75e-06/et)));
-  de = 1.0/sin(2 * atan(exp(-(1.305+1.392)/2))) * det;
+    det = et * (sqrt(0.0695*0.0695 + (1.21/sqrt(et))*(1.21/sqrt(et)) + (5.75e-06/et)*(5.75e-06/et)));
+    de = 1.0/sin(2 * atan(exp(-(1.305+1.392)/2))) * det;
   }
 
   if(1.392<=abs(eta) && abs(eta)<1.479){
-  det = et * (sqrt(0.0748*0.0748 + (1.2/sqrt(et))*(1.2/sqrt(et)) + (5.15e-08/et)*(5.15e-08/et)));
-  de = 1.0/sin(2 * atan(exp(-(1.392+1.479)/2))) * det;
+    det = et * (sqrt(0.0748*0.0748 + (1.2/sqrt(et))*(1.2/sqrt(et)) + (5.15e-08/et)*(5.15e-08/et)));
+    de = 1.0/sin(2 * atan(exp(-(1.392+1.479)/2))) * det;
   }
 
   if(1.479<=abs(eta) && abs(eta)<1.566){
-  det = et * (sqrt(0.0624*0.0624 + (1.23/sqrt(et))*(1.23/sqrt(et)) + (2.28e-05/et)*(2.28e-05/et)));
-  de = 1.0/sin(2 * atan(exp(-(1.479+1.566)/2))) * det;
+    det = et * (sqrt(0.0624*0.0624 + (1.23/sqrt(et))*(1.23/sqrt(et)) + (2.28e-05/et)*(2.28e-05/et)));
+    de = 1.0/sin(2 * atan(exp(-(1.479+1.566)/2))) * det;
   }
 
   if(1.566<=abs(eta) && abs(eta)<1.653){
-  det = et * (sqrt(0.0283*0.0283 + (1.25/sqrt(et))*(1.25/sqrt(et)) + (4.79e-07/et)*(4.79e-07/et)));
-  de = 1.0/sin(2 * atan(exp(-(1.566+1.653)/2))) * det;
+    det = et * (sqrt(0.0283*0.0283 + (1.25/sqrt(et))*(1.25/sqrt(et)) + (4.79e-07/et)*(4.79e-07/et)));
+    de = 1.0/sin(2 * atan(exp(-(1.566+1.653)/2))) * det;
   }
 
   if(1.653<=abs(eta) && abs(eta)<1.740){
-  det = et * (sqrt(0.0316*0.0316 + (1.21/sqrt(et))*(1.21/sqrt(et)) + (5e-05/et)*(5e-05/et)));
-  de = 1.0/sin(2 * atan(exp(-(1.653+1.740)/2))) * det;
+    det = et * (sqrt(0.0316*0.0316 + (1.21/sqrt(et))*(1.21/sqrt(et)) + (5e-05/et)*(5e-05/et)));
+    de = 1.0/sin(2 * atan(exp(-(1.653+1.740)/2))) * det;
   }
 
   if(1.740<=abs(eta) && abs(eta)<1.830){
-  det = et * (sqrt(2.29e-07*2.29e-07 + (1.2/sqrt(et))*(1.2/sqrt(et)) + (1.71e-05/et)*(1.71e-05/et)));
-  de = 1.0/sin(2 * atan(exp(-(1.740+1.830)/2))) * det;
+    det = et * (sqrt(2.29e-07*2.29e-07 + (1.2/sqrt(et))*(1.2/sqrt(et)) + (1.71e-05/et)*(1.71e-05/et)));
+    de = 1.0/sin(2 * atan(exp(-(1.740+1.830)/2))) * det;
   }
 
   if(1.830<=abs(eta) && abs(eta)<1.930){
-  det = et * (sqrt(5.18e-09*5.18e-09 + (1.14/sqrt(et))*(1.14/sqrt(et)) + (1.7/et)*(1.7/et)));
-  de = 1.0/sin(2 * atan(exp(-(1.830+1.930)/2))) * det;
+    det = et * (sqrt(5.18e-09*5.18e-09 + (1.14/sqrt(et))*(1.14/sqrt(et)) + (1.7/et)*(1.7/et)));
+    de = 1.0/sin(2 * atan(exp(-(1.830+1.930)/2))) * det;
   }
 
   if(1.930<=abs(eta) && abs(eta)<2.043){
-  det = et * (sqrt(2.17e-07*2.17e-07 + (1.09/sqrt(et))*(1.09/sqrt(et)) + (2.08/et)*(2.08/et)));
-  de = 1.0/sin(2 * atan(exp(-(1.930+2.043)/2))) * det;
+    det = et * (sqrt(2.17e-07*2.17e-07 + (1.09/sqrt(et))*(1.09/sqrt(et)) + (2.08/et)*(2.08/et)));
+    de = 1.0/sin(2 * atan(exp(-(1.930+2.043)/2))) * det;
   }
 
   if(2.043<=abs(eta) && abs(eta)<2.172){
-  det = et * (sqrt(3.65e-07*3.65e-07 + (1.09/sqrt(et))*(1.09/sqrt(et)) + (1.63/et)*(1.63/et)));
-  de = 1.0/sin(2 * atan(exp(-(2.043+2.172)/2))) * det;
+    det = et * (sqrt(3.65e-07*3.65e-07 + (1.09/sqrt(et))*(1.09/sqrt(et)) + (1.63/et)*(1.63/et)));
+    de = 1.0/sin(2 * atan(exp(-(2.043+2.172)/2))) * det;
   }
 
   if(2.172<=abs(eta) && abs(eta)<2.322){
-  det = et * (sqrt(2.02e-07*2.02e-07 + (1.09/sqrt(et))*(1.09/sqrt(et)) + (1.68/et)*(1.68/et)));
-  de = 1.0/sin(2 * atan(exp(-(2.172+2.322)/2))) * det;
+    det = et * (sqrt(2.02e-07*2.02e-07 + (1.09/sqrt(et))*(1.09/sqrt(et)) + (1.68/et)*(1.68/et)));
+    de = 1.0/sin(2 * atan(exp(-(2.172+2.322)/2))) * det;
   }
 
   if(2.322<=abs(eta) && abs(eta)<2.500){
-  det = et * (sqrt(5.27e-07*5.27e-07 + (1.12/sqrt(et))*(1.12/sqrt(et)) + (1.78/et)*(1.78/et)));
-  de = 1.0/sin(2 * atan(exp(-(2.322+2.500)/2))) * det;
+    det = et * (sqrt(5.27e-07*5.27e-07 + (1.12/sqrt(et))*(1.12/sqrt(et)) + (1.78/et)*(1.78/et)));
+    de = 1.0/sin(2 * atan(exp(-(2.322+2.500)/2))) * det;
   }
 
   return de;

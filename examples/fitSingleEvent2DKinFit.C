@@ -23,6 +23,9 @@ int main(int argc, char* argv[])
 
   HHKinFitMasterHeavyHiggs heavyhiggsfit(bjet1, bjet2, tauvis1, tauvis2, met, met_cov);
   heavyhiggsfit.addHypo(125,125);
+  heavyhiggsfit.addHypo(125,150);
+  heavyhiggsfit.addHypo(125,175);
+  heavyhiggsfit.addHypo(135,125);
   heavyhiggsfit.doFit();
 
   return (0);
