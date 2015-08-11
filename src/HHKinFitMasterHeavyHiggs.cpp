@@ -69,7 +69,7 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
 
       m_map_chi2[m_hypos[i]] = -pow(10,10);
       m_map_prob[m_hypos[i]] = -pow(10,10);
-      m_bestHypo = HHFitHypothesisHeavyHiggs(-pow(10,10),-pow(10,10));
+      m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
       m_bestChi2 = -pow(10,10);
       continue;
     }
@@ -84,7 +84,7 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
       std::cout << "Bjet energies are not compatible within 5 sigma with invariant mass constraint." << std::endl;
       m_map_chi2[m_hypos[i]] = -pow(10,10);
       m_map_prob[m_hypos[i]] = -pow(10,10);
-      m_bestHypo = HHFitHypothesisHeavyHiggs(-pow(10,10),-pow(10,10));
+      m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
       m_bestChi2 = -pow(10,10);
       continue;
     }
@@ -125,7 +125,8 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
 
     b1Fit->setInitStart(b1Fit->getInitial4Vector().E());
     b1Fit->setInitPrecision(0.002*b1Fit->getInitial4Vector().E());
-    b1Fit->setInitStepWidth(0.5*m_sigma_bjet1);
+    b1Fit->setInitStepWidth(0.1*(b1Fit->getUpperFitLimitE() - b1Fit->getLowerFitLimitE()));
+    //b1Fit->setInitStepWidth(0.5*m_sigma_bjet1);
     b1Fit->setInitDirection(1.0);
 
     fitObject->addFitObjectE(tau1Fit);

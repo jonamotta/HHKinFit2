@@ -94,8 +94,9 @@ HHKinFit2::HHKinFit::fit(){
       catch(HHKinFit2::HHEnergyRangeException const& e){
         std::cout << e.what() << std::endl;
 
-        std::cout << "iloop =" << iloop << std::endl;
         std::cout << "iter  ="<< iterbefore << " " << iter << std::endl;
+        std::cout << "iloop =" << iloop << std::endl;
+        std::cout << "fitobject ="<< i << std::endl;
         std::cout << "method="<< methodbefore << " " << method << std::endl;
         std::cout << "mode  ="<< modebefore << " " << mode << std::endl;
         std::cout << "noNewtonShifts="<< noNewtonShifts << std::endl;
