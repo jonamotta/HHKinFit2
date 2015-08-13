@@ -19,11 +19,11 @@ class HHFitConstraint4Vector : public HHFitConstraint {
   void printChi2() const;
 
  private:
-  bool m_components[4];
+  int m_ncomp;
   TMatrixD m_cov;
   TMatrixD m_invcov;
-  int m_ncomp;
   std::vector<int> m_indices;
+  bool m_components[4];
 };
 }
 #endif /* HHFitConstraint4Vector_ */

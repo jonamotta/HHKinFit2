@@ -27,7 +27,6 @@ HHKinFit2::HHFitConstraint4Vector::HHFitConstraint4Vector(HHFitObject* object, b
   }
   m_cov.ResizeTo(m_ncomp,m_ncomp);
 
-  int a=0;
   for (int i=0; i<m_ncomp; i++)
     for (int j=0; j<m_ncomp; j++)
       m_cov(i,j)=m_fitobject->getCovMatrix()(m_indices[i],m_indices[j]);

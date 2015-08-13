@@ -7,6 +7,7 @@ doc
 *.pdf
 *.png
 *.root
+libHHKinFit2.so
 runHHTauTauEventGenerator
 runHHKinFit
 compare2DKinFits

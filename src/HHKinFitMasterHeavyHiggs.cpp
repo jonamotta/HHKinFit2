@@ -169,68 +169,6 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
       TLorentzVector fittedB2 =  ( (TLorentzVector)b2Fit->getFit4Vector() ) ;
       m_map_fittedB2[m_hypos[i]]= fittedB2;
     
-      /*
-        if( entry_convergence_full.second == 0 ){
-      	Chi2Map chi2Map = advancedfitter.CreateChi2Map(15, 100);
-	
-	TCanvas* c1 = new TCanvas("canvas1");
-	TGraph2D* graph2d = new TGraph2D( chi2Map.size() );
-	
-	int pointN = 0;
-	for(Chi2Map::iterator iter = chi2Map.begin(); iter != chi2Map.end(); iter++){
-        graph2d->SetPoint(pointN, iter->first.first, iter->first.second, iter->second);
-        pointN++;
-	}
-	
-	std::stringstream fileNameStream;
-	TString fileName;
-	fileNameStream << "MinB1_" << m_bjet1_fitted.E() << "_MinTau1_" << m_tau1_fitted.E() << std::endl;
-	fileNameStream >> fileName;
-	
-	graph2d->Draw("Cont3COLZ");
-	c1->SaveAs(fileName + ".pdf");
-	
-	/*
-	Chi2Map chi2MapAroundStartvalues = advancedfitter.CreateChi2MapAroundStartvalues(15, 10);
-	
-	TCanvas* c2 = new TCanvas("canvas2");
-	TGraph2D* graph2dAroundStartvalues = new TGraph2D( chi2MapAroundStartvalues.size() );
-	
-	pointN = 0;
-	for(Chi2Map::iterator iter = chi2MapAroundStartvalues.begin(); iter != chi2MapAroundStartvalues.end(); iter++){
-        graph2dAroundStartvalues->SetPoint(pointN, iter->first.first, iter->first.second, iter->second);
-        pointN++;
-	}
-	
-	graph2dAroundStartvalues->Draw("Cont3COLZ");
-	c2->SaveAs(fileName + "AroundStartvalues.pdf");
-	
-	Chi2Map chi2MapTauValues = advancedfitter.CreateChi2Map(0, 100);
-
-	TCanvas* c3 = new TCanvas("canvas3");
-	TGraph* graph1dTauValues = new TGraph( chi2MapTauValues.size() );
-	
-	pointN = 0;
-	for(Chi2Map::iterator iter = chi2MapTauValues.begin(); iter != chi2MapTauValues.end(); iter++){
-        graph1dTauValues->SetPoint(pointN, iter->first.second, iter->second);
-        pointN++;
-	}
-
-	graph1dTauValues->Draw("AC*");
-	c3->SaveAs(fileName + "TauValues.pdf");
-	
-	
-	delete graph1dTauValues;
-	//delete graph2dAroundStartvalues;
-	//delete c2;
-	
-	delete c3;
-	
-	delete c1;
-	delete graph2d;
-	}
-      */
-
       delete c_invmh1;
       delete c_invmh2;
       delete c_b1;

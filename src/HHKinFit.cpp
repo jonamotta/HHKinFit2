@@ -266,7 +266,7 @@ HHKinFit2::HHKinFit::getChi2Function(int steps){
   TGraph* gr = new TGraph(npoints);
   gr->SetName("chi2function");
   double stepsize((m_fitobjects[0]->getUpperFitLimitE() - m_fitobjects[0]->getLowerFitLimitE())/steps);
-  for (unsigned int i=0; i<npoints; i++){
+  for (int i=0; i<npoints; i++){
     double e = 1.00001*m_fitobjects[0]->getLowerFitLimitE()+ i*stepsize;
     m_fitobjects[0]->changeEandSave(e);
     double chi2(this->getChi2());
@@ -286,7 +286,7 @@ HHKinFit2::HHKinFit::getLFunction(int steps){
   TGraph* gr = new TGraph(npoints);
   gr->SetName("Lfunction");
   double stepsize((m_fitobjects[0]->getUpperFitLimitE() - m_fitobjects[0]->getLowerFitLimitE())/steps);
-  for (unsigned int i=0; i<npoints; i++){
+  for (int i=0; i<npoints; i++){
     double e = 1.00001*m_fitobjects[0]->getLowerFitLimitE()+ i*stepsize;
     m_fitobjects[0]->changeEandSave(e);
     double L(this->getL());
