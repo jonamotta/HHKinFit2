@@ -52,13 +52,6 @@ HHKinFit2::HHFitObjectEConstBeta::constrainEtoMinv(double m, HHLorentzVector con
 HHKinFit2::HHLorentzVector
 HHKinFit2::HHFitObjectEConstBeta::changeE(double E) const{
   HHLorentzVector temp = this->getFit4Vector();
-
-  if((E<this->getLowerFitLimitE())||(E>this->getUpperFitLimitE())){
-    std::stringstream msg;
-    msg << "target energy is out of limits: "<<"E(set)="<<E<<" "<<"E(limits)=["<<this->getLowerFitLimitE()<<","<< this->getUpperFitLimitE() << "]";
-    throw(HHEnergyRangeException(msg.str()));
-  }
-
   temp.SetEkeepBeta(E);
 
   return(temp);
@@ -74,6 +67,3 @@ HHKinFit2::HHFitObjectEConstBeta::print() const{
   this->printCovMatrix();
   this->printLimits();
 }
-
-
-

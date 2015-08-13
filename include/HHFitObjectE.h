@@ -16,11 +16,11 @@ class HHFitObjectE : public HHFitObject {
   
   double getE() const;
   virtual HHLorentzVector changeE(double E) const = 0;
-  void changeEandSave(double E);
+  void changeEandSave(double E, bool respectLimits=true);
   virtual HHLorentzVector scaleE(double scale) const;
-  void scaleEandSave(double scale);
+  void scaleEandSave(double scale, bool respectLimits=true);
   virtual HHLorentzVector constrainEtoMinv(double minv, HHLorentzVector const& other4vector) const =0;
-  void constrainEtoMinvandSave(double minv, HHLorentzVector const& other4vector);
+  void constrainEtoMinvandSave(double minv, HHLorentzVector const& other4vector, bool respectLimits=true);
 
   double getUpperFitLimitE() const;
   double getLowerFitLimitE() const;

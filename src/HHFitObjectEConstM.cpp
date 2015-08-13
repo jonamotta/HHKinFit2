@@ -11,7 +11,6 @@ HHKinFit2::HHFitObjectEConstM::HHFitObjectEConstM(HHLorentzVector const& initial
 
 }
 
-
 HHKinFit2::HHLorentzVector
 HHKinFit2::HHFitObjectEConstM::constrainEtoMinv(double m, HHLorentzVector const& pset) const{
   HHLorentzVector pmod = getInitial4Vector();
@@ -76,13 +75,6 @@ HHKinFit2::HHFitObjectEConstM::constrainEtoMinv(double m, HHLorentzVector const&
 HHKinFit2::HHLorentzVector
 HHKinFit2::HHFitObjectEConstM::changeE(double E) const{
   HHLorentzVector temp = this->getFit4Vector();
-
-  if((E<this->getLowerFitLimitE())||(E>this->getUpperFitLimitE())){
-    std::stringstream msg;
-    msg << "target energy is out of limits: "<<"E(set)="<<E<<" "<<"E(limits)=["<<this->getLowerFitLimitE()<<","<< this->getUpperFitLimitE() << "]";
-    throw(HHEnergyRangeException(msg.str()));
-  }
-
   temp.SetEkeepM(E);
 
   return(temp);

@@ -15,9 +15,11 @@ class HHKinFit {
  public:
   HHKinFit();
 
+  void setPrintLevel(int printlevel=0);
+
   void fit();
-  double getChi2() const;
-  double getL() const;
+  double getChi2(bool respectLimits=true) const;
+  double getL(bool respectLimits=true) const;
   std::vector<HHFitObjectE*> getListOfFitObjects() const;
   std::vector<HHFitConstraint*> getListOfConstraints() const;
   
@@ -27,7 +29,6 @@ class HHKinFit {
   TGraph* getChi2Function(int steps);
   TGraph* getLFunction(int steps);
   int getConvergence() const;
-
 
   void printChi2() const;
 

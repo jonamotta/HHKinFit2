@@ -12,6 +12,7 @@
 #include "TAxis.h"
 #include <iostream>
 #include "exceptions/HHEnergyRangeException.h"
+#include "exceptions/HHInvMConstraintException.h"
 
 HHKinFit2::HHKinFit::HHKinFit()
 : m_fitobjects(std::vector<HHFitObjectE*>()),
@@ -20,6 +21,11 @@ HHKinFit2::HHKinFit::HHKinFit()
   m_convergence(0),
   m_printlevel(0),
   m_maxloops(500){
+}
+
+void
+HHKinFit2::HHKinFit::setPrintLevel(int printlevel){
+  m_printlevel=printlevel;
 }
 
 ///todo: compare with old kinfit method
@@ -87,9 +93,10 @@ HHKinFit2::HHKinFit::fit(){
   }
   
   for (int iloop = 0; iloop < m_maxloops * 10 && iter < m_maxloops; iloop++) { // FIT loop
+    bool respectLimits = (iter>=0) ; // do not respect limits when calculating numerical derivative
     for (unsigned int i=0; i<m_fitobjects.size();i++){
       try{
-        m_fitobjects[i]->changeEandSave(a[i]);
+        m_fitobjects[i]->changeEandSave(a[i],respectLimits);
       }
       catch(HHKinFit2::HHEnergyRangeException const& e){
         std::cout << e.what() << std::endl;
@@ -126,12 +133,10 @@ HHKinFit2::HHKinFit::fit(){
         throw(e);
       }
     }
-    
-    m_chi2=this->getChi2();
-    //	    std::cout << iloop << " a[0]: " << a[0] << " chi2: " << std::fixed << std::setprecision(8) << chi2 << std::endl;
-    //	    m_fitobjects[0]->print();
-    
-    
+
+    m_chi2=this->getChi2(respectLimits);
+
+   
     chi2before = m_chi2;
     chi2iterbefore[0]=chi2iter[0];
     iterbefore = iter;
@@ -188,20 +193,25 @@ HHKinFit2::HHKinFit::fit(){
 }
 
 double
-HHKinFit2::HHKinFit::getChi2() const{
+HHKinFit2::HHKinFit::getChi2(bool respectLimits) const{
   double chi2=0;
-  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it){
-    //std::cout << (*it)->getChi2() << std::endl;
+
+  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it)
+    (*it)->prepare(respectLimits);
+
+  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it)
     chi2 += (*it)->getChi2();
-  }
-  //std::cout << chi2 << std::endl;
-  //std::cout << "----------------------------------------------------------------------------------------------"<<std::endl;
+
   return(chi2);
 }
 
 void
 HHKinFit2::HHKinFit::printChi2() const{
   double chi2=0;
+
+  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it)
+    (*it)->prepare();
+
   for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it){
     std::cout << (*it)->getChi2() << std::endl;
     chi2 += (*it)->getChi2();
@@ -212,14 +222,15 @@ HHKinFit2::HHKinFit::printChi2() const{
 }
 
 double
-HHKinFit2::HHKinFit::getL() const{
+HHKinFit2::HHKinFit::getL(bool respectLimits) const{
   double L=1;
-  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it){
-    //std::cout << (*it)->getChi2() << std::endl;
+
+  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it)
+    (*it)->prepare(respectLimits);
+
+  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it)
     L *= (*it)->getLikelihood();
-  }
-  //std::cout << chi2 << std::endl;
-  //std::cout << "----------------------------------------------------------------------------------------------"<<std::endl;
+
   return(L);
 }
 

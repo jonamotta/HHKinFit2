@@ -14,6 +14,7 @@ class HHFitConstraintEHardM : public HHFitConstraint {
  public:
   HHFitConstraintEHardM(HHFitObject* fitobject, HHFitObject* constrainedobject, double mass);
 
+  void prepare(bool respectLimits=true);
   double getChi2() const;
   double getLikelihood() const;
 

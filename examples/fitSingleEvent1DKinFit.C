@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 
 #include "TLorentzVector.h"
 #include "TVector2.h"
@@ -12,14 +13,14 @@ using HHKinFit2::HHKinFitMasterSingleHiggs;
 
 int main(int argc, char* argv[])
 {
-  TLorentzVector tauvis1(27.0386,-3.37592,10.0049,29.04);
-  TLorentzVector tauvis2(-19.7041,7.58246,-1.47997,21.1647);
-  TVector2 met(-20.2176, 7.48374);
+  TLorentzVector tauvis1(-15.902388,37.502301,43.366285,59.503192);
+  TLorentzVector tauvis2(16.824116,-21.066462,7.050932,27.867069);
+  TVector2 met(8.283318,11.756746);
   TMatrixD met_cov(4,4);
-  met_cov[0][0]= 191.604;
-  met_cov[0][1]= -3.8281;
+  met_cov[0][0]= 359.15655;
+  met_cov[0][1]= 0;
   met_cov[1][0]= met_cov[0][1];
-  met_cov[1][1]= 156.727;
+  met_cov[1][1]= 359.15655;
 
   HHKinFitMasterSingleHiggs singlehiggsfit(tauvis1,tauvis2,met,met_cov);
 
@@ -33,7 +34,7 @@ int main(int argc, char* argv[])
   int points=0;
   for (int i=50; i<=250; i++){
     gr.SetPoint(points,i,singlehiggsfit.getChi2(i));
-    std::cout << singlehiggsfit.getChi2(i) << std::endl;
+    std::cout << std::setprecision(5) << singlehiggsfit.getChi2(i) << std::endl;
     points++;
   }
 

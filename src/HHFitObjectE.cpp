@@ -1,6 +1,7 @@
 #include "HHFitObjectE.h"
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 #include "exceptions/HHEnergyRangeException.h"
 #include "exceptions/HHLimitSettingException.h"
@@ -23,18 +24,27 @@ HHKinFit2::HHFitObjectE::scaleE(double scale) const{
 
 
 void
-HHKinFit2::HHFitObjectE::changeEandSave(double E){
+HHKinFit2::HHFitObjectE::changeEandSave(double E, bool respectLimits){
+  if (respectLimits){
+    if((E<this->getLowerFitLimitE())||(E>this->getUpperFitLimitE())){
+      std::stringstream msg;
+      msg << "target energy is out of limits: "<<"E(set)="<<E<<" "<<"E(limits)=["<<this->getLowerFitLimitE()<<","<< this->getUpperFitLimitE() << "]";
+      throw(HHEnergyRangeException(msg.str()));
+    }
+  }
   this->setFit4Vector(changeE(E));
 }
 
 void
-HHKinFit2::HHFitObjectE::scaleEandSave(double E){
-  this->setFit4Vector(scaleE(E));
+HHKinFit2::HHFitObjectE::scaleEandSave(double scale, bool respectLimits){
+  this->changeEandSave(scale*this->getFit4Vector().E(), respectLimits);
 }
 
 void
-HHKinFit2::HHFitObjectE::constrainEtoMinvandSave(double m, HHLorentzVector const& other4vector){
-  this->setFit4Vector(constrainEtoMinv(m, other4vector));
+HHKinFit2::HHFitObjectE::constrainEtoMinvandSave(double m, HHLorentzVector const& other4vector, bool respectLimits){
+  //  this->setFit4Vector(constrainEtoMinv(m, other4vector));
+  double E = constrainEtoMinv(m, other4vector).E();
+  this->changeEandSave(E, respectLimits);
 }
 
 double
@@ -68,17 +78,18 @@ HHKinFit2::HHFitObjectE::getLowerFitLimitE() const{
 
 void
 HHKinFit2::HHFitObjectE::setUpperFitLimitE(double upperlimit){
+  if (upperlimit<this->getLowerFitLimitE()){
+    std::stringstream msg;
+    msg << "Cannot set upper limit: E(upper)="<<upperlimit<<" < E(lower)="<<this->getLowerFitLimitE()<<"";
+    throw(HHLimitSettingException(msg.str()));
+  }
+
   m_upperLimitE = upperlimit;
 }
 
 void
 HHKinFit2::HHFitObjectE::setUpperFitLimitE(double minv, HHLorentzVector const& other4vectorMin){
-  try{
-    this->setUpperFitLimitE(constrainEtoMinv(minv,other4vectorMin).E());
-  }
-  catch(HHEnergyRangeException const& e){
-    throw(HHLimitSettingException(e.what()));
-  }
+  this->setUpperFitLimitE(constrainEtoMinv(minv,other4vectorMin).E());
 }
 
 void

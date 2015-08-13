@@ -93,9 +93,8 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
         {
           b1Fit->setCovMatrix(m_sigma_bjet1);
           b2Fit->setCovMatrix(m_sigma_bjet2);
-
-          b1Fit->printCovMatrix();
-          b2Fit->printCovMatrix();
+          //b1Fit->printCovMatrix();
+          //b2Fit->printCovMatrix();
         }
       else
         {
