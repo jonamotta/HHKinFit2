@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [[ -z "$KINFIT2PATH" ]];
 then
     export KINFIT2PATH=$PWD

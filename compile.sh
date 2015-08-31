@@ -1,6 +1,11 @@
  if [[ -z "$KINFIT2PATH" ]]
  then
-     echo "Environment not initialized "
+     echo "Trying to initialize environment:"
+     source ./setup.sh
+ fi
+ if [[ -z "$KINFIT2PATH" ]]
+ then
+     echo "Trying to initialize environment failed!"
  else
      echo "removing old files"
      rm -f libHHKinFit2.so
