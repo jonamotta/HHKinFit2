@@ -168,25 +168,25 @@ HHKinFit2::HHKinFit::fit(){
   }
   // ------ end of FIT loop
   
-  if(m_convergence != 0 && m_convergence != 5){
-    if(a[0] < (alimit[0][0] + 2*aprec[0]) ){
-      if(m_convergence == 3)
-        m_convergence = 5;
-      else{
-        //	        if (logLevel>1) std::cout << "Convergence at lower tau limit!" << std::endl;
-        m_convergence = 4;
+  int convergenceFlags = 0;
+
+  if(m_convergence != 0) //Check for convergence at limit
+  {
+    for(int param = 0; param < np; ++param) //Set bitwise flags for each param
+    {
+      if(a[param] < (alimit[param][0] + 2*aprec[param]) )
+      {
+	convergenceFlags = convergenceFlags | (1 << param);
+      }
+      else if(a[param] > (alimit[param][1] - 2*aprec[param]) )
+      {
+	convergenceFlags = convergenceFlags | (1 << param);
       }
     }
-    if(a[0] > (alimit[0][1] - 2*aprec[0]) ){
-      if(m_convergence == 3)
-        m_convergence = 5;
-      else{
-        //		if (logLevel>1)
-        //		  std::cout << "Convergence at upper tau limit!" << std::endl;
-        m_convergence = 4;
-      }
-    }
+    //2=at a[0] limit, 3=at a[1] limit 4=at a[0] and a[1] limit 
+    m_convergence = m_convergence + convergenceFlags; 
   }
+  
   //	  if (m_logLevel>1)
   //	    std::cout << "Convergence is " << m_convergence << std::endl;
   
