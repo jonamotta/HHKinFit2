@@ -129,8 +129,8 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
       //b1Fit->setInitStepWidth(0.5*m_sigma_bjet1);
       b1Fit->setInitDirection(1.0);
 
-      fitObject->addFitObjectE(tau1Fit);
       fitObject->addFitObjectE(b1Fit);
+      fitObject->addFitObjectE(tau1Fit);
 
       fitObject->addConstraint(c_invmh1);
       fitObject->addConstraint(c_invmh2);
