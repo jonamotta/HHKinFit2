@@ -106,9 +106,8 @@ PSMath::PSfit (int iloop, int &iter, int &method, int &mode,
   if (method == 3) {
     if(fabs(chi2Memory - chi2) < epsf) {      // test convergence
       convergence = 1;
-      iterMemory = iterMemory + 1;
-      iter = iterMemory;
       chi2Memory = chi2;
+      return convergence;
     }
     else{
       if(printlevel >=2)
@@ -131,7 +130,7 @@ PSMath::PSfit (int iloop, int &iter, int &method, int &mode,
       xh = 1.0/PSVnorm (daN, np);        // initial step width for line search
 
       if (daNabs == 0.)
-        return 5;                            //Minimum found at both limits
+        return 1;                            //Minimum found at both limits
       
       else {
         PSLineLimit (np, astart, daN, alimit, xlimit);
@@ -171,7 +170,7 @@ PSMath::PSfit (int iloop, int &iter, int &method, int &mode,
         }
       }
       if(didConverge){
-	convergence = 2;
+	convergence = 1;
 	iterMemory = iterMemory + 1;
 	iter = iterMemory;
 	return convergence;
@@ -237,8 +236,10 @@ PSMath::PSfit (int iloop, int &iter, int &method, int &mode,
 
       d = PSNewtonAnalyzer (np, a, alimit, aprec, daN, h, g, H, Hinv, chi2, noNewtonShifts, printlevel);
       //      std::cout << "d " << d << "   chi2Memory " << chi2Memory << "  chi2 " << chi2 << std::endl;
-      if (d < epsx) {      // test convergence in next run by checking if deltaChi2 is small enough
+      if (d < epsx) {   // test convergence in next run by checking if deltaChi2 is small enough
         method = 3;
+	iterMemory = iterMemory + 1;
+	iter = iterMemory;
 	if(printlevel >=2)
 	  std::cout << "Small Shift! Check for Convergence (small Chi2) in next Loop!" << std::endl;
       }
@@ -247,6 +248,7 @@ PSMath::PSfit (int iloop, int &iter, int &method, int &mode,
 	  std::cout << "No Minimum! Back to Linesearch!" << std::endl;
 	method = 1;
 	mode = 1;                        // switch to line search
+	iter = 1; //Set iter to something positive to start within limits
 	for (int ip = 0; ip < np; ip++) {
           astart[ip] = a[ip];
         }
@@ -345,6 +347,7 @@ PSMath::PSNewtonAnalyzer (int np, double a[], double alimit[][2],
     }
   }
   if (iNewton == 1) {                      // Newton Step width
+    PSMinverse (H, Hinv, np);
     for (int ii = 0; ii < np; ii++) {
       for (int jj = 0; jj < np; jj++) {
         daN[ii] = daN[ii] - Hinv[ii * np + jj] * g[jj];
