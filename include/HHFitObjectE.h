@@ -45,6 +45,7 @@ class HHFitObjectE : public HHFitObject {
   void setCovMatrix(TMatrixD cov);
 
   void reset();
+  void resetLimits();
 
   virtual void print() const;
   void printLimits() const;

@@ -171,12 +171,17 @@ HHKinFit2::HHFitObjectE::getInitStart(){
 void
 HHKinFit2::HHFitObjectE::reset(){
   HHFitObject::reset();
-  m_upperLimitE = pow(10,10);
-  m_lowerLimitE = 0;
+  resetLimits();
   m_initstart = -pow(10,10);
   m_initprec = -pow(10,10);
   m_initstep = -pow(10,10);
   m_initdirection = -pow(10,10);
+}
+
+void
+HHKinFit2::HHFitObjectE::resetLimits(){
+  m_upperLimitE = pow(10,10);
+  m_lowerLimitE = 0;
 }
 
 

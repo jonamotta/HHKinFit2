@@ -1,0 +1,78 @@
+#ifndef HHKinFitMasterSingleHiggsSoftLimits_H
+#define HHKinFitMasterSingleHiggsSoftLimits_H
+
+#include <TLorentzVector.h>
+#include <TMatrixD.h>
+#include <TVector2.h>
+
+#include "HHLorentzVector.h"
+#include "HHKinFit.h"
+
+#include <stdio.h>
+#include <map>
+#include <utility>
+#include <vector>
+#include <sstream>
+
+namespace HHKinFit2{
+
+typedef int                                 HHFitHypothesisSingleHiggs;
+typedef std::map< HHFitHypothesisSingleHiggs, double >         HHFitResultD;
+typedef std::map< HHFitHypothesisSingleHiggs, int >            HHFitResultI;
+typedef std::map< HHFitHypothesisSingleHiggs, bool >           HHFitResultB;
+typedef std::map< HHFitHypothesisSingleHiggs, TLorentzVector > HHFitResultTLor;
+
+class HHKinFitMasterSingleHiggsSoftLimits{
+  public:
+  HHKinFitMasterSingleHiggsSoftLimits(TLorentzVector tauvis1,
+                            TLorentzVector tauvis2,
+                            TVector2 met, TMatrixD met_cov,
+                            bool istruth=false,
+                            TLorentzVector* higgsgen=0);
+
+  //the main action, runs over all hypotheses and performs the fit
+  void fit();
+
+  void addHypo(HHFitHypothesisSingleHiggs hypo);
+
+  //Getters
+  HHFitHypothesisSingleHiggs getBestHypothesis();
+  double getBestChi2();
+
+  //Getters for fit results
+  double getChi2(HHFitHypothesisSingleHiggs hypo);
+ 
+  double getFitProb(HHFitHypothesisSingleHiggs hypo);
+
+
+  int getConvergence(HHFitHypothesisSingleHiggs hypo);
+
+  TLorentzVector getFittedTau1(HHFitHypothesisSingleHiggs hypo);
+
+  TLorentzVector getFittedTau2(HHFitHypothesisSingleHiggs hypo);
+  
+private:  
+  //hypotheses
+  std::vector< HHFitHypothesisSingleHiggs > m_hypos;
+
+  //input vectors
+  HHLorentzVector m_tauvis1;
+  HHLorentzVector m_tauvis2;
+
+  TVector2 m_MET;
+  TMatrixD m_MET_COV;
+
+  //fit result
+  HHFitResultI m_map_convergence;
+  
+  HHFitResultD m_map_chi2;
+  HHFitResultD m_map_prob;
+
+  HHFitResultTLor m_map_fittedTau1;
+  HHFitResultTLor m_map_fittedTau2;
+
+  HHFitHypothesisSingleHiggs m_bestHypo;
+  double m_chi2_best;
+};
+}
+#endif
