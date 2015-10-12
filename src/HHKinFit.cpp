@@ -11,8 +11,10 @@
 #include <iomanip>
 #include "TAxis.h"
 #include <iostream>
+#include <sstream>
 #include "exceptions/HHEnergyRangeException.h"
 #include "exceptions/HHInvMConstraintException.h"
+#include "exceptions/HHLimitSettingException.h"
 
 HHKinFit2::HHKinFit::HHKinFit()
 : m_fitobjects(std::vector<HHFitObjectE*>()),
@@ -72,10 +74,17 @@ HHKinFit2::HHKinFit::fit(){
     aprec[i]     = m_fitobjects[i]->getInitPrecision();
     h[i]         = m_fitobjects[i]->getInitStepWidth();
     daN[i]       = m_fitobjects[i]->getInitDirection();
-    alimit[i][0] = 1.00001* m_fitobjects[i]->getLowerFitLimitE();
-    alimit[i][1] = 0.99999* m_fitobjects[i]->getUpperFitLimitE();
-    
-    // tau: check initial values against fit range
+    alimit[i][0] = 1.00001*m_fitobjects[i]->getLowerFitLimitE();
+    alimit[i][1] = 0.99999*m_fitobjects[i]->getUpperFitLimitE();
+
+    if( alimit[i][1] - alimit[i][0] < 0.2 ) //Allow for at least 200MeV of wiggle room
+    {
+      std::stringstream msg;
+      msg << "Safety margin of limits for parameter " << i << " too small. Lower Limit: " << alimit[i][0] << "Upper Limit: " << alimit[i][1];
+      throw(HHLimitSettingException(msg.str()));
+    }
+
+    // Check initial values against fit range
     if (astart[i] - h[i] < alimit[i][0]) {
       astart[i] = alimit[i][0] + h[i];
     }
@@ -96,6 +105,14 @@ HHKinFit2::HHKinFit::fit(){
     bool respectLimits = (iter>=0) ; // do not respect limits when calculating numerical derivative
     for (unsigned int i=0; i<m_fitobjects.size();i++){
       try{
+	if(isnan(a[i]))
+	{
+	  std::cout << "WARNING! PSMath changed E of fit object " << i 
+		    << "to NAN!" << std::endl;
+	  std::stringstream msg;
+	  msg << "PS: PSMath changed E of fit object" << i << "to NAN!";
+	  throw(HHEnergyRangeException(msg.str()));
+	}
         m_fitobjects[i]->changeEandSave(a[i],respectLimits);
       }
       catch(HHKinFit2::HHEnergyRangeException const& e){
@@ -152,13 +169,12 @@ HHKinFit2::HHKinFit::fit(){
       aMemorybefore[i][3]=aMemory[i][3];
       aMemorybefore[i][4]=aMemory[i][4];
       gbefore[i]=g[i];
+    }
+    
+    for (unsigned int i=0; i<m_fitobjects.size()*m_fitobjects.size();i++){
       Hbefore[i]=H[i];
       Hinvbefore[i]=Hinv[i];
     }
-
-
-
-
     
     if (m_convergence != 0) break;
     m_convergence = PSMath::PSfit(iloop, iter, method, mode, noNewtonShifts, m_printlevel,
@@ -196,9 +212,12 @@ double
 HHKinFit2::HHKinFit::getChi2(bool respectLimits) const{
   double chi2=0;
 
-  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it)
+  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();
+      it != m_constraints.end(); 
+      ++it)
+  {
     (*it)->prepare(respectLimits);
-
+  }
   for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it)
     chi2 += (*it)->getChi2();
 

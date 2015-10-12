@@ -24,168 +24,227 @@
 void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
 {
   for(unsigned int i = 0; i < m_hypos.size(); ++i)
-    { 
-      HHFitObjectE* tau1Fit = new HHFitObjectEConstM(m_tauvis1);
-      HHFitObjectE* tau2Fit = new HHFitObjectEConstM(m_tauvis2);
+  { 
+    HHFitObjectE* tau1Fit = new HHFitObjectEConstM(m_tauvis1);
+    HHFitObjectE* tau2Fit = new HHFitObjectEConstM(m_tauvis2);
 
-      HHLorentzVector bJet1min = m_bjet1;
-      if (m_bjet1.E() - 5.0*m_sigma_bjet1 <= 0) bJet1min.SetEkeepBeta(10);
-      else bJet1min.SetEkeepBeta(m_bjet1.E() - 5.0*m_sigma_bjet1);
-  
-      HHLorentzVector bJet2min = m_bjet2;
-      if (m_bjet2.E() - 5.0*m_sigma_bjet2 <= 0) bJet2min.SetEkeepBeta(10);
-      else bJet2min.SetEkeepBeta(m_bjet2.E() - 5.0*m_sigma_bjet2);
-
-      HHFitObjectE* b1Fit = new HHFitObjectEConstBeta(m_bjet1);
-      HHFitObjectE* b2Fit = new HHFitObjectEConstBeta(m_bjet2);
-  
-      //prepare MET object
-      HHFitObjectMET* metFit = new HHFitObjectMET(m_MET);
-      metFit->setCovMatrix(m_MET_COV);
-
-      //prepare composite object: Higgs
-      HHFitObject* heavyHiggs  = new HHFitObjectComposite(tau1Fit, tau2Fit, 
-                                                          b1Fit, b2Fit,
-                                                          metFit);
-      HHFitObject* higgs1  = new HHFitObjectComposite(tau1Fit, tau2Fit);  
-      HHFitObject* higgs2  = new HHFitObjectComposite(b1Fit, b2Fit);
-
-      if(m_hypos.size() == 0)
-        {
-          addHypo(125, 125);
-        }
-
-
-      int mh1 = m_hypos[i].first;
-      int mh2 = m_hypos[i].second;
-  
-      try{
-        tau1Fit->setFitLimitsE(tau1Fit->getInitial4Vector(),mh1,tau2Fit->getInitial4Vector());
-        tau2Fit->setFitLimitsE(tau2Fit->getInitial4Vector(),mh1,tau1Fit->getInitial4Vector());
-      }
-      catch(HHLimitSettingException const& e){
-        std::cout << "Exception while setting tau limits:" << std::endl;
-        std::cout << e.what() << std::endl;
-        std::cout << "Tau energies are not compatible with invariant mass constraint." << std::endl;
-
-        m_map_chi2[m_hypos[i]] = -pow(10,10);
-        m_map_prob[m_hypos[i]] = -pow(10,10);
-        m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
-        m_bestChi2 = -pow(10,10);
-        continue;
-      }
-  
-      try{
-        b1Fit->setFitLimitsE(bJet1min, mh2, bJet2min);
-        b2Fit->setFitLimitsE(bJet2min, mh2, bJet1min);
-      }
-      catch(HHLimitSettingException const& e){
-        std::cout << "Exception while setting b-jet limits" << std::endl;
-        std::cout << e.what() << std::endl;
-        std::cout << "Bjet energies are not compatible within 5 sigma with invariant mass constraint." << std::endl;
-        m_map_chi2[m_hypos[i]] = -pow(10,10);
-        m_map_prob[m_hypos[i]] = -pow(10,10);
-        m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
-        m_bestChi2 = -pow(10,10);
-        continue;
-      }
-      if(fabs(m_bjet1_COV(0,0)) < 0.001)
-        {
-          b1Fit->setCovMatrix(m_sigma_bjet1);
-          b2Fit->setCovMatrix(m_sigma_bjet2);
-          //b1Fit->printCovMatrix();
-          //b2Fit->printCovMatrix();
-        }
-      else
-        {
-          std::cout << "Cov MATRIX set manually for ToyMC study." << std::endl;      
-          b1Fit->setCovMatrix(m_bjet1_COV);
-          b2Fit->setCovMatrix(m_bjet2_COV);
-        }
-    
-
-      //prepare constraints
-      HHFitConstraint* c_invmh1 = new HHFitConstraintEHardM(tau1Fit, tau2Fit, mh1);
-      HHFitConstraint* c_invmh2 = new HHFitConstraintEHardM(b1Fit, b2Fit, mh2);
-    
-      HHFitConstraint* c_b1 = new HHFitConstraint4Vector(b1Fit, false, false, 
-                                                         false, true);
-      HHFitConstraint* c_b2 = new HHFitConstraint4Vector(b2Fit, false, false, 
-                                                         false, true);
-      HHFitConstraint* c_balance = new HHFitConstraint4Vector(heavyHiggs, true, true, 
-                                                              false, false);
-
-      //fit
-      HHKinFit2::HHKinFit* fitObject = new HHKinFit2::HHKinFit();
-
-      tau1Fit->setInitStart((tau1Fit->getUpperFitLimitE()+tau1Fit->getLowerFitLimitE())/2);
-      tau1Fit->setInitPrecision(0.1);
-      tau1Fit->setInitStepWidth(0.1*(tau1Fit->getUpperFitLimitE() - tau1Fit->getLowerFitLimitE()));
-      tau1Fit->setInitDirection(1.0);
-
-      b1Fit->setInitStart(b1Fit->getInitial4Vector().E());
-      b1Fit->setInitPrecision(0.002*b1Fit->getInitial4Vector().E());
-      b1Fit->setInitStepWidth(0.1*(b1Fit->getUpperFitLimitE() - b1Fit->getLowerFitLimitE()));
-      //b1Fit->setInitStepWidth(0.5*m_sigma_bjet1);
-      b1Fit->setInitDirection(1.0);
-
-      fitObject->addFitObjectE(b1Fit);
-      fitObject->addFitObjectE(tau1Fit);
-
-      fitObject->addConstraint(c_invmh1);
-      fitObject->addConstraint(c_invmh2);
-      fitObject->addConstraint(c_b1);
-      fitObject->addConstraint(c_b2);
-      fitObject->addConstraint(c_balance);
-
-      fitObject->fit();
-
-      initialHH = (TLorentzVector)heavyHiggs->getInitial4Vector();
-      finalHH = (TLorentzVector)heavyHiggs->getFit4Vector();
-
-      m_map_convergence[m_hypos[i]] = fitObject->getConvergence();    
-    
-      double chi2 = fitObject->getChi2();
-      m_map_chi2[m_hypos[i]] = chi2;
-      m_map_prob[m_hypos[i]] = TMath::Prob(chi2, 2);
-
-      if(chi2 < m_bestChi2)
-        {
-          m_bestHypo = m_hypos[i];
-          m_bestChi2 = chi2;
-        }
-    
-      m_map_mH[m_hypos[i]] = heavyHiggs->getFit4Vector().M();
-      m_map_chi2BJet1[m_hypos[i]] = c_b1->getChi2();
-      m_map_chi2BJet2[m_hypos[i]] = c_b2->getChi2();
-      m_map_chi2Balance[m_hypos[i]] = c_balance->getChi2();
-    
-      TLorentzVector fittedTau1 =  ( (TLorentzVector)tau1Fit->getFit4Vector()  );
-      m_map_fittedTau1[m_hypos[i]] = fittedTau1;
-      TLorentzVector fittedTau2 =  ( (TLorentzVector)tau2Fit->getFit4Vector()  );
-      m_map_fittedTau2[m_hypos[i]] = fittedTau2;
-      TLorentzVector fittedB1 =  ( (TLorentzVector)b1Fit->getFit4Vector() ) ;
-      m_map_fittedB1[m_hypos[i]] = fittedB1;
-      TLorentzVector fittedB2 =  ( (TLorentzVector)b2Fit->getFit4Vector() ) ;
-      m_map_fittedB2[m_hypos[i]]= fittedB2;
-    
-      delete c_invmh1;
-      delete c_invmh2;
-      delete c_b1;
-      delete c_b2;
-      delete c_balance;
-    
-      delete fitObject;
-   
-      delete tau1Fit;
-      delete tau2Fit;
-      delete b1Fit;
-      delete b2Fit;
-      delete metFit;
-      delete heavyHiggs;
-      delete higgs1;
-      delete higgs2;
+    double bJet1Emin, bJet1Emax;
+    if (m_bjet1.E() - 5.0*m_sigma_bjet1 <= 5)
+    {
+      bJet1Emin = 5;
     }
+    else
+    {
+      bJet1Emin = m_bjet1.E() - 5.0*m_sigma_bjet1;
+    }
+    bJet1Emax = m_bjet1.E() + 5.0*m_sigma_bjet1;
+  
+    HHLorentzVector bJet2min = m_bjet2;
+    if (m_bjet2.E() - 5.0*m_sigma_bjet2 <= 0) bJet2min.SetEkeepBeta(5);
+    else bJet2min.SetEkeepBeta(m_bjet2.E() - 5.0*m_sigma_bjet2);
+      
+    HHLorentzVector bJet2max = m_bjet2;
+    bJet2max.SetEkeepBeta(m_bjet2.E() + 5.0*m_sigma_bjet2);
+
+    HHLorentzVector tau1min = m_tauvis1;
+    tau1min.SetEkeepM(0.9*m_tauvis1.E());
+      
+    HHLorentzVector tau2min = m_tauvis2;
+    tau2min.SetEkeepM(0.9*m_tauvis2.E());
+
+    HHFitObjectE* b1Fit = new HHFitObjectEConstBeta(m_bjet1);
+    HHFitObjectE* b2Fit = new HHFitObjectEConstBeta(m_bjet2);
+  
+    //prepare MET object
+    HHFitObjectMET* metFit = new HHFitObjectMET(m_MET);
+
+    //prepare composite object: Higgs
+    HHFitObject* heavyHiggs  = new HHFitObjectComposite(tau1Fit, tau2Fit, 
+							b1Fit, b2Fit,
+							metFit);
+    HHFitObject* higgs1  = new HHFitObjectComposite(tau1Fit, tau2Fit);  
+    HHFitObject* higgs2  = new HHFitObjectComposite(b1Fit, b2Fit);
+
+    if(m_hypos.size() == 0)
+    {
+      addHypo(125, 125);
+    }
+    int mh1 = m_hypos[i].first;
+    int mh2 = m_hypos[i].second;
+  
+    try
+    {
+      tau1Fit->setFitLimitsE(tau1min,mh1,tau2min);
+      tau2Fit->setFitLimitsE(tau2min,mh1,tau1min);
+    }
+    catch(HHLimitSettingException const& e)
+    {
+      std::cout << "Exception while setting tau limits:" << std::endl;
+      std::cout << e.what() << std::endl;
+      std::cout << "Tau energies are not compatible with invariant mass constraint." << std::endl;
+
+      m_map_chi2[m_hypos[i]] = -pow(10,10);
+      m_map_prob[m_hypos[i]] = -pow(10,10);
+      m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
+      m_bestChi2 = -pow(10,10);
+      m_map_convergence[m_hypos[i]] = -1;
+      continue;
+    }
+  
+    try
+    {
+      b1Fit->setLowerFitLimitE(bJet1Emin);
+      b1Fit->setUpperFitLimitE(bJet1Emax);
+      b1Fit->setLowerFitLimitE(mh2, bJet2max);
+      b1Fit->setUpperFitLimitE(mh2, bJet2min);
+
+      //b1Fit->setUpperFitLimitE(mh2, bJet2min);
+      //b1Fit->setLowerFitLimitE(mh2, bJet2max);
+      //b2Fit->setFitLimitsE(bJet2min, mh2, bJet1min);
+    }
+    catch(HHLimitSettingException const& e)
+    {
+      std::cout << "Exception while setting b-jet limits" << std::endl;
+      std::cout << e.what() << std::endl;
+      std::cout << "Bjet energies are not compatible within 5 sigma with invariant mass constraint." << std::endl;
+      m_map_chi2[m_hypos[i]] = -pow(10,10);
+      m_map_prob[m_hypos[i]] = -pow(10,10);
+      m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
+      m_bestChi2 = -pow(10,10);
+      m_map_convergence[m_hypos[i]] = -2;
+      continue;
+    }
+
+    if(fabs(m_bjet1_COV(0,0)) < 0.001)
+    {
+      b1Fit->setCovMatrix(m_sigma_bjet1);
+      b2Fit->setCovMatrix(m_sigma_bjet2);
+      //b1Fit->printCovMatrix();
+      //b2Fit->printCovMatrix();
+    }
+    else
+    {
+      std::cout << "Cov MATRIX set manually for ToyMC study." << std::endl;      
+      b1Fit->setCovMatrix(m_bjet1_COV);
+      b2Fit->setCovMatrix(m_bjet2_COV);
+    }
+
+    metFit->setCovMatrix(m_MET_COV);
+    heavyHiggs->setCovMatrix(m_MET_COV - m_bjet1_COV - m_bjet2_COV);
+
+    //prepare constraints
+    HHFitConstraint* c_invmh1 = new HHFitConstraintEHardM(tau1Fit, tau2Fit, mh1);
+    HHFitConstraint* c_invmh2 = new HHFitConstraintEHardM(b1Fit, b2Fit, mh2);
+    
+    HHFitConstraint* c_b1 = new HHFitConstraint4Vector(b1Fit, false, false, 
+						       false, true);
+    HHFitConstraint* c_b2 = new HHFitConstraint4Vector(b2Fit, false, false, 
+						       false, true);
+    HHFitConstraint* c_balance = new HHFitConstraint4Vector(heavyHiggs, true, true, 
+							    false, false);
+
+    //fit
+    HHKinFit2::HHKinFit* fitObject = new HHKinFit2::HHKinFit();
+
+    tau1Fit->setInitStart( (tau1Fit->getUpperFitLimitE()+
+			    tau1Fit->getLowerFitLimitE() )/2.0);
+    tau1Fit->setInitPrecision(0.1);
+    tau1Fit->setInitStepWidth(0.1*(tau1Fit->getUpperFitLimitE() - tau1Fit->getLowerFitLimitE()));
+    tau1Fit->setInitDirection(1.0);
+
+    b1Fit->setInitStart( (b1Fit->getUpperFitLimitE()+
+			  b1Fit->getLowerFitLimitE() )/2.0);
+    b1Fit->setInitPrecision(0.002*b1Fit->getInitial4Vector().E());
+    b1Fit->setInitStepWidth(0.1*(b1Fit->getUpperFitLimitE() - b1Fit->getLowerFitLimitE()));
+    //b1Fit->setInitStepWidth(0.5*m_sigma_bjet1);
+    b1Fit->setInitDirection(1.0);
+
+    fitObject->addFitObjectE(b1Fit);
+    fitObject->addFitObjectE(tau1Fit);
+
+    fitObject->addConstraint(c_invmh1);
+    fitObject->addConstraint(c_invmh2);
+    fitObject->addConstraint(c_b1);
+    fitObject->addConstraint(c_b2);
+    fitObject->addConstraint(c_balance);
+
+    try
+    {
+      fitObject->fit();
+    }
+    catch(HHLimitSettingException const& e)
+    {
+      std::cout << e.what() << std::endl;
+      m_map_chi2[m_hypos[i]] = -pow(10,10);
+      m_map_prob[m_hypos[i]] = -pow(10,10);
+      m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
+      m_bestChi2 = -pow(10,10);
+      if((b1Fit->getUpperFitLimitE() - b1Fit->getLowerFitLimitE()) <
+	 tau1Fit->getUpperFitLimitE() - tau1Fit->getLowerFitLimitE())
+      {
+	m_map_convergence[m_hypos[i]] = -2;
+      }
+      else
+      {
+	m_map_convergence[m_hypos[i]] = -1;
+      }
+      continue;
+    }
+    catch(HHKinFit2::HHEnergyRangeException const& e){
+      m_map_chi2[m_hypos[i]] = -pow(10,10);
+      m_map_prob[m_hypos[i]] = -pow(10,10);
+      m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
+      m_bestChi2 = -pow(10,10);
+      m_map_convergence[m_hypos[i]] = 0;
+      continue;
+    }
+
+    initialHH = (TLorentzVector)heavyHiggs->getInitial4Vector();
+    finalHH = (TLorentzVector)heavyHiggs->getFit4Vector();
+
+    m_map_convergence[m_hypos[i]] = fitObject->getConvergence();    
+    
+    double chi2 = fitObject->getChi2();
+    m_map_chi2[m_hypos[i]] = chi2;
+    m_map_prob[m_hypos[i]] = TMath::Prob(chi2, 2);
+
+    if(chi2 < m_bestChi2)
+    {
+      m_bestHypo = m_hypos[i];
+      m_bestChi2 = chi2;
+    }
+    
+    m_map_mH[m_hypos[i]] = heavyHiggs->getFit4Vector().M();
+    m_map_chi2BJet1[m_hypos[i]] = c_b1->getChi2();
+    m_map_chi2BJet2[m_hypos[i]] = c_b2->getChi2();
+    m_map_chi2Balance[m_hypos[i]] = c_balance->getChi2();
+    
+    TLorentzVector fittedTau1 =  ( (TLorentzVector)tau1Fit->getFit4Vector()  );
+    m_map_fittedTau1[m_hypos[i]] = fittedTau1;
+    TLorentzVector fittedTau2 =  ( (TLorentzVector)tau2Fit->getFit4Vector()  );
+    m_map_fittedTau2[m_hypos[i]] = fittedTau2;
+    TLorentzVector fittedB1 =  ( (TLorentzVector)b1Fit->getFit4Vector() ) ;
+    m_map_fittedB1[m_hypos[i]] = fittedB1;
+    TLorentzVector fittedB2 =  ( (TLorentzVector)b2Fit->getFit4Vector() ) ;
+    m_map_fittedB2[m_hypos[i]]= fittedB2;
+    
+    delete c_invmh1;
+    delete c_invmh2;
+    delete c_b1;
+    delete c_b2;
+    delete c_balance;
+    
+    delete fitObject;
+   
+    delete tau1Fit;
+    delete tau2Fit;
+    delete b1Fit;
+    delete b2Fit;
+    delete metFit;
+    delete heavyHiggs;
+    delete higgs1;
+    delete higgs2;
+  }
 }
 
 void HHKinFit2::HHKinFitMasterHeavyHiggs::addHypo(HHFitHypothesisHeavyHiggs hypo)
@@ -225,36 +284,37 @@ HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(const TLorentzVect
   m_tauvis2.SetMkeepE(1.77682);
    
   if(met != 0)
-    {
-      m_MET = TVector2(met->Px(), met->Py());
-    }
+  {
+    m_MET = TVector2(met->Px(), met->Py());
+  }
   m_MET_COV(0,0) = met_cov(0,0);
   m_MET_COV(1,0) = met_cov(1,0);
   m_MET_COV(0,1) = met_cov(0,1);
   m_MET_COV(1,1) = met_cov(1,1);
 
   if(sigmaEbjet1 >= 0.0)
-    {
-      m_sigma_bjet1 = sigmaEbjet1;
-    }
+  {
+    m_sigma_bjet1 = sigmaEbjet1;
+  }
   else
-    {
-      m_sigma_bjet1 = GetPFBJetRes(m_bjet1.Eta(), m_bjet1.Et());
-    }
+  {
+    m_sigma_bjet1 = GetPFBJetRes(m_bjet1.Eta(), m_bjet1.Et());
+  }
   
   if(sigmaEbjet2 >= 0.0)
-    {
-      m_sigma_bjet2 = sigmaEbjet2;
-    }
+  {
+    m_sigma_bjet2 = sigmaEbjet2;
+  }
   else
-    {
-      m_sigma_bjet2 = GetPFBJetRes(m_bjet2.Eta(), m_bjet2.Et());
-    }
+  {
+    m_sigma_bjet2 = GetPFBJetRes(m_bjet2.Eta(), m_bjet2.Et());
+  }
 
   m_bestChi2 = 99999.0;
   m_bestHypo = HHFitHypothesisHeavyHiggs(0,0);
 
-  if (istruth){
+  if (istruth)
+  {
     TRandom3 r(0);  
     /*
       if(heavyhiggsgen != NULL)
@@ -310,7 +370,7 @@ HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(const TLorentzVect
     
     m_bjet1.SetPtEtaPhiE(bjet1_Pt, m_bjet1.Eta(), m_bjet1.Phi(), bjet1_E);
     
-    m_bjet1_COV = bjet1Cov;
+    //m_bjet1_COV = bjet1Cov;
     
     double b1Px_afterSmear = m_bjet1.Px();
     b1Px_standardDevs = (b1Px_beforeSmear - b1Px_afterSmear)/bjet1_dpx;
@@ -334,18 +394,18 @@ HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(const TLorentzVect
     
     
     m_bjet2.SetPtEtaPhiE(bjet2_Pt, m_bjet2.Eta(), m_bjet2.Phi(), bjet2_E);
-    m_bjet2_COV = bjet2Cov;
+    //m_bjet2_COV = bjet2Cov;
 
     HHLorentzVector heavyH;
     heavyH = HHLorentzVector(heavyhiggsgen->Px(), heavyhiggsgen->Py(),
 			     heavyhiggsgen->Pz(), heavyhiggsgen->E());
 
-    double recoilXSmeared = r.Gaus(heavyhiggsgen->Px(), 15.0);
-    double recoilYSmeared = r.Gaus(heavyhiggsgen->Py(), 15.0);
+    double recoilXSmeared = r.Gaus(heavyhiggsgen->Px(), 20.0);
+    double recoilYSmeared = r.Gaus(heavyhiggsgen->Py(), 20.0);
 
     TMatrixD recoil_COV = TMatrixD(4,4);
-    recoil_COV(0,0)=225;    recoil_COV(0,1)=0;
-    recoil_COV(1,0)=0;      recoil_COV(1,1)=225;
+    recoil_COV(0,0)=400;    recoil_COV(0,1)=0;
+    recoil_COV(1,0)=0;      recoil_COV(1,1)=400;
 
     TVector2 recoilVec2 = TVector2(recoilXSmeared, recoilYSmeared);
     TVector2 b1Vec2 = TVector2(m_bjet1.Px(), m_bjet1.Py());
@@ -356,7 +416,7 @@ HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(const TLorentzVect
     m_MET = recoilVec2 - b1Vec2 - b2Vec2 - tauVis1Vec2 - tauVis2Vec2; 
     smearedMET = m_MET;
 
-    m_MET_COV = recoil_COV - bjet1Cov - bjet2Cov;
+    m_MET_COV = recoil_COV + bjet1Cov + bjet2Cov;
   }  
 }
 
@@ -435,10 +495,13 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::setAdvancedBalance(const TLorentzVecto
                                                              TMatrixD met_cov)
 {
   if(met != 0)
-    {
-      m_MET = TVector2(met->Px(), met->Py());
-    }
-  m_MET_COV = met_cov;
+  {
+    m_MET = TVector2(met->Px(), met->Py());
+  }
+  m_MET_COV(0,0) = met_cov(0,0);
+  m_MET_COV(1,0) = met_cov(1,0);
+  m_MET_COV(0,1) = met_cov(0,1);
+  m_MET_COV(1,1) = met_cov(1,1);
 }
 double HHKinFit2::HHKinFitMasterHeavyHiggs::GetPFBJetRes(double eta, double et){
   double det=0;

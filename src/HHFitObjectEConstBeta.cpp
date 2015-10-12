@@ -13,6 +13,20 @@ HHKinFit2::HHFitObjectEConstBeta::HHFitObjectEConstBeta(HHLorentzVector const& i
 
 HHKinFit2::HHLorentzVector
 HHKinFit2::HHFitObjectEConstBeta::constrainEtoMinv(double m, HHLorentzVector const& pset) const{
+  
+  double E = calculateEConstrainedToMinv(m, pset);
+  if ( E < 0)
+  {
+    std::stringstream msg;
+    msg << "problem in constraining energy to inv. mass in FitObjectEConstBeta: minv="
+	<< m << " E(set)=" << E;
+    throw(HHEnergyConstraintException(msg.str()));
+  }
+  return(this->changeE(E));  
+}
+
+double HHKinFit2::HHFitObjectEConstBeta::calculateEConstrainedToMinv(double m, HHLorentzVector const& pset) const
+{
   HHLorentzVector pmod = getInitial4Vector();
 
   //energy and momenta of involved particles
@@ -39,15 +53,28 @@ HHKinFit2::HHFitObjectEConstBeta::constrainEtoMinv(double m, HHLorentzVector con
   double c=(1-pow(b1c,2))*pow(E1,2)-pow(m,2);
   double E2new = (1./(2*a))*(-b+sqrt(pow(b,2)-4*a*c));
 
-  if (isnan(E2new)||isinf(E2new)||E2new<0){
+  if (isnan(E2new)||isinf(E2new)){
     std::stringstream msg;
-    msg << "problem in constraining energy to inv. mass: minv="<<m<< " E(set)="<<E2new;
+    msg << "problem in constraining energy to inv. mass in FitObjectEConstBeta: minv="<<m<< " E(set)="<<E2new;
+    std::cout << "E1:     " << E1 << std::endl;
+    std::cout << "P1:     " << P1 << std::endl;
+    
+    std::cout << "P2:     " << P2 << std::endl;
+    std::cout << "E2new:  " << E2new << std::endl;
+    
+    std::cout << "a:      " << a << std::endl;
+    std::cout << "b2c:    " << b2c << std::endl;
+    
+    std::cout << "b:      " << b << std::endl;
+    std::cout << "c:      " << c << std::endl;
+    std::cout << "cosa:   " << cosa << std::endl;
+    std::cout << "b1c:    " << b1c << std::endl;
+    
+    std::cout << "sqrt^2: " <<  pow(b,2)-4*a*c << std::endl;
     throw(HHEnergyConstraintException(msg.str()));
   }
-  
-  return(this->changeE(E2new));
+  return E2new;
 }
-
 
 HHKinFit2::HHLorentzVector
 HHKinFit2::HHFitObjectEConstBeta::changeE(double E) const{

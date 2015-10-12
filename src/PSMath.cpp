@@ -210,6 +210,7 @@ PSMath::PSfit (int iloop, int &iter, int &method, int &mode,
       iterMemory = iterMemory + 1;
       iter = iterMemory;
       chi2Memory = chi2;
+      return convergence;
     }
   }
 
@@ -859,9 +860,16 @@ PSMath::PSLineSearch (int & mode, double hh, double xlimit[],
     d32 = x[3] - x[2];
     g = 1. / d31 * ((f[3] - f[2]) * d21 / d32 + (f[2] - f[1]) * d32 / d21); // derivative
     H = 2. / d31 * ((f[3] - f[2]) / d32 - (f[2] - f[1]) / d21);       // Hesse
+    if(fabs(H) < 0.00001){
+      H = 0.00001;
+    }
     xt = x[2] - (g / H) * 1.02;                               // Newton Method
-    //    PSVprint("  x ",x,4) ;
-    //    cout << "   d21 " << d21 << "   d31 " << d31 << "   d32 " << d32 << "  xt " << xt << endl;
+
+    //PSVprint("  x ",x,4);
+    //std::cout << "   g " << g << std::endl;
+    //std::cout << "   H " << H << std::endl;
+    //std::cout << "   d21 " << d21 << "   d31 " << d31 << "   d32 " 
+    //	      << d32 << "  xt " << xt << std::endl;
 
     if (fabs(x[2] - xt) < close * d31) {       // safety for numerical precision
     //      cout << "close" << xt << endl;

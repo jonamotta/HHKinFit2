@@ -20,6 +20,7 @@ class HHFitObjectE : public HHFitObject {
   virtual HHLorentzVector scaleE(double scale) const;
   void scaleEandSave(double scale, bool respectLimits=true);
   virtual HHLorentzVector constrainEtoMinv(double minv, HHLorentzVector const& other4vector) const =0;
+  virtual double calculateEConstrainedToMinv(double m, HHLorentzVector const& other4vector) const =0;
   void constrainEtoMinvandSave(double minv, HHLorentzVector const& other4vector, bool respectLimits=true);
 
   double getUpperFitLimitE() const;
@@ -30,6 +31,7 @@ class HHFitObjectE : public HHFitObject {
   void setUpperFitLimitE(double const upperlimit);
   void setUpperFitLimitE(double const minv, HHLorentzVector const& other4vectorMin);
   void setLowerFitLimitE(double const lowerlimit);
+  void setLowerFitLimitE(double const minv, HHLorentzVector const& other4vectorMin);
   void setLowerFitLimitE(HHLorentzVector const& other4vectorMin);
 
   void setInitStart(double start);

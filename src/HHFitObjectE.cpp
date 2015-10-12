@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include "exceptions/HHEnergyRangeException.h"
+#include "exceptions/HHEnergyConstraintException.h"
 #include "exceptions/HHLimitSettingException.h"
 
 
@@ -89,12 +90,41 @@ HHKinFit2::HHFitObjectE::setUpperFitLimitE(double upperlimit){
 
 void
 HHKinFit2::HHFitObjectE::setUpperFitLimitE(double minv, HHLorentzVector const& other4vectorMin){
-  this->setUpperFitLimitE(constrainEtoMinv(minv,other4vectorMin).E());
+  try
+  {
+    this->setUpperFitLimitE(constrainEtoMinv(minv,other4vectorMin).E());
+  }
+  catch(HHEnergyConstraintException const& e)
+  {
+    std::cout << e.what() << std::endl;
+    std::stringstream msg;
+    msg << "Cannot set upper limit. Energy of second particle would be invalid/negative.";
+    throw(HHLimitSettingException(msg.str()));
+  }
 }
 
 void
 HHKinFit2::HHFitObjectE::setLowerFitLimitE(double lowerlimit){
   m_lowerLimitE = lowerlimit;
+}
+
+void
+HHKinFit2::HHFitObjectE::setLowerFitLimitE(double minv, HHLorentzVector const& other4vectorMin){
+  try
+  {
+    double lowerFitLimit = calculateEConstrainedToMinv(minv,other4vectorMin);
+    if(lowerFitLimit > m_lowerLimitE)
+    {
+      this->setLowerFitLimitE(lowerFitLimit);
+    }
+  }
+  catch(HHEnergyConstraintException const& e)
+  {
+    std::cout << e.what() << std::endl;
+    std::stringstream msg;
+    msg << "Cannot set upper limit. Energy of second particle would be invalid/negative.";
+    throw(HHLimitSettingException(msg.str()));
+  }
 }
 
 void
