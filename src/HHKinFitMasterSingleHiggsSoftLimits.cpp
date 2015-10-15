@@ -12,6 +12,7 @@
 #include "HHFitObjectEConstM.h"
 #include "HHFitObjectEConstBeta.h"
 #include "HHFitConstraint4Vector.h"
+#include "HHFitConstraintSoftBoundary.h"
 
 #include "exceptions/HHEnergyRangeException.h"
 #include "exceptions/HHLimitSettingException.h"
