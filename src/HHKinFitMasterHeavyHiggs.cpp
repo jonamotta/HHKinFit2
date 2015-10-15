@@ -42,6 +42,11 @@
 
 void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
 {
+  if(m_hypos.size() == 0)
+  {
+    addHypo(125, 125);
+  }
+
   for(unsigned int i = 0; i < m_hypos.size(); ++i)
   { 
     HHFitObjectE* tau1Fit = new HHFitObjectEConstM(m_tauvis1);
@@ -84,10 +89,6 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
     HHFitObject* higgs1  = new HHFitObjectComposite(tau1Fit, tau2Fit);  
     HHFitObject* higgs2  = new HHFitObjectComposite(b1Fit, b2Fit);
 
-    if(m_hypos.size() == 0)
-    {
-      addHypo(125, 125);
-    }
     int mh1 = m_hypos[i].first;
     int mh2 = m_hypos[i].second;
   
