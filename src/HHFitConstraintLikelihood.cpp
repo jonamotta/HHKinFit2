@@ -1,6 +1,12 @@
+#ifdef HHKINFIT2
 #include "HHFitConstraintLikelihood.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraintLikelihood.h"
+#endif
+
 #include <cmath>
 #include <iostream>
+
 #include "TSpline.h"
 
 HHKinFit2::HHFitConstraintLikelihood::HHFitConstraintLikelihood(HHFitObject* object1,HHFitObject* object2, TF1* likelihood1,TF1* likelihood2 )

@@ -1,7 +1,6 @@
+#ifdef HHKINFIT2
 #include "HHKinFitMasterSingleHiggsSoftLimits.h"
 #include "HHKinFit.h"
-#include "TMatrixD.h"
-#include "TRandom3.h"
 #include "HHFitObjectEConstM.h"
 #include "HHFitObjectEConstBeta.h"
 #include "HHFitObjectMET.h"
@@ -13,10 +12,31 @@
 #include "HHFitObjectEConstBeta.h"
 #include "HHFitConstraint4Vector.h"
 #include "HHFitConstraintSoftBoundary.h"
-
 #include "exceptions/HHEnergyRangeException.h"
 #include "exceptions/HHLimitSettingException.h"
 #include "exceptions/HHCovarianceMatrixException.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHKinFitMasterSingleHiggsSoftLimits.h"
+#include "HHKinFit2/HHKinFit2/interface/HHKinFit.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectEConstM.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectEConstBeta.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectMET.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectComposite.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraintLikelihood.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraint.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraintEHardM.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectEConstM.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectEConstBeta.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraint4Vector.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraintSoftBoundary.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHEnergyRangeException.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHLimitSettingException.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHCovarianceMatrixException.h"
+#endif
+
+#include "TMatrixD.h"
+#include "TRandom3.h"
+
 #include <TMath.h>
 #include <cmath>
 #include <cstdlib>

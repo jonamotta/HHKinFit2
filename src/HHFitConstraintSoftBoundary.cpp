@@ -1,11 +1,18 @@
+#ifdef HHKINFIT2
 #include "HHFitConstraintSoftBoundary.h"
+#include "exceptions/HHCovarianceMatrixException.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraintSoftBoundary.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHCovarianceMatrixException.h"
+#endif
+
+#include "TMath.h"
 #include "TMatrixD.h"
 #include "TMatrixDEigen.h"
+
+#include <cmath>
 #include <iostream>
 #include <sstream>
-#include "exceptions/HHCovarianceMatrixException.h"
-#include <cmath>
-#include "TMath.h"
 
 
 HHKinFit2::HHFitConstraintSoftBoundary::HHFitConstraintSoftBoundary(HHFitObject* object, double percent)

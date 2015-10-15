@@ -5,8 +5,13 @@
 #ifndef HHFitObject_
 #define HHFitObject_
 
-#include "TMatrixD.h"
+#ifdef HHKINFIT2
 #include "HHLorentzVector.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHLorentzVector.h"
+#endif
+
+#include "TMatrixD.h"
 
 namespace HHKinFit2{
 class HHFitObject {

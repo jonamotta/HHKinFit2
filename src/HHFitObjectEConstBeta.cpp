@@ -1,10 +1,17 @@
+#ifdef HHKINFIT2
 #include "HHFitObjectEConstBeta.h"
+#include "exceptions/HHEnergyRangeException.h"
+#include "exceptions/HHEnergyConstraintException.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectEConstBeta.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHEnergyRangeException.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHEnergyConstraintException.h"
+#endif
+
 #include <cassert>
 #include <iostream>
 #include <sstream>
 #include <math.h>
-#include "exceptions/HHEnergyRangeException.h"
-#include "exceptions/HHEnergyConstraintException.h"
 
 HHKinFit2::HHFitObjectEConstBeta::HHFitObjectEConstBeta(HHLorentzVector const& initial4vector)
   :HHFitObjectE(initial4vector){

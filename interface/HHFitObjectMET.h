@@ -5,9 +5,14 @@
 #ifndef HHFitObjectMET_
 #define HHFitObjectMET_
 
+#ifdef HHKINFIT2
+#include "HHFitObject.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitObject.h"
+#endif
+
 #include "TVector2.h"
 #include "TMatrixD.h"
-#include "HHFitObject.h"
 
 namespace HHKinFit2{
 class HHFitObjectMET : public HHFitObject {

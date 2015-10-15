@@ -5,8 +5,14 @@
 #ifndef HHFitConstraint4Vector_
 #define HHFitConstraint4Vector_
 
+#ifdef HHKINFIT2
 #include "HHFitConstraint.h"
 #include "HHFitObject.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraint.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObject.h"
+#endif
+
 #include <vector>
 
 namespace HHKinFit2{

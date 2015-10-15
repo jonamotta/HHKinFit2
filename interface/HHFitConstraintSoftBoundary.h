@@ -5,8 +5,14 @@
 #ifndef HHFitConstraintSoftBoundary_
 #define HHFitConstraintSoftBoundary_
 
+#ifdef HHKINFIT2
 #include "HHFitConstraint.h"
 #include "HHFitObject.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraint.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObject.h"
+#endif
+
 #include <vector>
 
 namespace HHKinFit2{

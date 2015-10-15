@@ -1,6 +1,12 @@
+#ifdef HHKINFIT2
 #include "HHLorentzVector.h"
-#include <cmath>
 #include "exceptions/HHEnergyRangeException.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHLorentzVector.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHEnergyRangeException.h"
+#endif
+
+#include <cmath>
 #include <sstream>
 
 HHKinFit2::HHLorentzVector::HHLorentzVector(double x, double y, double z, double t)

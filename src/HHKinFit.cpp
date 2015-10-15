@@ -1,3 +1,4 @@
+#ifdef HHKINFIT2
 #include "HHKinFit.h"
 #include "HHFitConstraint4Vector.h"
 #include "HHFitConstraintEHardM.h"
@@ -8,13 +9,30 @@
 #include "HHFitObject.h"
 #include "HHFitObjectComposite.h"
 #include "PSMath.h"
-#include <iomanip>
-#include "TAxis.h"
-#include <iostream>
-#include <sstream>
 #include "exceptions/HHEnergyRangeException.h"
 #include "exceptions/HHInvMConstraintException.h"
 #include "exceptions/HHLimitSettingException.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHKinFit.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraint4Vector.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraintEHardM.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraint.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraintLikelihood.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectEConstM.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectE.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObject.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectComposite.h"
+#include "HHKinFit2/HHKinFit2/interface/PSMath.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHEnergyRangeException.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHInvMConstraintException.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHLimitSettingException.h"
+#endif
+
+#include "TAxis.h"
+
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 
 HHKinFit2::HHKinFit::HHKinFit()
 : m_fitobjects(std::vector<HHFitObjectE*>()),

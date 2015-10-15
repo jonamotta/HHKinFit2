@@ -1,4 +1,8 @@
+#ifdef HHKINFIT2
 #include "HHFitConstraint.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraint.h"
+#endif
 
 HHKinFit2::HHFitConstraint::HHFitConstraint(HHFitObject* fitobject)
   :m_fitobject(fitobject){

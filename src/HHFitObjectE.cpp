@@ -1,11 +1,18 @@
+#ifdef HHKINFIT2
 #include "HHFitObjectE.h"
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-
 #include "exceptions/HHEnergyRangeException.h"
 #include "exceptions/HHEnergyConstraintException.h"
 #include "exceptions/HHLimitSettingException.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectE.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHEnergyRangeException.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHEnergyConstraintException.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHLimitSettingException.h"
+#endif
+
+#include <iostream>
+#include <iomanip>
+#include <sstream>
 
 
 HHKinFit2::HHFitObjectE::HHFitObjectE(HHLorentzVector const& initial4vector)

@@ -5,10 +5,14 @@
 #ifndef HHFitObjectComposite_
 #define HHFitObjectComposite_
 
+#ifdef HHKINFIT2
 #include "HHLorentzVector.h"
-#include "TMatrixD.h"
-
 #include "HHFitObject.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHLorentzVector.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObject.h"
+#endif
+
 #include "TMatrixD.h"
 
 namespace HHKinFit2{

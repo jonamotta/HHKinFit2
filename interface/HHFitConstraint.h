@@ -5,7 +5,11 @@
 #ifndef HHFitConstraint_
 #define HHFitConstraint_
 
+#ifdef HHKINFIT2
 #include "HHFitObject.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitObject.h"
+#endif
 
 namespace HHKinFit2{
 class HHFitConstraint {
