@@ -1,12 +1,18 @@
+#ifdef HHKINFIT2
 #include "HHFitConstraint4Vector.h"
+#include "exceptions/HHCovarianceMatrixException.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraint4Vector.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHCovarianceMatrixException.h"
+#endif
+
+#include "TMath.h"
 #include "TMatrixD.h"
 #include "TMatrixDEigen.h"
+
 #include <iostream>
 #include <sstream>
-#include "exceptions/HHCovarianceMatrixException.h"
 #include <cmath>
-#include "TMath.h"
-
 
 HHKinFit2::HHFitConstraint4Vector::HHFitConstraint4Vector(HHFitObject* object, bool px, bool py, bool pz, bool E)
   : HHFitConstraint(object),
@@ -27,7 +33,6 @@ HHKinFit2::HHFitConstraint4Vector::HHFitConstraint4Vector(HHFitObject* object, b
   }
   m_cov.ResizeTo(m_ncomp,m_ncomp);
 
-  int a=0;
   for (int i=0; i<m_ncomp; i++)
     for (int j=0; j<m_ncomp; j++)
       m_cov(i,j)=m_fitobject->getCovMatrix()(m_indices[i],m_indices[j]);

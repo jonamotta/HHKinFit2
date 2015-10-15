@@ -1,3 +1,4 @@
+#ifdef HHKINFIT2
 #include "HHKinFit.h"
 #include "HHFitConstraint4Vector.h"
 #include "HHFitConstraintEHardM.h"
@@ -8,10 +9,30 @@
 #include "HHFitObject.h"
 #include "HHFitObjectComposite.h"
 #include "PSMath.h"
-#include <iomanip>
-#include "TAxis.h"
-#include <iostream>
 #include "exceptions/HHEnergyRangeException.h"
+#include "exceptions/HHInvMConstraintException.h"
+#include "exceptions/HHLimitSettingException.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHKinFit.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraint4Vector.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraintEHardM.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraint.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraintLikelihood.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectEConstM.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectE.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObject.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectComposite.h"
+#include "HHKinFit2/HHKinFit2/interface/PSMath.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHEnergyRangeException.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHInvMConstraintException.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHLimitSettingException.h"
+#endif
+
+#include "TAxis.h"
+
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 
 HHKinFit2::HHKinFit::HHKinFit()
 : m_fitobjects(std::vector<HHFitObjectE*>()),
@@ -20,6 +41,11 @@ HHKinFit2::HHKinFit::HHKinFit()
   m_convergence(0),
   m_printlevel(0),
   m_maxloops(500){
+}
+
+void
+HHKinFit2::HHKinFit::setPrintLevel(int printlevel){
+  m_printlevel=printlevel;
 }
 
 ///todo: compare with old kinfit method
@@ -66,10 +92,17 @@ HHKinFit2::HHKinFit::fit(){
     aprec[i]     = m_fitobjects[i]->getInitPrecision();
     h[i]         = m_fitobjects[i]->getInitStepWidth();
     daN[i]       = m_fitobjects[i]->getInitDirection();
-    alimit[i][0] = 1.00001* m_fitobjects[i]->getLowerFitLimitE();
-    alimit[i][1] = 0.99999* m_fitobjects[i]->getUpperFitLimitE();
-    
-    // tau: check initial values against fit range
+    alimit[i][0] = 1.00001*m_fitobjects[i]->getLowerFitLimitE();
+    alimit[i][1] = 0.99999*m_fitobjects[i]->getUpperFitLimitE();
+
+    if( alimit[i][1] - alimit[i][0] < 0.2 ) //Allow for at least 200MeV of wiggle room
+    {
+      std::stringstream msg;
+      msg << "Safety margin of limits for parameter " << i << " too small. Lower Limit: " << alimit[i][0] << "Upper Limit: " << alimit[i][1];
+      throw(HHLimitSettingException(msg.str()));
+    }
+
+    // Check initial values against fit range
     if (astart[i] - h[i] < alimit[i][0]) {
       astart[i] = alimit[i][0] + h[i];
     }
@@ -87,15 +120,25 @@ HHKinFit2::HHKinFit::fit(){
   }
   
   for (int iloop = 0; iloop < m_maxloops * 10 && iter < m_maxloops; iloop++) { // FIT loop
+    bool respectLimits = (iter>=0) ; // do not respect limits when calculating numerical derivative
     for (unsigned int i=0; i<m_fitobjects.size();i++){
       try{
-        m_fitobjects[i]->changeEandSave(a[i]);
+	if(isnan(a[i]))
+	{
+	  std::cout << "WARNING! PSMath changed E of fit object " << i 
+		    << "to NAN!" << std::endl;
+	  std::stringstream msg;
+	  msg << "PS: PSMath changed E of fit object" << i << "to NAN!";
+	  throw(HHEnergyRangeException(msg.str()));
+	}
+        m_fitobjects[i]->changeEandSave(a[i],respectLimits);
       }
       catch(HHKinFit2::HHEnergyRangeException const& e){
         std::cout << e.what() << std::endl;
 
-        std::cout << "iloop =" << iloop << std::endl;
         std::cout << "iter  ="<< iterbefore << " " << iter << std::endl;
+        std::cout << "iloop =" << iloop << std::endl;
+        std::cout << "fitobject ="<< i << std::endl;
         std::cout << "method="<< methodbefore << " " << method << std::endl;
         std::cout << "mode  ="<< modebefore << " " << mode << std::endl;
         std::cout << "noNewtonShifts="<< noNewtonShifts << std::endl;
@@ -125,12 +168,10 @@ HHKinFit2::HHKinFit::fit(){
         throw(e);
       }
     }
-    
-    m_chi2=this->getChi2();
-    //	    std::cout << iloop << " a[0]: " << a[0] << " chi2: " << std::fixed << std::setprecision(8) << chi2 << std::endl;
-    //	    m_fitobjects[0]->print();
-    
-    
+
+    m_chi2=this->getChi2(respectLimits);
+
+   
     chi2before = m_chi2;
     chi2iterbefore[0]=chi2iter[0];
     iterbefore = iter;
@@ -146,13 +187,12 @@ HHKinFit2::HHKinFit::fit(){
       aMemorybefore[i][3]=aMemory[i][3];
       aMemorybefore[i][4]=aMemory[i][4];
       gbefore[i]=g[i];
+    }
+    
+    for (unsigned int i=0; i<m_fitobjects.size()*m_fitobjects.size();i++){
       Hbefore[i]=H[i];
       Hinvbefore[i]=Hinv[i];
     }
-
-
-
-
     
     if (m_convergence != 0) break;
     m_convergence = PSMath::PSfit(iloop, iter, method, mode, noNewtonShifts, m_printlevel,
@@ -162,45 +202,53 @@ HHKinFit2::HHKinFit::fit(){
   }
   // ------ end of FIT loop
   
-  if(m_convergence != 0 && m_convergence != 5){
-    if(a[0] < (alimit[0][0] + 2*aprec[0]) ){
-      if(m_convergence == 3)
-        m_convergence = 5;
-      else{
-        //	        if (logLevel>1) std::cout << "Convergence at lower tau limit!" << std::endl;
-        m_convergence = 4;
+  int convergenceFlags = 0;
+
+  if(m_convergence != 0) //Check for convergence at limit
+  {
+    for(int param = 0; param < np; ++param) //Set bitwise flags for each param
+    {
+      if(a[param] < (alimit[param][0] + 2*aprec[param]) )
+      {
+	convergenceFlags = convergenceFlags | (1 << param);
+      }
+      else if(a[param] > (alimit[param][1] - 2*aprec[param]) )
+      {
+	convergenceFlags = convergenceFlags | (1 << param);
       }
     }
-    if(a[0] > (alimit[0][1] - 2*aprec[0]) ){
-      if(m_convergence == 3)
-        m_convergence = 5;
-      else{
-        //		if (logLevel>1)
-        //		  std::cout << "Convergence at upper tau limit!" << std::endl;
-        m_convergence = 4;
-      }
-    }
+    //2=at a[0] limit, 3=at a[1] limit 4=at a[0] and a[1] limit 
+    m_convergence = m_convergence + convergenceFlags; 
   }
+  
   //	  if (m_logLevel>1)
   //	    std::cout << "Convergence is " << m_convergence << std::endl;
   
 }
 
 double
-HHKinFit2::HHKinFit::getChi2() const{
+HHKinFit2::HHKinFit::getChi2(bool respectLimits) const{
   double chi2=0;
-  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it){
-    //std::cout << (*it)->getChi2() << std::endl;
-    chi2 += (*it)->getChi2();
+
+  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();
+      it != m_constraints.end(); 
+      ++it)
+  {
+    (*it)->prepare(respectLimits);
   }
-  //std::cout << chi2 << std::endl;
-  //std::cout << "----------------------------------------------------------------------------------------------"<<std::endl;
+  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it)
+    chi2 += (*it)->getChi2();
+
   return(chi2);
 }
 
 void
 HHKinFit2::HHKinFit::printChi2() const{
   double chi2=0;
+
+  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it)
+    (*it)->prepare();
+
   for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it){
     std::cout << (*it)->getChi2() << std::endl;
     chi2 += (*it)->getChi2();
@@ -211,14 +259,15 @@ HHKinFit2::HHKinFit::printChi2() const{
 }
 
 double
-HHKinFit2::HHKinFit::getL() const{
+HHKinFit2::HHKinFit::getL(bool respectLimits) const{
   double L=1;
-  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it){
-    //std::cout << (*it)->getChi2() << std::endl;
+
+  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it)
+    (*it)->prepare(respectLimits);
+
+  for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it)
     L *= (*it)->getLikelihood();
-  }
-  //std::cout << chi2 << std::endl;
-  //std::cout << "----------------------------------------------------------------------------------------------"<<std::endl;
+
   return(L);
 }
 
@@ -254,7 +303,7 @@ HHKinFit2::HHKinFit::getChi2Function(int steps){
   TGraph* gr = new TGraph(npoints);
   gr->SetName("chi2function");
   double stepsize((m_fitobjects[0]->getUpperFitLimitE() - m_fitobjects[0]->getLowerFitLimitE())/steps);
-  for (unsigned int i=0; i<npoints; i++){
+  for (int i=0; i<npoints; i++){
     double e = 1.00001*m_fitobjects[0]->getLowerFitLimitE()+ i*stepsize;
     m_fitobjects[0]->changeEandSave(e);
     double chi2(this->getChi2());
@@ -274,7 +323,7 @@ HHKinFit2::HHKinFit::getLFunction(int steps){
   TGraph* gr = new TGraph(npoints);
   gr->SetName("Lfunction");
   double stepsize((m_fitobjects[0]->getUpperFitLimitE() - m_fitobjects[0]->getLowerFitLimitE())/steps);
-  for (unsigned int i=0; i<npoints; i++){
+  for (int i=0; i<npoints; i++){
     double e = 1.00001*m_fitobjects[0]->getLowerFitLimitE()+ i*stepsize;
     m_fitobjects[0]->changeEandSave(e);
     double L(this->getL());

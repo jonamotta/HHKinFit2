@@ -5,8 +5,14 @@
 #ifndef HHFitConstraint4Vector_
 #define HHFitConstraint4Vector_
 
+#ifdef HHKINFIT2
 #include "HHFitConstraint.h"
 #include "HHFitObject.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraint.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObject.h"
+#endif
+
 #include <vector>
 
 namespace HHKinFit2{
@@ -19,11 +25,11 @@ class HHFitConstraint4Vector : public HHFitConstraint {
   void printChi2() const;
 
  private:
-  bool m_components[4];
+  int m_ncomp;
   TMatrixD m_cov;
   TMatrixD m_invcov;
-  int m_ncomp;
   std::vector<int> m_indices;
+  bool m_components[4];
 };
 }
 #endif /* HHFitConstraint4Vector_ */

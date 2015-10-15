@@ -1,5 +1,11 @@
+#ifdef HHKINFIT2
 #include "HHFitObjectMET.h"
 #include "HHLorentzVector.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectMET.h"
+#include "HHKinFit2/HHKinFit2/interface/HHLorentzVector.h"
+#endif
+
 #include <iostream>
 #include <iomanip>
 

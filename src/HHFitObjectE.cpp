@@ -1,9 +1,18 @@
+#ifdef HHKINFIT2
 #include "HHFitObjectE.h"
+#include "exceptions/HHEnergyRangeException.h"
+#include "exceptions/HHEnergyConstraintException.h"
+#include "exceptions/HHLimitSettingException.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectE.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHEnergyRangeException.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHEnergyConstraintException.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHLimitSettingException.h"
+#endif
+
 #include <iostream>
 #include <iomanip>
-
-#include "exceptions/HHEnergyRangeException.h"
-#include "exceptions/HHLimitSettingException.h"
+#include <sstream>
 
 
 HHKinFit2::HHFitObjectE::HHFitObjectE(HHLorentzVector const& initial4vector)
@@ -23,18 +32,27 @@ HHKinFit2::HHFitObjectE::scaleE(double scale) const{
 
 
 void
-HHKinFit2::HHFitObjectE::changeEandSave(double E){
+HHKinFit2::HHFitObjectE::changeEandSave(double E, bool respectLimits){
+  if (respectLimits){
+    if((E<this->getLowerFitLimitE())||(E>this->getUpperFitLimitE())){
+      std::stringstream msg;
+      msg << "target energy is out of limits: "<<"E(set)="<<E<<" "<<"E(limits)=["<<this->getLowerFitLimitE()<<","<< this->getUpperFitLimitE() << "]";
+      throw(HHEnergyRangeException(msg.str()));
+    }
+  }
   this->setFit4Vector(changeE(E));
 }
 
 void
-HHKinFit2::HHFitObjectE::scaleEandSave(double E){
-  this->setFit4Vector(scaleE(E));
+HHKinFit2::HHFitObjectE::scaleEandSave(double scale, bool respectLimits){
+  this->changeEandSave(scale*this->getFit4Vector().E(), respectLimits);
 }
 
 void
-HHKinFit2::HHFitObjectE::constrainEtoMinvandSave(double m, HHLorentzVector const& other4vector){
-  this->setFit4Vector(constrainEtoMinv(m, other4vector));
+HHKinFit2::HHFitObjectE::constrainEtoMinvandSave(double m, HHLorentzVector const& other4vector, bool respectLimits){
+  //  this->setFit4Vector(constrainEtoMinv(m, other4vector));
+  double E = constrainEtoMinv(m, other4vector).E();
+  this->changeEandSave(E, respectLimits);
 }
 
 double
@@ -68,22 +86,52 @@ HHKinFit2::HHFitObjectE::getLowerFitLimitE() const{
 
 void
 HHKinFit2::HHFitObjectE::setUpperFitLimitE(double upperlimit){
+  if (upperlimit<this->getLowerFitLimitE()){
+    std::stringstream msg;
+    msg << "Cannot set upper limit: E(upper)="<<upperlimit<<" < E(lower)="<<this->getLowerFitLimitE()<<"";
+    throw(HHLimitSettingException(msg.str()));
+  }
+
   m_upperLimitE = upperlimit;
 }
 
 void
 HHKinFit2::HHFitObjectE::setUpperFitLimitE(double minv, HHLorentzVector const& other4vectorMin){
-  try{
+  try
+  {
     this->setUpperFitLimitE(constrainEtoMinv(minv,other4vectorMin).E());
   }
-  catch(HHEnergyRangeException const& e){
-    throw(HHLimitSettingException(e.what()));
+  catch(HHEnergyConstraintException const& e)
+  {
+    std::cout << e.what() << std::endl;
+    std::stringstream msg;
+    msg << "Cannot set upper limit. Energy of second particle would be invalid/negative.";
+    throw(HHLimitSettingException(msg.str()));
   }
 }
 
 void
 HHKinFit2::HHFitObjectE::setLowerFitLimitE(double lowerlimit){
   m_lowerLimitE = lowerlimit;
+}
+
+void
+HHKinFit2::HHFitObjectE::setLowerFitLimitE(double minv, HHLorentzVector const& other4vectorMin){
+  try
+  {
+    double lowerFitLimit = calculateEConstrainedToMinv(minv,other4vectorMin);
+    if(lowerFitLimit > m_lowerLimitE)
+    {
+      this->setLowerFitLimitE(lowerFitLimit);
+    }
+  }
+  catch(HHEnergyConstraintException const& e)
+  {
+    std::cout << e.what() << std::endl;
+    std::stringstream msg;
+    msg << "Cannot set upper limit. Energy of second particle would be invalid/negative.";
+    throw(HHLimitSettingException(msg.str()));
+  }
 }
 
 void
@@ -156,6 +204,23 @@ double
 HHKinFit2::HHFitObjectE::getInitStart(){
   return(m_initstart);
 }
+
+void
+HHKinFit2::HHFitObjectE::reset(){
+  HHFitObject::reset();
+  resetLimits();
+  m_initstart = -pow(10,10);
+  m_initprec = -pow(10,10);
+  m_initstep = -pow(10,10);
+  m_initdirection = -pow(10,10);
+}
+
+void
+HHKinFit2::HHFitObjectE::resetLimits(){
+  m_upperLimitE = pow(10,10);
+  m_lowerLimitE = 0;
+}
+
 
 void
 HHKinFit2::HHFitObjectE::print() const{

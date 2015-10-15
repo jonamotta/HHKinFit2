@@ -1,4 +1,9 @@
+#ifdef HHKINFIT2
 #include "HHFitObjectComposite.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectComposite.h"
+#endif
+
 #include <iostream>
 
 HHKinFit2::HHFitObjectComposite::HHFitObjectComposite(std::vector<HHFitObject*> const& subobjects)

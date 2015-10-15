@@ -5,8 +5,13 @@
 #include <TMatrixD.h>
 #include <TVector2.h>
 
+#ifdef HHKINFIT2
 #include "HHLorentzVector.h"
 #include "HHKinFit.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHLorentzVector.h"
+#include "HHKinFit2/HHKinFit2/interface/HHKinFit.h"
+#endif
 
 #include <stdio.h>
 #include <map>
@@ -24,23 +29,27 @@ typedef std::map< HHFitHypothesisHeavyHiggs, TLorentzVector > HHFitResultTLor;
 
 class HHKinFitMasterHeavyHiggs{
   public:
-  HHKinFitMasterHeavyHiggs(const TLorentzVector* bjet1,
-		 const TLorentzVector* bjet2,
-		 const TLorentzVector* tauvis1,
-		 const TLorentzVector* tauvis2,
-		 const TLorentzVector* met = 0, TMatrixD met_cov = TMatrixD(4,4), 
-		 double sigmaEbjet1 = -1.0, double sigmaEbjet2 = -1.0,
-		 bool istruth=false, TLorentzVector* heavyhiggsgen=0);
-
+ 
+  HHKinFitMasterHeavyHiggs(TLorentzVector const& bjet1,
+                           TLorentzVector const& bjet2,
+                           TLorentzVector const& tauvis1,
+                           TLorentzVector const& tauvis2,
+                           TVector2 const& met, TMatrixD const& met_cov,
+                           double sigmaEbjet1 = -1.0, double sigmaEbjet2 = -1.0,
+                           bool istruth=false,
+                           TLorentzVector const& higgsgen=TLorentzVector(0,0,0,0));
+  
   //the main action, runs over all hypotheses and performs the fit
-  void doFit();
+  void fit();
 
+  //sets the hypotheses
   void addHypo(HHFitHypothesisHeavyHiggs hypo);
   void addHypo(int mh1, int mh2);
 
   //Getters
-  HHFitHypothesisHeavyHiggs getLowestChi2Hypothesis();
-
+  HHFitHypothesisHeavyHiggs getBestHypothesis();
+  double getBestChi2();
+  
   //Getters for fit results
   double getChi2(HHFitHypothesisHeavyHiggs hypo);
   double getChi2(int mh1 = 125, int mh2 = 125);
@@ -82,9 +91,21 @@ class HHKinFitMasterHeavyHiggs{
   double getBJet1Resolution(){return m_sigma_bjet1;};
   double getBJet2Resolution(){return m_sigma_bjet2;};
 
-  //For Backwards compatibility
+  //DEPRECATED/////////////////////////////////////////////////////////
+  //only here for backwards compatibility
+  HHKinFitMasterHeavyHiggs(const TLorentzVector* bjet1,
+                           const TLorentzVector* bjet2,
+                           const TLorentzVector* tauvis1,
+                           const TLorentzVector* tauvis2,
+                           const TLorentzVector* met = 0, TMatrixD met_cov = TMatrixD(4,4), 
+                           double sigmaEbjet1 = -1.0, double sigmaEbjet2 = -1.0,
+                           bool istruth=false, TLorentzVector* heavyhiggsgen=0);
+  void doFit();
+  HHFitHypothesisHeavyHiggs getLowestChi2Hypothesis();
   void setAdvancedBalance(const TLorentzVector* met, TMatrixD met_cov);
-
+  /////////////////////////////////////////////////////////////////////
+  
+  
   TLorentzVector neutrinos;
   TVector2 smearedMET;
   

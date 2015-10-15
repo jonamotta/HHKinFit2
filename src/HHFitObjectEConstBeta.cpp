@@ -1,10 +1,17 @@
+#ifdef HHKINFIT2
 #include "HHFitObjectEConstBeta.h"
+#include "exceptions/HHEnergyRangeException.h"
+#include "exceptions/HHEnergyConstraintException.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectEConstBeta.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHEnergyRangeException.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHEnergyConstraintException.h"
+#endif
+
 #include <cassert>
 #include <iostream>
 #include <sstream>
 #include <math.h>
-#include "exceptions/HHEnergyRangeException.h"
-#include "exceptions/HHEnergyConstraintException.h"
 
 HHKinFit2::HHFitObjectEConstBeta::HHFitObjectEConstBeta(HHLorentzVector const& initial4vector)
   :HHFitObjectE(initial4vector){
@@ -13,6 +20,20 @@ HHKinFit2::HHFitObjectEConstBeta::HHFitObjectEConstBeta(HHLorentzVector const& i
 
 HHKinFit2::HHLorentzVector
 HHKinFit2::HHFitObjectEConstBeta::constrainEtoMinv(double m, HHLorentzVector const& pset) const{
+  
+  double E = calculateEConstrainedToMinv(m, pset);
+  if ( E < 0)
+  {
+    std::stringstream msg;
+    msg << "problem in constraining energy to inv. mass in FitObjectEConstBeta: minv="
+	<< m << " E(set)=" << E;
+    throw(HHEnergyConstraintException(msg.str()));
+  }
+  return(this->changeE(E));  
+}
+
+double HHKinFit2::HHFitObjectEConstBeta::calculateEConstrainedToMinv(double m, HHLorentzVector const& pset) const
+{
   HHLorentzVector pmod = getInitial4Vector();
 
   //energy and momenta of involved particles
@@ -39,26 +60,32 @@ HHKinFit2::HHFitObjectEConstBeta::constrainEtoMinv(double m, HHLorentzVector con
   double c=(1-pow(b1c,2))*pow(E1,2)-pow(m,2);
   double E2new = (1./(2*a))*(-b+sqrt(pow(b,2)-4*a*c));
 
-  if (isnan(E2new)||isinf(E2new)||E2new<0){
+  if (isnan(E2new)||isinf(E2new)){
     std::stringstream msg;
-    msg << "problem in constraining energy to inv. mass: minv="<<m<< " E(set)="<<E2new;
+    msg << "problem in constraining energy to inv. mass in FitObjectEConstBeta: minv="<<m<< " E(set)="<<E2new;
+    std::cout << "E1:     " << E1 << std::endl;
+    std::cout << "P1:     " << P1 << std::endl;
+    
+    std::cout << "P2:     " << P2 << std::endl;
+    std::cout << "E2new:  " << E2new << std::endl;
+    
+    std::cout << "a:      " << a << std::endl;
+    std::cout << "b2c:    " << b2c << std::endl;
+    
+    std::cout << "b:      " << b << std::endl;
+    std::cout << "c:      " << c << std::endl;
+    std::cout << "cosa:   " << cosa << std::endl;
+    std::cout << "b1c:    " << b1c << std::endl;
+    
+    std::cout << "sqrt^2: " <<  pow(b,2)-4*a*c << std::endl;
     throw(HHEnergyConstraintException(msg.str()));
   }
-  
-  return(this->changeE(E2new));
+  return E2new;
 }
-
 
 HHKinFit2::HHLorentzVector
 HHKinFit2::HHFitObjectEConstBeta::changeE(double E) const{
   HHLorentzVector temp = this->getFit4Vector();
-
-  if((E<this->getLowerFitLimitE())||(E>this->getUpperFitLimitE())){
-    std::stringstream msg;
-    msg << "target energy is out of limits: "<<"E(set)="<<E<<" "<<"E(limits)=["<<this->getLowerFitLimitE()<<","<< this->getUpperFitLimitE() << "]";
-    throw(HHEnergyRangeException(msg.str()));
-  }
-
   temp.SetEkeepBeta(E);
 
   return(temp);
@@ -74,6 +101,3 @@ HHKinFit2::HHFitObjectEConstBeta::print() const{
   this->printCovMatrix();
   this->printLimits();
 }
-
-
-

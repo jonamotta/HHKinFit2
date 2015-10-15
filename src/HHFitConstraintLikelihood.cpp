@@ -1,6 +1,12 @@
+#ifdef HHKINFIT2
 #include "HHFitConstraintLikelihood.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraintLikelihood.h"
+#endif
+
 #include <cmath>
 #include <iostream>
+
 #include "TSpline.h"
 
 HHKinFit2::HHFitConstraintLikelihood::HHFitConstraintLikelihood(HHFitObject* object1,HHFitObject* object2, TF1* likelihood1,TF1* likelihood2 )
@@ -12,14 +18,14 @@ HHKinFit2::HHFitConstraintLikelihood::HHFitConstraintLikelihood(HHFitObject* obj
     m_likelihoodhisto(),
     m_likelihoodspline1(),
     m_likelihoodspline2(),
+    m_object2(object2),
+    mode(1),
     m_zmax1(0),
     m_zcutleft1(0),
     m_zcutright1(0),
     m_zmax2(0),
     m_zcutleft2(0),
-    m_zcutright2(0),
-    mode(1),
-    m_object2(object2){
+    m_zcutright2(0){
 
 }
 
@@ -30,16 +36,16 @@ HHKinFit2::HHFitConstraintLikelihood::HHFitConstraintLikelihood(HHFitObject* obj
     m_likelihoodhisto1(likelihoodhisto1),
     m_likelihoodhisto2(likelihoodhisto2),
     m_likelihoodhisto(),
+    m_likelihoodspline1(),
+    m_likelihoodspline2(),    
+    m_object2(object2),
+    mode(2),
     m_zmax1(0),
     m_zcutleft1(0),
     m_zcutright1(0),
     m_zmax2(0),
     m_zcutleft2(0),
-    m_zcutright2(0),
-    m_likelihoodspline1(),
-    m_likelihoodspline2(),
-    mode(2),
-    m_object2(object2){
+    m_zcutright2(0){
 }
 
 HHKinFit2::HHFitConstraintLikelihood::HHFitConstraintLikelihood(HHFitObject* object1,HHFitObject* object2, TH2D* likelihoodhisto)
@@ -48,17 +54,17 @@ HHKinFit2::HHFitConstraintLikelihood::HHFitConstraintLikelihood(HHFitObject* obj
     m_likelihood2(),
     m_likelihoodhisto1(),
     m_likelihoodhisto2(),
+    m_likelihoodhisto(likelihoodhisto),
+    m_likelihoodspline1(),
+    m_likelihoodspline2(),
+    m_object2(object2),
+    mode(3),
     m_zmax1(0),
     m_zcutleft1(0),
     m_zcutright1(0),
     m_zmax2(0),
     m_zcutleft2(0),
-    m_zcutright2(0),
-    m_likelihoodhisto(likelihoodhisto),
-    m_likelihoodspline1(),
-    m_likelihoodspline2(),
-    mode(3),
-    m_object2(object2){
+    m_zcutright2(0){
 }
 
 HHKinFit2::HHFitConstraintLikelihood::HHFitConstraintLikelihood(HHFitObject* object1,HHFitObject* object2,TSpline3* likelihoodspline1,  TSpline3* likelihoodspline2)
@@ -68,16 +74,16 @@ HHKinFit2::HHFitConstraintLikelihood::HHFitConstraintLikelihood(HHFitObject* obj
     m_likelihoodhisto1(),
     m_likelihoodhisto2(),
     m_likelihoodhisto(),
+    m_likelihoodspline1(likelihoodspline1),
+    m_likelihoodspline2(likelihoodspline2),
+    m_object2(object2),
+    mode(4),
     m_zmax1(0),
     m_zcutleft1(likelihoodspline1->GetXmin()),
     m_zcutright1(likelihoodspline1->GetXmax()),
     m_zmax2(0),
     m_zcutleft2(likelihoodspline2->GetXmin()),
-    m_zcutright2(likelihoodspline2->GetXmax()),
-    m_likelihoodspline1(likelihoodspline1),
-    m_likelihoodspline2(likelihoodspline2),
-    mode(4),
-    m_object2(object2){
+    m_zcutright2(likelihoodspline2->GetXmax()){
 //maxscan
 	double ymax1=0;
     double ymax2=0;
@@ -175,6 +181,7 @@ HHKinFit2::HHFitConstraintLikelihood::getChi2() const{
 		double chi2=-2*log(x1)-2*log(x2);
 		return(chi2);
 	}
+	return(pow(10,10));
 }
 /*double
 HHKinFit2::HHFitConstraintLikelihood::getLikelihood() const{
@@ -207,5 +214,5 @@ HHKinFit2::HHFitConstraintLikelihood::getLikelihood() const{
 		if(x2<0)x2=0.0000001;
 	    return(x1*x2);
 	}
-
+	return(pow(10,-10));
 }

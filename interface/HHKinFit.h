@@ -7,17 +7,25 @@
 
 #include "TGraph.h"
 #include <vector>
+
+#ifdef HHKINFIT2
 #include "HHFitObjectE.h"
 #include "HHFitConstraint.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitObjectE.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraint.h"
+#endif
 
 namespace HHKinFit2{
 class HHKinFit {
  public:
   HHKinFit();
 
+  void setPrintLevel(int printlevel=0);
+
   void fit();
-  double getChi2() const;
-  double getL() const;
+  double getChi2(bool respectLimits=true) const;
+  double getL(bool respectLimits=true) const;
   std::vector<HHFitObjectE*> getListOfFitObjects() const;
   std::vector<HHFitConstraint*> getListOfConstraints() const;
   
@@ -27,7 +35,6 @@ class HHKinFit {
   TGraph* getChi2Function(int steps);
   TGraph* getLFunction(int steps);
   int getConvergence() const;
-
 
   void printChi2() const;
 

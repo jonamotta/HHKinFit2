@@ -5,9 +5,15 @@
 #ifndef HHFitConstraintLikelihood_
 #define HHFitConstraintLikelihood_
 
+#ifdef HHKINFIT2
 #include "HHFitConstraint.h"
-#include "TF1.h"
 #include "HHFitObject.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraint.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitObject.h"
+#endif
+
+#include "TF1.h"
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TSpline.h"

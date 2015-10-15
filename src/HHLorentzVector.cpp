@@ -1,6 +1,12 @@
+#ifdef HHKINFIT2
 #include "HHLorentzVector.h"
-#include <cmath>
 #include "exceptions/HHEnergyRangeException.h"
+#else
+#include "HHKinFit2/HHKinFit2/interface/HHLorentzVector.h"
+#include "HHKinFit2/HHKinFit2/interface/exceptions/HHEnergyRangeException.h"
+#endif
+
+#include <cmath>
 #include <sstream>
 
 HHKinFit2::HHLorentzVector::HHLorentzVector(double x, double y, double z, double t)
@@ -56,10 +62,15 @@ HHKinFit2::HHLorentzVector::SetEkeepM(double E){
   double pnew = sqrt(pow(E,2)-pow(M(),2));
   if (isnan(pnew)) {
       std::cout << "WARNING: SetEkeepM(): Targeted E is smaller than m. Set P=1, E=sqrt(m**2+1**2)" << std::endl;
+      std::cout << "E: " << E << std::endl;
+      std::cout << "M: " << M() << std::endl;
       E=sqrt(pow(M(),2)+1.0);
       pnew = 1.0;
+      std::cout << "New E: " << E << std::endl;
+      std::cout << "ptnew: " << pnew * sin(2.*atan(exp(-Eta()))) << std::endl;
   }
   double ptnew = pnew * sin(2.*atan(exp(-Eta())));
+  
   SetPtEtaPhiE(ptnew,Eta(),Phi(),E);
 
 }
