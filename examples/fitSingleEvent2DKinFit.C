@@ -24,5 +24,9 @@ int main(int argc, char* argv[])
   heavyhiggsfit.addHypo(125,125);
   heavyhiggsfit.doFit();
 
+  std::cout << "Heavy Higgs fit finished. The fitted heavy Higgs mass is: " <<
+    heavyhiggsfit.getMH(125, 125) << "GeV" << std::endl;
+
+
   return (0);
 }
