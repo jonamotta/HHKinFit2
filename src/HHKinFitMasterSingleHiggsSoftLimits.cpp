@@ -143,12 +143,12 @@ void HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::addHypo(HHFitHypothesisSing
 
 
 HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::HHKinFitMasterSingleHiggsSoftLimits(
-                                                                TLorentzVector tauvis1,
-                                                                TLorentzVector tauvis2,
-                                                                TVector2 met, 
-                                                                TMatrixD met_cov, 
+                                                                TLorentzVector const& tauvis1,
+                                                                TLorentzVector const& tauvis2,
+                                                                TVector2 const& met, 
+                                                                TMatrixD const& met_cov, 
                                                                 bool istruth,
-                                                                TLorentzVector* higgsgen)
+                                                                TLorentzVector const& higgsgen)
 :m_MET_COV(TMatrixD(4,4))
 {
   

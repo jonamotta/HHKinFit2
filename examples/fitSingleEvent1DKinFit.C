@@ -21,25 +21,24 @@ int main(int argc, char* argv[])
   met_cov[0][1]= 0;
   met_cov[1][0]= met_cov[0][1];
   met_cov[1][1]= 359.15655;
-
+  
   HHKinFitMasterSingleHiggs singlehiggsfit(tauvis1,tauvis2,met,met_cov);
-
-  for (int i=50; i<=250; i++)
-    singlehiggsfit.addHypo(i);
- 
+  
+  singlehiggsfit.addHypo(125);
   singlehiggsfit.fit();
 
-  TFile f("out1D.root","RECREATE");
-  TGraph gr(0);
-  int points=0;
-  for (int i=50; i<=250; i++){
-    gr.SetPoint(points,i,singlehiggsfit.getChi2(i));
-    std::cout << std::setprecision(5) << singlehiggsfit.getChi2(i) << std::endl;
-    points++;
-  }
 
-  gr.Write();
-  f.Close();
+  std::cout << "Single Higgs fit finished." << std::endl;
 
+  std::cout << "chi2: " << singlehiggsfit.getChi2(125) << std::endl;
+  std::cout << "Fit prob: " << singlehiggsfit.getFitProb(125) << std::endl;
+  std::cout << "Convergence: " << singlehiggsfit.getConvergence(125) << std::endl;
+
+  TLorentzVector fittedTau1 = singlehiggsfit.getFittedTau1(125);
+  TLorentzVector fittedTau2 = singlehiggsfit.getFittedTau2(125);
+
+  std::cout << "Energy of fitted tau1: " << fittedTau1.E() << std::endl;
+  std::cout << "Energy of fitted tau2: " << fittedTau2.E() << std::endl;
+  
   return (0);
 }

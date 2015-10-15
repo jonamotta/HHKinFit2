@@ -2,6 +2,7 @@
 
 #include "TLorentzVector.h"
 #include "TMatrixD.h"
+#include "TVector2.h"
 #include "HHKinFitMasterHeavyHiggs.h"
 
 
@@ -9,12 +10,12 @@ using HHKinFit2::HHKinFitMasterHeavyHiggs;
 
 int main(int argc, char* argv[])
 {
-  TLorentzVector* bjet1   = new TLorentzVector(-18.0706,28.8731,19.1597,39.3622);
-  TLorentzVector* bjet2   = new TLorentzVector(14.1252,71.0363,-160.683,176.315);
-  TLorentzVector* tauvis1 = new TLorentzVector(-20.9251,-24.865,-4.66771,32.8318);
-  TLorentzVector* tauvis2 = new TLorentzVector(53.6093,-24.6612,-52.1178,78.7299);
-  TLorentzVector* met     = new TLorentzVector(31.2118,-38.0866,0,0);
-  TMatrixD        met_cov(2,2);
+  TLorentzVector bjet1(-18.0706,28.8731,19.1597,39.3622);
+  TLorentzVector bjet2(14.1252,71.0363,-160.683,176.315);
+  TLorentzVector tauvis1(-20.9251,-24.865,-4.66771,32.8318);
+  TLorentzVector tauvis2(53.6093,-24.6612,-52.1178,78.7299);
+  TVector2 met(31.2118,-38.0866);
+  TMatrixD met_cov(2,2);
   met_cov[0][0]= 200;
   met_cov[0][1]= 0;
   met_cov[1][0]= 0;
@@ -33,7 +34,7 @@ int main(int argc, char* argv[])
   //If no mass hypothesis is given, the MSSM case with a 125GeV light higgs is assumed.
   //heavyhiggsfit.addHypo(125,110); 
 
-  heavyhiggsfit.doFit();
+  heavyhiggsfit.fit();
 
   std::cout << "Heavy Higgs fit finished." << std::endl;
 

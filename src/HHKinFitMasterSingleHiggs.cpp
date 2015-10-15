@@ -57,8 +57,6 @@ void HHKinFit2::HHKinFitMasterSingleHiggs::fit()
   
       int mh = m_hypos[i];
 
-      std::cout << mh << std::endl;
-  
       try{
         tau1Fit->setFitLimitsE(tau1Fit->getInitial4Vector(),mh,tau2Fit->getInitial4Vector());
         tau2Fit->setFitLimitsE(tau2Fit->getInitial4Vector(),mh,tau1Fit->getInitial4Vector());
@@ -133,13 +131,12 @@ void HHKinFit2::HHKinFitMasterSingleHiggs::addHypo(HHFitHypothesisSingleHiggs hy
 }
 
 
-HHKinFit2::HHKinFitMasterSingleHiggs::HHKinFitMasterSingleHiggs(
-                                                                TLorentzVector tauvis1,
-                                                                TLorentzVector tauvis2,
-                                                                TVector2 met, 
-                                                                TMatrixD met_cov, 
+HHKinFit2::HHKinFitMasterSingleHiggs::HHKinFitMasterSingleHiggs(TLorentzVector const& tauvis1,
+                                                                TLorentzVector const& tauvis2,
+                                                                TVector2 const& met, 
+                                                                TMatrixD const& met_cov, 
                                                                 bool istruth,
-                                                                TLorentzVector* higgsgen)
+                                                                TLorentzVector const& higgsgen)
 :m_MET_COV(TMatrixD(4,4))
 {
   
