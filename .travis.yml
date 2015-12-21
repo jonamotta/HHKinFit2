@@ -1,0 +1,21 @@
+# travis config for HHKinFit2
+sudo: required
+language: cpp
+services: docker
+notifications:
+  email:
+    on_success: change
+    on_failure: always
+compiler: gcc
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - clang
+before_install:
+  - sudo apt-get -y install root-system
+install: 
+  - source setup.sh
+script: 
+  - source compile.sh
