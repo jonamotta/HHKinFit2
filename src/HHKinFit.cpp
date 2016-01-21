@@ -40,7 +40,7 @@ HHKinFit2::HHKinFit::HHKinFit()
   m_chi2(99999),
   m_convergence(0),
   m_printlevel(0),
-  m_maxloops(500){
+  m_maxloops(10000){
 }
 
 void
@@ -52,6 +52,8 @@ HHKinFit2::HHKinFit::setPrintLevel(int printlevel){
 void 
 HHKinFit2::HHKinFit::fit(){
   
+  m_chi2 = 99999;
+  m_convergence = 0;
   //  ----------  for PSfit -----
   const int np = m_fitobjects.size();
   double a[np];
@@ -68,7 +70,6 @@ HHKinFit2::HHKinFit::fit(){
   double daNbefore[np];
   double hbefore[np];
   double chi2iterbefore[1], aMemorybefore[np][5], gbefore[np], Hbefore[np * np], Hinvbefore[np * np];
-
 
   int iter = 0;             //  number of iterations
   int method = 1;           //  initial fit method, see PSfit()
@@ -89,12 +90,12 @@ HHKinFit2::HHKinFit::fit(){
     //daN[i] = 1.0;   //0.0                 // initial search direction
 
     astart[i]    = m_fitobjects[i]->getInitStart();
-    aprec[i]     = m_fitobjects[i]->getInitPrecision();
-    h[i]         = m_fitobjects[i]->getInitStepWidth();
+    aprec[i]     = m_fitobjects[i]->getInitPrecision() * 0.1;
+    h[i]         = m_fitobjects[i]->getInitPrecision();
     daN[i]       = m_fitobjects[i]->getInitDirection();
     alimit[i][0] = 1.00001*m_fitobjects[i]->getLowerFitLimitE();
     alimit[i][1] = 0.99999*m_fitobjects[i]->getUpperFitLimitE();
-
+    
     if( alimit[i][1] - alimit[i][0] < 0.2 ) //Allow for at least 200MeV of wiggle room
     {
       std::stringstream msg;
@@ -119,7 +120,8 @@ HHKinFit2::HHKinFit::fit(){
     aMemory[i][3] = -980.0;
   }
   
-  for (int iloop = 0; iloop < m_maxloops * 10 && iter < m_maxloops; iloop++) { // FIT loop
+  for (int iloop = 0; iloop < m_maxloops * 10 && iter < m_maxloops; iloop++) 
+  { // FIT loop
     bool respectLimits = (iter>=0) ; // do not respect limits when calculating numerical derivative
     for (unsigned int i=0; i<m_fitobjects.size();i++){
       try{
@@ -171,6 +173,25 @@ HHKinFit2::HHKinFit::fit(){
 
     m_chi2=this->getChi2(respectLimits);
 
+    if(m_printlevel > 1)
+    {
+      std::cout << "-----------------------------------------------------" << std::endl;
+      std::cout << "EB1: " << a[0] << std::endl;
+      std::cout << "ETau1: " << a[1] << std::endl;
+      if(np ==  2)
+      {
+	double b1Chi2 = m_constraints[2]->getChi2();
+	double b2Chi2 = m_constraints[3]->getChi2();
+	double balChi2 = m_constraints[4]->getChi2();
+	std::cout << "Chi2: " << m_chi2 << "  Chi2b1: " << b1Chi2
+		  << "  Chi2b2: " << b2Chi2 << "  Chi2Bal: " << balChi2 << std::endl;
+      }
+      else
+      {
+	std::cout << "Chi2: " << m_chi2 << std::endl;
+      }
+      std::cout << "-----------------------------------------------------" << std::endl;
+    }
    
     chi2before = m_chi2;
     chi2iterbefore[0]=chi2iter[0];
@@ -194,11 +215,29 @@ HHKinFit2::HHKinFit::fit(){
       Hinvbefore[i]=Hinv[i];
     }
     
-    if (m_convergence != 0) break;
-    m_convergence = PSMath::PSfit(iloop, iter, method, mode, noNewtonShifts, m_printlevel,
+    if (m_convergence != 0) 
+    {
+      m_loopsNeeded = iloop;
+      break;
+    }
+
+    m_convergence = PSMath::PSfit(iloop, iter, method, mode, noNewtonShifts, 
+				  m_printlevel,
                                   np, a, astart, alimit, aprec,
                                   daN, h, aMemory, m_chi2, chi2iter, g, H,
                                   Hinv);
+
+    if(m_printlevel > 1)
+    {
+      if((iloop+1) >= (m_maxloops * 10)-1)
+      {
+	std::cout << "Aborting! To many iloops!" << std::endl;
+      }
+      if((iter+1) >= m_maxloops)
+      {
+	std::cout << "Aborting! To many iters!" << std::endl;
+      }
+    }
   }
   // ------ end of FIT loop
   
@@ -313,6 +352,79 @@ HHKinFit2::HHKinFit::getChi2Function(int steps){
   gr->SetMinimum(0);
   gr->GetXaxis()->SetTitle("E_{1}[GeV]");
   gr->GetYaxis()->SetTitle("#chi^{2}");
+  return(gr);
+}
+
+TGraph2D*
+HHKinFit2::HHKinFit::getChi2Function(int* steps, double* mins, double* maxs)
+{
+  TGraph2D* gr;
+//  TObject* obj;
+  /*
+  if(m_fitobjects.size() == 1)
+  {
+    int npoints = steps[0];
+    obj = new TGraph(npoints);
+    TGraph* gr = (TGraph*)obj;
+    gr->SetName("chi2function");
+    double stepsize((m_fitobjects[0]->getUpperFitLimitE() - m_fitobjects[0]->getLowerFitLimitE())/npoints);
+    for (int i=0; i<npoints; i++){
+      double e = 1.00001*m_fitobjects[0]->getLowerFitLimitE()+ i*stepsize;
+      m_fitobjects[0]->changeEandSave(e);
+      double chi2(this->getChi2());
+      //    std::cout << i << " " << e << " " << chi2 << std::endl;
+      gr->SetPoint(i,e,chi2);
+    }
+    gr->SetMinimum(0);
+    gr->GetXaxis()->SetTitle("E_{1}[GeV]");
+    gr->GetYaxis()->SetTitle("#chi^{2}");
+  }
+  */
+  if(m_fitobjects.size() ==2)
+  {
+    if(mins[0] < m_fitobjects[0]->getLowerFitLimitE())
+    {
+      mins[0] = m_fitobjects[0]->getLowerFitLimitE();
+    }
+    if(mins[1] < m_fitobjects[1]->getLowerFitLimitE())
+    {
+      mins[1] = m_fitobjects[1]->getLowerFitLimitE();
+    }
+    if(maxs[0] > m_fitobjects[0]->getUpperFitLimitE())
+    {
+      maxs[0] = m_fitobjects[0]->getUpperFitLimitE();
+    }
+    if(maxs[1] > m_fitobjects[1]->getUpperFitLimitE())
+    {
+      maxs[1] = m_fitobjects[1]->getUpperFitLimitE();
+    }
+    
+    int stepsPar1 = steps[0];
+    int stepsPar2 = steps[1];
+
+    gr = new TGraph2D(stepsPar1 * stepsPar2);
+//    TGraph2D* gr = (TGraph2D*)obj;
+    gr->SetName("chi2function");
+    double stepsize1 = (maxs[0] - mins[0])/stepsPar1;
+    double stepsize2 = (maxs[1] - mins[1])/stepsPar2;
+    for(int i = 0;
+	i < stepsPar1;
+	i++)
+    {
+      double e1 = 1.00001*mins[0] + i*stepsize1;
+      m_fitobjects[0]->changeEandSave(e1);
+      for(int j = 0;
+	  j < stepsPar2;
+	  j++)
+      {
+	double e2 = 1.00001*mins[1] + j*stepsize2;
+	m_fitobjects[1]->changeEandSave(e2);
+	double chi2 = this->getChi2();
+	gr->SetPoint(i*stepsPar1+j, e1, e2, chi2);
+      }
+    }  
+    gr->GetZaxis()->SetRangeUser(0.0, 100.0);
+  }
   return(gr);
 }
 

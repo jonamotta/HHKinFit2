@@ -11,6 +11,7 @@
 #include "HHFitObjectEConstM.h"
 #include "HHFitObjectEConstBeta.h"
 #include "HHFitConstraint4Vector.h"
+#include "HHFitConstraint4VectorBJet.h"
 #include "exceptions/HHEnergyRangeException.h"
 #include "exceptions/HHLimitSettingException.h"
 #include "exceptions/HHCovarianceMatrixException.h"
@@ -27,6 +28,7 @@
 #include "HHKinFit2/HHKinFit2/interface/HHFitObjectEConstM.h"
 #include "HHKinFit2/HHKinFit2/interface/HHFitObjectEConstBeta.h"
 #include "HHKinFit2/HHKinFit2/interface/HHFitConstraint4Vector.h"
+#include "HHKinFit2/HHKinFit2/interface/HHFitConstraint4VectorBJet.h"
 #include "HHKinFit2/HHKinFit2/interface/exceptions/HHEnergyRangeException.h"
 #include "HHKinFit2/HHKinFit2/interface/exceptions/HHLimitSettingException.h"
 #include "HHKinFit2/HHKinFit2/interface/exceptions/HHCovarianceMatrixException.h"
@@ -39,6 +41,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <iterator>
+#include <sstream>
 
 void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
 {
@@ -47,28 +50,17 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
     addHypo(125, 125);
   }
 
+  //TCanvas* c1 = new TCanvas();
+
   for(unsigned int i = 0; i < m_hypos.size(); ++i)
   { 
     HHFitObjectE* tau1Fit = new HHFitObjectEConstM(m_tauvis1);
     HHFitObjectE* tau2Fit = new HHFitObjectEConstM(m_tauvis2);
 
-    double bJet1Emin, bJet1Emax;
-    if (m_bjet1.E() - 5.0*m_sigma_bjet1 <= 5)
-    {
-      bJet1Emin = 5;
-    }
-    else
-    {
-      bJet1Emin = m_bjet1.E() - 5.0*m_sigma_bjet1;
-    }
-    bJet1Emax = m_bjet1.E() + 5.0*m_sigma_bjet1;
-  
+    double bJet1Emin;
     HHLorentzVector bJet2min = m_bjet2;
-    if (m_bjet2.E() - 5.0*m_sigma_bjet2 <= 0) bJet2min.SetEkeepBeta(5);
-    else bJet2min.SetEkeepBeta(m_bjet2.E() - 5.0*m_sigma_bjet2);
-      
-    HHLorentzVector bJet2max = m_bjet2;
-    bJet2max.SetEkeepBeta(m_bjet2.E() + 5.0*m_sigma_bjet2);
+    bJet1Emin = 5.0;
+    bJet2min.SetEkeepBeta(5);
 
     HHLorentzVector tau1min = m_tauvis1;
     tau1min.SetEkeepM(0.9*m_tauvis1.E());
@@ -110,23 +102,20 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
       m_map_convergence[m_hypos[i]] = -1;
       continue;
     }
-  
+
     try
     {
       b1Fit->setLowerFitLimitE(bJet1Emin);
-      b1Fit->setUpperFitLimitE(bJet1Emax);
-      b1Fit->setLowerFitLimitE(mh2, bJet2max);
       b1Fit->setUpperFitLimitE(mh2, bJet2min);
-
-      //b1Fit->setUpperFitLimitE(mh2, bJet2min);
-      //b1Fit->setLowerFitLimitE(mh2, bJet2max);
-      //b2Fit->setFitLimitsE(bJet2min, mh2, bJet1min);
     }
     catch(HHLimitSettingException const& e)
     {
       std::cout << "Exception while setting b-jet limits" << std::endl;
       std::cout << e.what() << std::endl;
       std::cout << "Bjet energies are not compatible within 5 sigma with invariant mass constraint." << std::endl;
+      std::cout << "B1 Momentum: " << m_bjet1.P() << std::endl;
+      std::cout << "B2 Momentum: " << m_bjet2.P() << std::endl;
+
       m_map_chi2[m_hypos[i]] = -pow(10,10);
       m_map_prob[m_hypos[i]] = -pow(10,10);
       m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
@@ -134,7 +123,8 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
       m_map_convergence[m_hypos[i]] = -2;
       continue;
     }
-
+    
+    /*
     if(fabs(m_bjet1_COV(0,0)) < 0.001)
     {
       b1Fit->setCovMatrix(m_sigma_bjet1);
@@ -148,36 +138,46 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
       b1Fit->setCovMatrix(m_bjet1_COV);
       b2Fit->setCovMatrix(m_bjet2_COV);
     }
+    */
 
     metFit->setCovMatrix(m_MET_COV);
-    heavyHiggs->setCovMatrix(m_MET_COV - m_bjet1_COV - m_bjet2_COV);
+    heavyHiggs->setCovMatrix(m_MET_COV);// - m_bjet1_COV - m_bjet2_COV);
 
     //prepare constraints
     HHFitConstraint* c_invmh1 = new HHFitConstraintEHardM(tau1Fit, tau2Fit, mh1);
     HHFitConstraint* c_invmh2 = new HHFitConstraintEHardM(b1Fit, b2Fit, mh2);
     
-    HHFitConstraint* c_b1 = new HHFitConstraint4Vector(b1Fit, false, false, 
-						       false, true);
-    HHFitConstraint* c_b2 = new HHFitConstraint4Vector(b2Fit, false, false, 
-						       false, true);
+    HHFitConstraint* c_b1 = new HHFitConstraint4VectorBJet(b1Fit);
+    HHFitConstraint* c_b2 = new HHFitConstraint4VectorBJet(b2Fit);
+//   HHFitConstraint* c_b1 = new HHFitConstraint4VectorBJet(b1Fit, 2.06421, 99.92,
+//							   0.17, 1.15, 0.466, 1.608);
+//    HHFitConstraint* c_b2 = new HHFitConstraint4VectorBJet(b2Fit, 2.06421, 99.92,
+//							   0.17, 1.15, 0.466, 1.608);
+    //HHFitConstraint* c_b1 = new HHFitConstraint4Vector(b1Fit, false, false, 
+    //						       false, true);
+    //HHFitConstraint* c_b2 = new HHFitConstraint4Vector(b2Fit, false, false, 
+    //						       false, true);
     HHFitConstraint* c_balance = new HHFitConstraint4Vector(heavyHiggs, true, true, 
 							    false, false);
 
     //fit
     HHKinFit2::HHKinFit* fitObject = new HHKinFit2::HHKinFit();
 
-    tau1Fit->setInitStart( (tau1Fit->getUpperFitLimitE()+
-			    tau1Fit->getLowerFitLimitE() )/2.0);
     tau1Fit->setInitPrecision(0.1);
-    tau1Fit->setInitStepWidth(0.1*(tau1Fit->getUpperFitLimitE() - tau1Fit->getLowerFitLimitE()));
+    tau1Fit->setInitStepWidth(0.1*(tau1Fit->getUpperFitLimitE() - 
+				   tau1Fit->getLowerFitLimitE()));
+
+    b1Fit->setInitPrecision(0.1);
+    b1Fit->setInitStepWidth(0.02*(b1Fit->getUpperFitLimitE() - 
+				  b1Fit->getLowerFitLimitE()));
+
+
     tau1Fit->setInitDirection(1.0);
 
-    b1Fit->setInitStart( (b1Fit->getUpperFitLimitE()+
-			  b1Fit->getLowerFitLimitE() )/2.0);
-    b1Fit->setInitPrecision(0.002*b1Fit->getInitial4Vector().E());
-    b1Fit->setInitStepWidth(0.1*(b1Fit->getUpperFitLimitE() - b1Fit->getLowerFitLimitE()));
+    b1Fit->setInitStart( 0.9*b1Fit->getInitial4Vector().E());
+    b1Fit->setInitDirection(-1.0);
+
     //b1Fit->setInitStepWidth(0.5*m_sigma_bjet1);
-    b1Fit->setInitDirection(1.0);
 
     fitObject->addFitObjectE(b1Fit);
     fitObject->addFitObjectE(tau1Fit);
@@ -188,6 +188,26 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
     fitObject->addConstraint(c_b2);
     fitObject->addConstraint(c_balance);
 
+    /*
+    //For Chi2Map
+    int steps[2];
+    steps[0] = 30;
+    steps[1] = 30;
+    
+    double mins[2];
+    double maxs[2];
+    //END For Chi2Map
+    */
+
+//    double b1NegTauUpFit,b1PosTauDownFit, b1NegTauDownFit;
+//    double tau1NegTauUpFit, tau1PosTauDownFit, tau1NegTauDownFit;
+    double chi2NegTauUp = 99999;
+    double chi2PosTauDown = 99999;
+    double chi2NegTauDown = 99999;
+    double chi2Min = 99999;
+
+    //--NegTauDown
+    tau1Fit->setInitStart(tau1Fit->getUpperFitLimitE());
     try
     {
       fitObject->fit();
@@ -200,7 +220,7 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
       m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
       m_bestChi2 = -pow(10,10);
       if((b1Fit->getUpperFitLimitE() - b1Fit->getLowerFitLimitE()) <
-	 tau1Fit->getUpperFitLimitE() - tau1Fit->getLowerFitLimitE())
+	 (tau1Fit->getUpperFitLimitE() - tau1Fit->getLowerFitLimitE()))
       {
 	m_map_convergence[m_hypos[i]] = -2;
       }
@@ -211,6 +231,7 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
       continue;
     }
     catch(HHKinFit2::HHEnergyRangeException const& e){
+      std::cout << "Energy Range Exception" << std::endl;
       m_map_chi2[m_hypos[i]] = -pow(10,10);
       m_map_prob[m_hypos[i]] = -pow(10,10);
       m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
@@ -219,35 +240,382 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::doFit()
       continue;
     }
 
-    initialHH = (TLorentzVector)heavyHiggs->getInitial4Vector();
-    finalHH = (TLorentzVector)heavyHiggs->getFit4Vector();
-
-    m_map_convergence[m_hypos[i]] = fitObject->getConvergence();    
-    
-    double chi2 = fitObject->getChi2();
-    m_map_chi2[m_hypos[i]] = chi2;
-    m_map_prob[m_hypos[i]] = TMath::Prob(chi2, 2);
-
-    if(chi2 < m_bestChi2)
+    if(fitObject->getChi2() > 0)
     {
-      m_bestHypo = m_hypos[i];
-      m_bestChi2 = chi2;
+      chi2NegTauDown = fitObject->getChi2();
+      if(chi2NegTauDown < chi2Min)
+      {
+	chi2Min = chi2NegTauDown;
+      }
+      //b1NegTauDownFit = b1Fit->getFit4Vector().E();
+      //tau1NegTauDownFit = tau1Fit->getFit4Vector().E();
     }
+
+
+    //--NegTauUp
+//      b1Fit->setInitStart( 0.9*b1Fit->getInitial4Vector().E());
+    tau1Fit->setInitStart((tau1Fit->getUpperFitLimitE() - 
+			   tau1Fit->getLowerFitLimitE())/2.0);
+    try
+    {
+      fitObject->fit();
+    }
+    catch(HHLimitSettingException const& e)
+    {
+      std::cout << e.what() << std::endl;
+      m_map_chi2[m_hypos[i]] = -pow(10,10);
+      m_map_prob[m_hypos[i]] = -pow(10,10);
+      m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
+      m_bestChi2 = -pow(10,10);
+      if((b1Fit->getUpperFitLimitE() - b1Fit->getLowerFitLimitE()) <
+	 (tau1Fit->getUpperFitLimitE() - tau1Fit->getLowerFitLimitE()))
+      {
+	m_map_convergence[m_hypos[i]] = -2;
+      }
+      else
+      {
+	m_map_convergence[m_hypos[i]] = -1;
+      }
+      continue;
+    }
+    catch(HHKinFit2::HHEnergyRangeException const& e){
+      std::cout << "Energy Range Exception" << std::endl;
+      m_map_chi2[m_hypos[i]] = -pow(10,10);
+      m_map_prob[m_hypos[i]] = -pow(10,10);
+      m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
+      m_bestChi2 = -pow(10,10);
+      m_map_convergence[m_hypos[i]] = 0;
+      continue;
+    }
+
+    if(fitObject->getChi2() > 0)
+    {
+      chi2NegTauUp = fitObject->getChi2();
+      if(chi2NegTauUp < chi2Min)
+      {
+	chi2Min = chi2NegTauUp;
+      }
+      //b1NegTauUpFit = b1Fit->getFit4Vector().E();
+      //tau1NegTauUpFit = tau1Fit->getFit4Vector().E();
+    }
+
+    //--PosTauDown
+    tau1Fit->setInitStart(tau1Fit->getLowerFitLimitE());
+    try
+    {
+      fitObject->fit();
+    }
+    catch(HHLimitSettingException const& e)
+    {
+      std::cout << e.what() << std::endl;
+      m_map_chi2[m_hypos[i]] = -pow(10,10);
+      m_map_prob[m_hypos[i]] = -pow(10,10);
+      m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
+      m_bestChi2 = -pow(10,10);
+      if((b1Fit->getUpperFitLimitE() - b1Fit->getLowerFitLimitE()) <
+	 (tau1Fit->getUpperFitLimitE() - tau1Fit->getLowerFitLimitE()))
+      {
+	m_map_convergence[m_hypos[i]] = -2;
+      }
+      else
+      {
+	m_map_convergence[m_hypos[i]] = -1;
+      }
+      continue;
+    }
+    catch(HHKinFit2::HHEnergyRangeException const& e){
+      std::cout << "Energy Range Exception" << std::endl;
+      m_map_chi2[m_hypos[i]] = -pow(10,10);
+      m_map_prob[m_hypos[i]] = -pow(10,10);
+      m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
+      m_bestChi2 = -pow(10,10);
+      m_map_convergence[m_hypos[i]] = 0;
+      continue;
+    }
+
+    if(fitObject->getChi2() > 0)
+    {
+      chi2PosTauDown = fitObject->getChi2();
+      if(chi2PosTauDown < chi2Min)
+      {
+	chi2Min = chi2PosTauDown;
+      }
+      //b1PosTauDownFit = b1Fit->getFit4Vector().E();
+      //tau1PosTauDownFit = tau1Fit->getFit4Vector().E();
+    }
+       
+    bool improvementDetected = false;
+    if(fabs(chi2NegTauDown - chi2Min) > 0.1)
+    {
+      improvementDetected = true;
+    }
+    if(fabs(chi2PosTauDown - chi2Min) > 0.1)
+    {
+      improvementDetected = true;
+    }
+    if(fabs(chi2NegTauUp - chi2Min) > 0.1)
+    {
+      improvementDetected = true;
+    }
+
+    if(improvementDetected) 
+    {
+      /*
+	std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" 
+	<< std::endl;
+	std::cout << "Difference in B-Fit directions detected: " << std::endl;
+	std::cout << "Chi2 PosTauUp: " << chi2PosTauUp << std::endl
+	<< "Chi2 NegTauUp: " << chi2NegTauUp << std::endl
+	<< "Chi2 PosTauDown: " << chi2PosTauDown << std::endl
+	<< "Chi2 negTauDown: " << chi2NegTauDown << std::endl;
+	mins[0] = b1PosTauDownFit;
+	maxs[0] = b1PosTauDownFit;
+      if(b1NegTauDownFit < mins[0])
+      {
+	mins[0] = b1NegTauDownFit;
+      }
+      if(b1NegTauDownFit > maxs[0])
+      {
+	maxs[0] = b1NegTauDownFit;
+      }
+      
+      if(doTauUpStart)
+      {
+	if(b1NegTauUpFit < mins[0])
+	{
+	  mins[0] = b1NegTauUpFit;
+	}
+	if(b1NegTauUpFit > maxs[0])
+	{
+	  maxs[0] = b1NegTauUpFit;
+	}
+      
+	if(b1PosTauUpFit < mins[0])
+	{
+	  mins[0] = b1PosTauUpFit;
+	}
+	if(b1PosTauUpFit > maxs[0])
+	{
+	  maxs[0] = b1PosTauUpFit;
+	}
+      }
+      mins[1] = tau1PosTauDownFit;
+      maxs[1] = tau1PosTauDownFit;
+      if(tau1NegTauDownFit < mins[1])
+      {
+	mins[1] = tau1NegTauDownFit;
+      }
+      if(tau1NegTauDownFit > maxs[1])
+      {
+	maxs[1] = tau1NegTauDownFit;
+      }
+      
+      if(doTauUpStart)
+      {
+	if(tau1NegTauUpFit < mins[1])
+	{
+	  mins[1] = tau1NegTauUpFit;
+	}
+	if(tau1NegTauUpFit > maxs[1])
+	{
+	  maxs[1] = tau1NegTauUpFit;
+	}
+
+	if(tau1PosTauUpFit < mins[1])
+	{
+	  mins[1] = tau1PosTauUpFit;
+	}
+	if(tau1PosTauUpFit > maxs[1])
+	{
+	  maxs[1] = tau1PosTauUpFit;
+	}
+      }
+      mins[0] = mins[0]*0.9;
+      mins[1] = mins[1]*0.9;
+      maxs[0] = maxs[0]*1.1;
+      maxs[1] = maxs[1]*1.1;
+
+      TGraph2D* graph = fitObject->getChi2Function(steps, mins, maxs);
+
+      graph->GetXaxis()->SetTitle("X");
+      //graph->GetXaxis()->SetTitleOffset(0.1);
+      graph->GetYaxis()->SetTitle("Y");
+      //graph->GetYaxis()->SetTitleOffset(0.1);
+      graph->GetZaxis()->SetTitle("Z");
+      //graph->GetZaxis()->SetTitleOffset(1.0);
+      graph->Draw("Cont3COLZ");
+
+      TString b1PosTauUp;
+      TString b1NegTauUp;
+      TString b1PosTauDown;
+      TString b1NegTauDown;
+      TString tau1PosTauUp;
+      TString tau1NegTauUp;
+      TString tau1PosTauDown;
+      TString tau1NegTauDown;
+
+      std::stringstream stream;
+
+      if(doTauUpStart)
+      {
+	stream << b1PosTauUpFit;
+	stream >> b1PosTauUp;
+	stream.clear();
+
+	stream << b1NegTauUpFit;
+	stream >> b1NegTauUp;
+	stream.clear();
+      }
+      stream << b1PosTauDownFit;
+      stream >> b1PosTauDown;
+      stream.clear();
+
+      stream << b1NegTauDownFit;
+      stream >> b1NegTauDown;
+      stream.clear();
+      
+      if(doTauUpStart)
+      {
+	stream << tau1PosTauUpFit;
+	stream >> tau1PosTauUp;
+	stream.clear();
+	
+	stream << tau1NegTauUpFit;
+	stream >> tau1NegTauUp;
+	stream.clear();
+      }
+      stream << tau1PosTauDownFit;
+      stream >> tau1PosTauDown;
+      stream.clear();
+
+      stream << tau1NegTauDownFit;
+      stream >> tau1NegTauDown;
+      stream.clear();
+
+      if(doTauUpStart)
+      {
+	c1->SaveAs("PosUp" + b1PosTauUp + "-" + tau1PosTauUp +
+		   "NegUp" + b1NegTauUp + "-" + tau1NegTauUp +
+		   "PosDown" + b1PosTauDown + "-" + tau1PosTauDown + 
+		   "NegDown" + b1NegTauDown + "-" + tau1NegTauDown +
+		   ".pdf");
+      }
+      else
+      {
+	c1->SaveAs("PosDown" + b1PosTauDown + "-" + tau1PosTauDown + 
+		   "NegDown" + b1NegTauDown + "-" + tau1NegTauDown +
+		   ".pdf");
+      }
+      */
+      bool hasRerun = false;
+      m_bestMethodFlag = 0;
+      //Mark all methods that got the best chi2
+      //1 = chi2NegTauDown
+      //2 = chi2PosTauDown
+      //3 = chi2NegTauDown + chi2PosTauDown
+      //4 = chi2NegTauUp
+      //5 = chi2NegTauUp + chi2NegTauDown
+      //6 = chi2NegTauUp + chi2PosTauDown
+      //7 = All, should not happen
+      
+      if(fabs(chi2NegTauDown - chi2Min) <= 0.1)
+      {
+	m_bestMethodFlag = m_bestMethodFlag | (1 << 0); 
+	tau1Fit->setInitStart(tau1Fit->getUpperFitLimitE());
+	fitObject->fit();
+	hasRerun = true;
+      }
+      if(fabs(chi2PosTauDown - chi2Min) <= 0.1)
+      {
+	m_bestMethodFlag = m_bestMethodFlag | (1 << 1); 
+	hasRerun = true; //No need to rerun as this was the last config to run
+      }
+   
+      if(fabs(chi2NegTauUp - chi2Min) <= 0.1)
+      {
+	m_bestMethodFlag = m_bestMethodFlag | (1 << 2); 
+	if(!hasRerun)
+	{
+	  tau1Fit->setInitStart((tau1Fit->getUpperFitLimitE() - 
+				 tau1Fit->getLowerFitLimitE())/2.0);
+	  fitObject->fit();
+	  hasRerun = true;
+	}
+      }
+      
+      if(!hasRerun)
+      {
+	std::cout << "--------ALARM! ALARM! SOMETHING HAS GONE HORRIBLY WRONG!-------" 
+		  << std::endl;
+      }
+    }
+
+    /* No Convergence MAP
+    if(fitObject->getConvergence() == 0)
+    {
+      std::cout << "####################################################" << std::endl;
+      std::cout << "No Convergence! Printing how we got here: " << std::endl;
+      fitObject->setPrintLevel(3);
+      fitObject->fit();
+      fitObject->setPrintLevel(0);
+      std::cout << "####################################################" << std::endl;
+
+      mins[0] = 0.9*b1Fit->getFit4Vector().E();
+      mins[1] = 0.9*tau1Fit->getFit4Vector().E();
+      maxs[0] = 1.1*b1Fit->getFit4Vector().E();
+      maxs[1] = 1.1*tau1Fit->getFit4Vector().E();
+ 
+      TString b1Point;
+      TString tau1Point;
+      std::stringstream stream;
+
+      stream << b1Fit->getFit4Vector().E();
+      stream >> b1Point;
+      stream.clear();
+
+      stream << tau1Fit->getFit4Vector().E();
+      stream >> tau1Point;
+      stream.clear();
+
+      TGraph2D* graph = (TGraph2D*)fitObject->getChi2Function(steps, mins, maxs);
+      graph->Draw("Cont3COLZ");
+
+      c1->SaveAs("NoConvergence" + b1Point + "-" + tau1Point + ".pdf");
+    }
+    */
+
+    {//Filling Results
+      initialHH = (TLorentzVector)heavyHiggs->getInitial4Vector();
+      finalHH = (TLorentzVector)heavyHiggs->getFit4Vector();
+
+      m_map_convergence[m_hypos[i]] = fitObject->getConvergence();    
     
-    m_map_mH[m_hypos[i]] = heavyHiggs->getFit4Vector().M();
-    m_map_chi2BJet1[m_hypos[i]] = c_b1->getChi2();
-    m_map_chi2BJet2[m_hypos[i]] = c_b2->getChi2();
-    m_map_chi2Balance[m_hypos[i]] = c_balance->getChi2();
+      double chi2 = fitObject->getChi2();
+      m_map_chi2[m_hypos[i]] = chi2;
+      m_map_prob[m_hypos[i]] = TMath::Prob(chi2, 2);
+      m_loopsNeeded = fitObject->m_loopsNeeded;
+
+      if(chi2 < m_bestChi2)
+      {
+	m_bestHypo = m_hypos[i];
+	m_bestChi2 = chi2;
+      }
     
-    TLorentzVector fittedTau1 =  ( (TLorentzVector)tau1Fit->getFit4Vector()  );
-    m_map_fittedTau1[m_hypos[i]] = fittedTau1;
-    TLorentzVector fittedTau2 =  ( (TLorentzVector)tau2Fit->getFit4Vector()  );
-    m_map_fittedTau2[m_hypos[i]] = fittedTau2;
-    TLorentzVector fittedB1 =  ( (TLorentzVector)b1Fit->getFit4Vector() ) ;
-    m_map_fittedB1[m_hypos[i]] = fittedB1;
-    TLorentzVector fittedB2 =  ( (TLorentzVector)b2Fit->getFit4Vector() ) ;
-    m_map_fittedB2[m_hypos[i]]= fittedB2;
+      m_map_mH[m_hypos[i]] = heavyHiggs->getFit4Vector().M();
+      m_map_chi2BJet1[m_hypos[i]] = c_b1->getChi2();
+      m_map_chi2BJet2[m_hypos[i]] = c_b2->getChi2();
+      m_map_chi2Balance[m_hypos[i]] = c_balance->getChi2();
     
+      TLorentzVector fittedTau1 =  ( (TLorentzVector)tau1Fit->getFit4Vector()  );
+      m_map_fittedTau1[m_hypos[i]] = fittedTau1;
+      TLorentzVector fittedTau2 =  ( (TLorentzVector)tau2Fit->getFit4Vector()  );
+      m_map_fittedTau2[m_hypos[i]] = fittedTau2;
+      TLorentzVector fittedB1 =  ( (TLorentzVector)b1Fit->getFit4Vector() ) ;
+      m_map_fittedB1[m_hypos[i]] = fittedB1;
+      TLorentzVector fittedB2 =  ( (TLorentzVector)b2Fit->getFit4Vector() ) ;
+      m_map_fittedB2[m_hypos[i]]= fittedB2;
+    }
+
     delete c_invmh1;
     delete c_invmh2;
     delete c_b1;
@@ -302,7 +670,10 @@ HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(const TLorentzVect
  
   m_tauvis1.SetMkeepE(1.77682);
   m_tauvis2.SetMkeepE(1.77682);
-   
+
+  m_bestMethodFlag = 0;
+  m_loopsNeeded = 0;
+
   if(met != 0)
   {
     m_MET = TVector2(met->Px(), met->Py());
@@ -335,40 +706,7 @@ HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(const TLorentzVect
 
   if (istruth)
   {
-    TRandom3 r(0);  
-    /*
-      if(heavyhiggsgen != NULL)
-      {
-      Double_t pxHeavyH = heavyhiggsgen->Px();
-      Double_t pyHeavyH = heavyhiggsgen->Py();
-      Double_t transEnergyHeavyH = sqrt(pxHeavyH*pxHeavyH+pyHeavyH*pyHeavyH);
-      
-      }
-      else
-      {
-      heavyH = HHLorentzVector(0,0,0,0);
-      std::cout << "WARNING! Truthinput mode active but no Heavy Higgs gen-information given! Setting HH to Zero!" << std::endl;
-      }*/   
-
-    /*
-      HHLorentzVector MET4 = heavyH - (m_bjet1 + m_bjet2 + m_tauvis1 + m_tauvis2);
-      neutrinos = (TLorentzVector)MET4;
-
-      Double_t METXSmeared = r.Gaus(MET4.Px(), 10.0);
-      Double_t METYSmeared = r.Gaus(MET4.Py(), 10.0);
-
-      std::cout << "Met smeared by: " <<  MET4.Px() - METXSmeared << "  " 
-      << MET4.Py() - METYSmeared << std::endl;
-	      
-      m_MET = TVector2(METXSmeared, METYSmeared);
-      smearedMET = m_MET;
-
-      m_MET_COV = TMatrixD(4,4);
-      m_MET_COV(0,0)=100;    m_MET_COV(0,1)=0;
-      m_MET_COV(1,0)=0;      m_MET_COV(1,1)=100;
-    */
-
-
+    /*Old Systamtics Test
     Double_t bjet1_E  = r.Gaus(m_bjet1.E(), m_sigma_bjet1);
     Double_t bjet1_P  = sqrt(pow(bjet1_E,2) - pow(m_bjet1.M(),2));
     Double_t bjet1_Pt = sin(m_bjet1.Theta())*bjet1_P;
@@ -415,6 +753,54 @@ HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(const TLorentzVect
     
     m_bjet2.SetPtEtaPhiE(bjet2_Pt, m_bjet2.Eta(), m_bjet2.Phi(), bjet2_E);
     //m_bjet2_COV = bjet2Cov;
+    */
+    TF1* crystalBall = new TF1("crystalBall", crystalBallLikePDFROOT, 0.0, 10.0, 6);
+    crystalBall->SetParameter(0,2.06421);
+    crystalBall->SetParameter(1,99.92);
+    crystalBall->SetParameter(2,0.17);
+    crystalBall->SetParameter(3,1.15);
+    crystalBall->SetParameter(4,0.466);
+    crystalBall->SetParameter(5,1.608);
+
+    /*
+    TCanvas* c1 = new TCanvas;
+    crystalBall->Draw();
+    c1->SaveAs("crystBall.pdf");
+    delete c1;
+    */
+
+    TRandom3 r(0);
+    gRandom = new TRandom3(0);
+    Double_t randomSmear = crystalBall->GetRandom();
+    if(randomSmear < 0.1)
+    {
+      randomSmear = 0.1;
+    }
+    Double_t eTemp = m_bjet1.E() * 1/randomSmear;
+    if(pow(eTemp,2) < pow(m_bjet1.M(),2))
+    {
+      eTemp = m_bjet1.M()*1.1;
+    }
+
+    Double_t bjet1_E  = eTemp;
+    Double_t bjet1_P  = sqrt(pow(bjet1_E,2) - pow(m_bjet1.M(),2));
+    Double_t bjet1_Pt = sin(m_bjet1.Theta())*bjet1_P;    
+    m_bjet1.SetPtEtaPhiE(bjet1_Pt, m_bjet1.Eta(), m_bjet1.Phi(), bjet1_E);
+    randomSmear = crystalBall->GetRandom();
+    if(randomSmear < 0.1)
+    {
+      randomSmear = 0.1;
+    }
+    eTemp = m_bjet2.E() * 1/randomSmear;
+    if(pow(eTemp,2) < pow(m_bjet2.M(),2))
+    {
+      eTemp = m_bjet2.M()*1.1;
+    }
+
+    Double_t bjet2_E  = eTemp;
+    Double_t bjet2_P  = sqrt(pow(bjet2_E,2) - pow(m_bjet2.M(),2));
+    Double_t bjet2_Pt = sin(m_bjet2.Theta())*bjet2_P;
+    m_bjet2.SetPtEtaPhiE(bjet2_Pt, m_bjet2.Eta(), m_bjet2.Phi(), bjet2_E);
 
     HHLorentzVector heavyH;
     heavyH = HHLorentzVector(heavyhiggsgen->Px(), heavyhiggsgen->Py(),
@@ -436,7 +822,8 @@ HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(const TLorentzVect
     m_MET = recoilVec2 - b1Vec2 - b2Vec2 - tauVis1Vec2 - tauVis2Vec2; 
     smearedMET = m_MET;
 
-    m_MET_COV = recoil_COV + bjet1Cov + bjet2Cov;
+    //m_MET_COV = recoil_COV + bjet1Cov + bjet2Cov;
+    m_MET_COV = recoil_COV;
   }  
 }
 
@@ -660,3 +1047,46 @@ double HHKinFit2::HHKinFitMasterHeavyHiggs::GetPFBJetRes(double eta, double et){
   return de;
 
 }    
+
+
+double HHKinFit2::crystBallLikePDF(double x, double alpha, double n, double sigma, 
+				   double mean, double beta, double normalization) 
+{
+  if (sigma < 0.)     return 0.;
+  double fitVal;
+  double z = (x - mean)/sigma; 
+  //if (alpha < 0) z = -z; 
+  double abs_alpha = std::abs(alpha);
+  double abs_beta = std::abs(beta);
+  if (x < 0)
+  {
+    fitVal = 0;
+  }
+  else if (z  > - abs_alpha && z < abs_beta)
+    fitVal = std::exp(- 0.5 * z * z);
+  else if(z  <= - abs_alpha)
+  {
+    double nDivAlpha = n/abs_alpha;
+    double AA =  std::exp(-0.5*abs_alpha*abs_alpha);
+    double B = nDivAlpha -abs_alpha;
+    double arg = nDivAlpha/(B-z);
+    fitVal = AA * std::pow(arg,n);
+  }
+  else
+  {
+    double nDivBeta = n/abs_beta;
+    double AA =  std::exp(-0.5*abs_beta*abs_beta);
+    double B = nDivBeta -abs_beta;
+    double arg = nDivBeta/(B+z);
+    fitVal = AA * std::pow(arg,n);
+  }
+
+  return normalization * fitVal;
+}
+
+double HHKinFit2::crystalBallLikePDFROOT(double* x, double *par)
+{
+  double fitVal = crystBallLikePDF(x[0], par[0], par[1], par[2], par[3],
+				   par[4], par[5]);
+  return fitVal;
+}

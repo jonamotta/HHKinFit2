@@ -4,6 +4,7 @@
 #include <TLorentzVector.h>
 #include <TMatrixD.h>
 #include <TVector2.h>
+#include <TCanvas.h>
 
 #ifdef HHKINFIT2
 #include "HHLorentzVector.h"
@@ -26,6 +27,11 @@ typedef std::map< HHFitHypothesisHeavyHiggs, double >         HHFitResultD;
 typedef std::map< HHFitHypothesisHeavyHiggs, int >            HHFitResultI;
 typedef std::map< HHFitHypothesisHeavyHiggs, bool >           HHFitResultB;
 typedef std::map< HHFitHypothesisHeavyHiggs, TLorentzVector > HHFitResultTLor;
+
+double crystBallLikePDF(double x, double alpha, double n, double sigma, 
+			double mean, double beta, double normalization);
+
+double crystalBallLikePDFROOT(double* x, double *par);
 
 class HHKinFitMasterHeavyHiggs{
   public:
@@ -97,6 +103,8 @@ class HHKinFitMasterHeavyHiggs{
   TLorentzVector finalHH;
   double b1Px_standardDevs;
 
+  int m_loopsNeeded;
+  int m_bestMethodFlag;
 private:
   double GetPFBJetRes(double eta, double et);
 

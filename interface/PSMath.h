@@ -67,8 +67,8 @@ class PSMath {
 
  
   static int PSderivative(int icall, int np, double a[], double h[],
-		     double chi2, double chi2iter[],
-		     double g[], double H[]);
+			  double chi2, double chi2iter[],
+			  double g[], double H[], int printlevel);
 
   static int PSderivative1(int icall, double a[], double h[],
 			       double chi2, double g[], double H[]);
