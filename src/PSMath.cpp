@@ -12,7 +12,6 @@
 #include <iostream>
 
 
-
 // Collection of mathematical tools
 //-----------------------------
 //  PSfit            Fit tool
@@ -133,7 +132,6 @@ PSMath::PSfit (int iloop, int &iter, int &method, int &mode,
       daNabs = PSVnorm (daN, np);      // check initial search direction
       //      xh     = PSVnorm(h, np) ;        // initial step width for line search
       xh = 1.0/PSVnorm (daN, np);        // initial step width for line search
-
       if (daNabs == 0.)
         return 1;                            //Minimum found at both limits
       
@@ -143,12 +141,12 @@ PSMath::PSfit (int iloop, int &iter, int &method, int &mode,
     }
 
     double epsxLS = epsx;
-
     for(int ip = 0; ip < np; ip++) {
       if(aprec[ip]*0.5/fabs(daN[ip]) < epsxLS){
 	epsxLS = aprec[ip]*0.5/fabs(daN[ip]);
       }
     }
+
 
     xx = PSLineSearch (mode, xh, xlimit, epsxLS, epsf, x, f, chi2, printlevel);
     for (int ip = 0; ip < np; ip++) {
@@ -166,14 +164,17 @@ PSMath::PSfit (int iloop, int &iter, int &method, int &mode,
       //      PSVprint("aMemory ",aMemory,np) ;
       //      PSVprint("      a ", a, np) ;
       bool didConverge = true;
+
       for (int ip = 0; ip < np; ip++) { // check for progress w.r.t. previous iteration
-        if (fabs(a[ip] - aMemory[ip][0]) > aprec[ip]) {
+	if (fabs(a[ip] - aMemory[ip][0]) > aprec[ip]) 
+	{
 	  if(printlevel >=2)
 	    std::cout << "No Convergence as Parameter " << np << " is " << fabs(a[ip] - aMemory[ip][0]) << " away from previous iteration." << std::endl;
 	  didConverge = false;
-          break;
-        }
+	  break;
+	}
       }
+      
       if(didConverge){
 	convergence = 1;
 	iterMemory = iterMemory + 1;
@@ -181,7 +182,6 @@ PSMath::PSfit (int iloop, int &iter, int &method, int &mode,
 	return convergence;
       }
 
- 
       for (int previousIter = 1; previousIter <= 4; previousIter++){
 	bool weHaveBeenHereBefore = true;
 	for (int ip = 0; ip < np; ip++) {
@@ -227,9 +227,21 @@ PSMath::PSfit (int iloop, int &iter, int &method, int &mode,
       return convergence;
     }
     if(printlevel >=2)
+    {
 	std::cout << "Newton Method! Calc. derivative!" << std::endl;
+	if(icallNewton == 0)
+	{
+	  std::cout << "Stepwidths are: " << std::endl;
+	  for(int i = 0;
+	      i < np;
+	      i++)
+	  {
+	    std::cout << "Param " << i << " stepwith is: " << h[i] << std::endl;
+	  }
+	}
+    }
     if(np > 1)
-      ready = PSderivative(icallNewton, np, a, h, chi2, chi2iter, g, H);
+      ready = PSderivative(icallNewton, np, a, h, chi2, chi2iter, g, H, printlevel);
     else
       ready = PSderivative1(icallNewton, a, h, chi2, g, H);
 
@@ -242,12 +254,12 @@ PSMath::PSfit (int iloop, int &iter, int &method, int &mode,
 
       d = PSNewtonAnalyzer (np, a, alimit, aprec, daN, h, g, H, Hinv, chi2, noNewtonShifts, printlevel);
       //      std::cout << "d " << d << "   chi2Memory " << chi2Memory << "  chi2 " << chi2 << std::endl;
-      if (d < epsx) {   // test convergence in next run by checking if deltaChi2 is small enough
+      if (d < epsx) {   // test convergence in next run by checking if deltaChi2 and delta a[np] is small enough
         method = 3;
 	iterMemory = iterMemory + 1;
 	iter = iterMemory;
 	if(printlevel >=2)
-	  std::cout << "Small Shift! Check for Convergence (small Chi2) in next Loop!" << std::endl;
+	  std::cout << "Small Shift! Check for Convergence (small delta Chi2) in next Loop!" << std::endl;
       }
       else {
 	if(printlevel >=2)
@@ -389,16 +401,16 @@ PSMath::PSNewtonAnalyzer (int np, double a[], double alimit[][2],
     for (int ip = 0; ip < np; ip++) {
       daN[ip] = -g[ip] * hnorm / gnorm;
       if(printlevel>2)
-	std::cout << "daN[" << np << "] set to " << daN[ip] << std::endl;
+	std::cout << "daN[" << ip << "] set to " << daN[ip] << std::endl;
     }
     for (int ip = 0; ip < np; ip++) {                 // check limits
       if (a[ip] < alimit[ip][0] + aprec[ip]) {
-        h[ip] = aprec[ip];
+        //h[ip] = aprec[ip];
         daN[ip] = fmax (daN[ip], 0.);
 	if (printlevel>0) std::cout << "At lower limit for parameter " << ip << std::endl;
       }
       else if (a[ip] > alimit[ip][1] - aprec[ip]) {
-        h[ip] = aprec[ip];
+        //h[ip] = aprec[ip];
         daN[ip] = fmin (daN[ip], 0.);
 	if (printlevel>0) std::cout << "At upper limit for parameter " << ip << std::endl;
 	//if (daN[ip]*g[ip]<0.) {daN[ip] = 0.; }
@@ -1391,7 +1403,7 @@ int PSMath::PSderivative1 (int icall, double a[], double h[],
 int
 PSMath::PSderivative (int icall, int np, double a[], double h[],
                       double chi2, double chi2iter[], double g[],
-                      double H[])
+                      double H[], int printlevel)
 {
   // Tool for numerical calculation of derivative and Hesse matrix
   //  depending on icall, the components of a[] are shifted up and down.
@@ -1422,7 +1434,7 @@ PSMath::PSderivative (int icall, int np, double a[], double h[],
     std::cout << "WARNING! Using PSderivative for 1-dim Case! Use PSderivative1 instead!" << std::endl;
 
   int ready = -1;
-  int nstep = 1 + 2 * np + np * (np - 1);
+  int nstep = 1 + 2 * np + np * (np - 1);                               //7
   int iter;                       // number of finished iteration
   int icalc;                       // current number of chi2 calculations
   //     within current iteration
@@ -1431,13 +1443,13 @@ PSMath::PSderivative (int icall, int np, double a[], double h[],
 
   int shiftnom = 0;        //     icall = 0             for nominal a[] //0
   int shiftp1 = 1;        //     etc see above                          //1
-  int shiftp2 = shiftp1 + np - 1;                                       //1
-  int shiftm1 = shiftp2 + 1;                                            //2
-  int shiftm2 = shiftm1 + np - 1;                                       //2
-  //int shiftpp1 = shiftm2 + 1;                                           //3
-  int shiftpp2 = shiftm2 + np * (np - 1) / 2;                           //3
-  //int shiftmm1 = shiftpp2 + 1;                                          //4
-  int shiftmm2 = shiftpp2 + np * (np - 1) / 2;                          //3
+  int shiftp2 = shiftp1 + np - 1;                                       //2
+  int shiftm1 = shiftp2 + 1;                                            //3
+  int shiftm2 = shiftm1 + np - 1;                                       //4
+  //int shiftpp1 = shiftm2 + 1;                                           
+  int shiftpp2 = shiftm2 + np * (np - 1) / 2;                           //5
+  //int shiftmm1 = shiftpp2 + 1;                                          
+  int shiftmm2 = shiftpp2 + np * (np - 1) / 2;                          //6
 
   iter = icall / nstep;
   icalc = icall - iter * nstep;
@@ -1449,6 +1461,11 @@ PSMath::PSderivative (int icall, int np, double a[], double h[],
   //int ia1new = -1;
   int iainew = -1, iajnew = -1;
   double signold = 0., signnew = 0.;
+
+  if(printlevel >=4)
+  {
+    std::cout << "icalc is: " << icalc << std::endl;
+  }
 
   if (icalc == shiftnom) { //cout <<" Nominal "<< chi2 << "\n" ;
     iaold = -1;
@@ -1548,7 +1565,8 @@ PSMath::PSderivative (int icall, int np, double a[], double h[],
       signnew = -1.;
     };
   }
-  else if (icalc == shiftmm2) {  // cout <<" Hesse -- end   "<< chi2 << "\n" ;
+  else if (icalc == shiftmm2) 
+  {  // cout <<" Hesse -- end   "<< chi2 << "\n" ;
     iaiold = np - 2;
     iajold = np - 1;
     signold = +1.;
@@ -1556,6 +1574,19 @@ PSMath::PSderivative (int icall, int np, double a[], double h[],
   else {
     std::cout << "ERROR \n";
   };
+
+  if(printlevel >=4)
+  {
+    std::cout << "Shift parameters: " << std::endl;
+    std::cout << "iaold:    " << iaold << std::endl;
+    std::cout << "ianew:    " << ianew << std::endl;
+    std::cout << "signold:    " << signold << std::endl;
+    std::cout << "signnew:    " << signnew << std::endl;
+    std::cout << "iaiold:    " << iaiold << std::endl;
+    std::cout << "iainew:    " << iainew << std::endl;
+    std::cout << "iajold:    " << iajold << std::endl;
+    std::cout << "iajnew:    " << iajnew << std::endl;
+  }
 
   if (iaold >= 0) {
     a[iaold] = a[iaold] + signold * h[iaold];
@@ -1586,7 +1617,7 @@ PSMath::PSderivative (int icall, int np, double a[], double h[],
     };
   };
 
-  if (iaold >= 0) {
+  if (iaold >= 0 && icalc <= shiftmm2) {
     g[iaold] = g[iaold] - signold * chi2;  // build up derivative
     H[iaold * np + iaold] = H[iaold * np + iaold] + chi2; // build up Hesse diagonal
   }

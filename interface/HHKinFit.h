@@ -6,6 +6,7 @@
 #define HHKinFit_
 
 #include "TGraph.h"
+#include "TGraph2D.h"
 #include <vector>
 
 #ifdef HHKINFIT2
@@ -32,13 +33,16 @@ class HHKinFit {
   void addFitObjectE(HHFitObjectE* fitobject);
   void addConstraint(HHFitConstraint* constraint);
   
+  //Returns TGraph for 1D Fit
   TGraph* getChi2Function(int steps);
+  ///Returns TGraph2D for 2D Fit
+  TGraph2D* getChi2Function(int* steps, double* mins, double* maxs);
   TGraph* getLFunction(int steps);
   int getConvergence() const;
 
   void printChi2() const;
 
-
+  int m_loopsNeeded;
  private:
   std::vector<HHFitObjectE*> m_fitobjects;
   std::vector<HHFitConstraint*> m_constraints;
