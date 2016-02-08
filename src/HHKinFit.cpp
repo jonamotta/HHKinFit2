@@ -358,7 +358,7 @@ HHKinFit2::HHKinFit::getChi2Function(int steps){
 TGraph2D*
 HHKinFit2::HHKinFit::getChi2Function(int* steps, double* mins, double* maxs)
 {
-  TGraph2D* gr;
+  TGraph2D* gr=NULL;
 //  TObject* obj;
   /*
   if(m_fitobjects.size() == 1)
@@ -380,7 +380,7 @@ HHKinFit2::HHKinFit::getChi2Function(int* steps, double* mins, double* maxs)
     gr->GetYaxis()->SetTitle("#chi^{2}");
   }
   */
-  if(m_fitobjects.size() ==2)
+  if(m_fitobjects.size()==2)
   {
     if(mins[0] < m_fitobjects[0]->getLowerFitLimitE())
     {
