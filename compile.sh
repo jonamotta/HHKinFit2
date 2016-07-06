@@ -18,7 +18,8 @@
 #     g++ -std=c++11 examples/compare2DKinFits.C `root-config --cflags --glibs` -I $KINFIT2PATH/include -I $KINFIT1PATH/interface -L $KINFIT2PATH -lHHKinFit2 -L $KINFIT1PATH -lHHKinFit1 -o compare2DKinFits
 #     #g++ -std=c++11 examples/gensimHH.C `root-config --cflags --glibs` -I $KINFIT2PATH/include -I $KINFIT1PATH/interface -L $KINFIT2PATH -lHHKinFit2 -o gensimHH
 #     #g++ -std=c++11 examples/example.C `root-config --cflags --glibs` -I $KINFIT2PATH/include -I $KINFIT1PATH/interface -L $KINFIT2PATH -lHHKinFit2 -o example
-#    clang examples/fitSingleEvent2DKinFit.C `root-config --cflags --glibs` -I $KINFIT2PATH/interface -L $KINFIT2PATH -lHHKinFit2 -D HHKINFIT2 -o fitSingleEvent2DKinFit
-#    clang examples/fitSingleEvent1DKinFit.C `root-config --cflags --glibs` -I $KINFIT2PATH/interface -L $KINFIT2PATH -lHHKinFit2 -D HHKINFIT2 -o fitSingleEvent1DKinFit
+#    g++ examples/fitSingleEvent2DKinFit.C `root-config --cflags --glibs` -I $KINFIT2PATH/interface -L $KINFIT2PATH -lHHKinFit2 -D HHKINFIT2 -o fitSingleEvent2DKinFit
+    clang examples/fitSingleEvent2DKinFit.C `root-config --cflags --glibs` -I $KINFIT2PATH/interface -L $KINFIT2PATH -lHHKinFit2 -stdlib=libstdc++ -lstdc++ -D HHKINFIT2 -o fitSingleEvent2DKinFit
+    clang examples/fitSingleEvent1DKinFit.C `root-config --cflags --glibs` -I $KINFIT2PATH/interface -L $KINFIT2PATH -lHHKinFit2 -stdlib=libstdc++ -lstdc++ -D HHKINFIT2 -o fitSingleEvent1DKinFit
  fi
 

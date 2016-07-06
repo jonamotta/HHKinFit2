@@ -146,9 +146,9 @@ HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::HHKinFitMasterSingleHiggsSoftLim
                                                                 TLorentzVector const& tauvis1,
                                                                 TLorentzVector const& tauvis2,
                                                                 TVector2 const& met, 
-                                                                TMatrixD const& met_cov, 
-                                                                bool istruth,
-                                                                TLorentzVector const& higgsgen)
+                                                                TMatrixD const& met_cov) 
+//                                                                bool istruth,
+  //                                                              TLorentzVector const& higgsgen)
 :m_MET_COV(TMatrixD(4,4))
 {
   

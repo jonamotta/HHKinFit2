@@ -30,10 +30,10 @@ typedef std::map< HHFitHypothesisSingleHiggs, TLorentzVector > HHFitResultTLor;
 class HHKinFitMasterSingleHiggsSoftLimits{
   public:
   HHKinFitMasterSingleHiggsSoftLimits(TLorentzVector const& tauvis1,
-                            TLorentzVector const& tauvis2,
-                            TVector2 const& met, TMatrixD const& met_cov,
-                            bool istruth=false,
-                            TLorentzVector const& higgsgen=TLorentzVector(0,0,0,0));
+                                      TLorentzVector const& tauvis2,
+                                      TVector2 const& met, TMatrixD const& met_cov);
+                                      //bool istruth=false,
+                                      //TLorentzVector const& higgsgen=TLorentzVector(0,0,0,0));
 
   //the main action, runs over all hypotheses and performs the fit
   void fit();

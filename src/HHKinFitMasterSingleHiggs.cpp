@@ -134,9 +134,9 @@ void HHKinFit2::HHKinFitMasterSingleHiggs::addHypo(HHFitHypothesisSingleHiggs hy
 HHKinFit2::HHKinFitMasterSingleHiggs::HHKinFitMasterSingleHiggs(TLorentzVector const& tauvis1,
                                                                 TLorentzVector const& tauvis2,
                                                                 TVector2 const& met, 
-                                                                TMatrixD const& met_cov, 
-                                                                bool istruth,
-                                                                TLorentzVector const& higgsgen)
+                                                                TMatrixD const& met_cov) 
+                                                                //bool istruth,
+                                                                //TLorentzVector const& higgsgen)
 :m_MET_COV(TMatrixD(4,4))
 {
   
