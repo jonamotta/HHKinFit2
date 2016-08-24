@@ -71,6 +71,7 @@ HHKinFit2Producer::HHKinFit2Producer(const edm::ParameterSet& iConfig){
   produces<double>("mH").setBranchAlias("mH");
   produces<double>("P").setBranchAlias("P");
   produces<double>("chi2").setBranchAlias("chi2");
+  produces<int>("convergence").setBranchAlias("convergence");
 
   muonsToken_ = consumes<pat::MuonCollection>(iConfig.getParameter<edm::InputTag>("muons"));
   tausToken_  = consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("taus"));
@@ -87,13 +88,13 @@ void
 HHKinFit2Producer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
 
   edm::Handle<pat::MuonCollection> muons;
-  edm::Handle<pat::MuonCollection> taus;
-  edm::Handle<pat::MuonCollection> jets;
-  edm::Handle<pat::MuonCollection> met;
+  edm::Handle<pat::TauCollection> taus;
+  edm::Handle<pat::JetCollection> jets;
+  edm::Handle<pat::METCollection> met;
 
   iEvent.getByToken(muonsToken_,muons);
   iEvent.getByToken(tausToken_,taus);
-  iEvent.getByToken(metToken_,jets);
+  iEvent.getByToken(jetsToken_,jets);
   iEvent.getByToken(metToken_,met);
 
   double mH = 0;
@@ -125,7 +126,6 @@ HHKinFit2Producer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
     met_cov[0][1]=0;
     met_cov[1][0]=0;
     met_cov[1][1]=100;
-    met_cov.Print();
 
     HHKinFit2::HHKinFitMasterHeavyHiggs* kinFit = new HHKinFit2::HHKinFitMasterHeavyHiggs(bjet1,bjet2,tau1,tau2,met_vec,met_cov);
 
@@ -149,7 +149,7 @@ HHKinFit2Producer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
   std::auto_ptr<double> pmH(new double(mH));
   std::auto_ptr<double> pprob(new double(prob));
   std::auto_ptr<double> pchi2(new double(chi2));
-  std::auto_ptr<double> pconvergence(new double(convergence));
+  std::auto_ptr<int> pconvergence(new int(convergence));
 
   iEvent.put(std::move(pmH),  "mH");
   iEvent.put(std::move(pprob),   "P");
