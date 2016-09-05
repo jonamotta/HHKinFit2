@@ -34,6 +34,7 @@
 #include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
+#include "RecoMET/METAlgorithms/interface/METSignificance.h"
 
 #include "HHKinFit2/HHKinFit2/interface/HHKinFitMasterHeavyHiggs.h"
 
@@ -61,6 +62,8 @@ private:
   edm::EDGetTokenT<pat::TauCollection> tausToken_;
   edm::EDGetTokenT<pat::JetCollection> jetsToken_;
   edm::EDGetTokenT<pat::METCollection> metToken_;
+  edm::EDGetTokenT<ROOT::Math::SMatrix<double,2,2,ROOT::Math::MatRepSym<double,2> > > metcovmatToken_;
+
   bool debug_;
 };
 
@@ -77,6 +80,7 @@ HHKinFit2Producer::HHKinFit2Producer(const edm::ParameterSet& iConfig){
   tausToken_  = consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("taus"));
   jetsToken_  = consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("bjets"));
   metToken_   = consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("met"));
+  metcovmatToken_ = consumes<ROOT::Math::SMatrix<double,2,2,ROOT::Math::MatRepSym<double,2> > >(iConfig.getParameter<edm::InputTag>("metCovMat")); 
 }
 
 
@@ -91,11 +95,13 @@ HHKinFit2Producer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
   edm::Handle<pat::TauCollection> taus;
   edm::Handle<pat::JetCollection> jets;
   edm::Handle<pat::METCollection> met;
-
+  edm::Handle<ROOT::Math::SMatrix<double,2,2,ROOT::Math::MatRepSym<double,2> > > metCovMats;
+    
   iEvent.getByToken(muonsToken_,muons);
   iEvent.getByToken(tausToken_,taus);
   iEvent.getByToken(jetsToken_,jets);
   iEvent.getByToken(metToken_,met);
+  iEvent.getByToken(metcovmatToken_, metCovMats);
 
   double mH = 0;
   double prob = 0;
@@ -122,10 +128,10 @@ HHKinFit2Producer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
 
     TVector2 met_vec(met->at(0).px(),met->at(0).py());
     TMatrixD met_cov(2,2);
-    met_cov[0][0]=100;
-    met_cov[0][1]=0;
-    met_cov[1][0]=0;
-    met_cov[1][1]=100;
+    met_cov[0][0]=(*metCovMats)(0,0);
+    met_cov[0][1]=(*metCovMats)(0,1);
+    met_cov[1][0]=(*metCovMats)(1,0);
+    met_cov[1][1]=(*metCovMats)(1,1);
 
     HHKinFit2::HHKinFitMasterHeavyHiggs* kinFit = new HHKinFit2::HHKinFitMasterHeavyHiggs(bjet1,bjet2,tau1,tau2,met_vec,met_cov);
 
@@ -176,6 +182,7 @@ HHKinFit2Producer::fillDescriptions(edm::ConfigurationDescriptions& descriptions
   desc.add<edm::InputTag>("taus")->setComment("tau input collection");
   desc.add<edm::InputTag>("bjets")->setComment("jet input collection");
   desc.add<edm::InputTag>("met")->setComment("met input collection");
+  desc.add<edm::InputTag>("metCovMat")->setComment("met covariance matrix input");
   desc.add<bool>("debug", false)->setComment("flag to switch on debug output");
 
   descriptions.addDefault(desc);

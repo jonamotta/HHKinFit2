@@ -2,6 +2,7 @@
 <use name="FWCore/Framework"/>
 <use name="FWCore/ParameterSet"/>
 <use name="FWCore/Utilities"/>
+<use name="RecoMET/METAlgorithms"/>
 <use name="HHKinFit2/HHKinFit2"/>
 <use name="root"/>
 <flags EDM_PLUGIN="1"/>
