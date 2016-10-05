@@ -36,7 +36,7 @@
 #include "DataFormats/PatCandidates/interface/MET.h"
 #include "RecoMET/METAlgorithms/interface/METSignificance.h"
 
-#include "HHKinFit2/HHKinFit2/interface/HHKinFitMasterHeavyHiggs.h"
+#include "HHKinFit2/HHKinFit2Scenarios/interface/HHKinFitMasterHeavyHiggs.h"
 
 #include <TLorentzVector.h>
 #include <TMatrixD.h>
