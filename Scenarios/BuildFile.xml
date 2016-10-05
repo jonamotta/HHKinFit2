@@ -1,0 +1,11 @@
+<flags CXXFLAGS="-g" />
+<flags LDFLAGS="-rdynamic" />
+
+<use name="root" />
+<use name="roofit"/>
+<use name="rootmath" />
+<flags ADD_SUBDIR="1"/>
+
+<export>
+   <lib   name="1"/>
+</export>

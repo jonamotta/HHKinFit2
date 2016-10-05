@@ -3,7 +3,8 @@
 if [[ -z "$KINFIT2PATH" ]];
 then
     export KINFIT2PATH=`readlink -m $PWD/../../`
-    export LD_LIBRARY_PATH=$KINFIT2PATH/HHKinFit2/HHKinFit2:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=$KINFIT2PATH/HHKinFit2/HHKinFit2Core:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=$KINFIT2PATH/HHKinFit2/HHKinFit2Scenarios:$LD_LIBRARY_PATH
     echo "Set KINFIT2PATH and updated LD_LIBRARY_PATH"
 
     if [[ $HOST == *"naf"*  ]];
