@@ -6,8 +6,8 @@
 #include <TVector2.h>
 #include <TCanvas.h>
 
-#include "HHKinFit2/HHKinFit2/interface/HHLorentzVector.h"
-#include "HHKinFit2/HHKinFit2/interface/HHKinFit.h"
+#include "HHKinFit2/HHKinFit2Core/interface/HHLorentzVector.h"
+#include "HHKinFit2/HHKinFit2Core/interface/HHKinFit.h"
 
 #include <stdio.h>
 #include <map>
