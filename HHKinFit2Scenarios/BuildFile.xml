@@ -4,6 +4,7 @@
 <use name="root" />
 <use name="roofit"/>
 <use name="rootmath" />
+<use name="HHKinFit2/HHKinFit2Core" />
 <flags ADD_SUBDIR="1"/>
 
 <export>

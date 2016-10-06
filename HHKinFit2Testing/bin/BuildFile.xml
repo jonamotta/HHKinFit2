@@ -1,23 +1,13 @@
-<bin name="fitSingleEvent1DKinFit" file="fitSingleEvent1DKinFit.C">
-  <Flags CXXFLAGS="-g" />
-  <Flags LDFLAGS="-rdynamic" />
-  <flags EDM_PLUGIN="1"/>
-  <use name="HHKinFit2/HHKinFit2" />
-  <use name="root" />
-</bin>
+<flags CXXFLAGS="-g" />
+<flags LDFLAGS="-rdynamic" />
 
-<bin name="fitSingleEvent2DKinFit" file="fitSingleEvent2DKinFit.C">
-  <Flags CXXFLAGS="-g" />
-  <Flags LDFLAGS="-rdynamic" />
-  <flags EDM_PLUGIN="1"/>
-  <use name="HHKinFit2/HHKinFit2" />
-  <use name="root" />
-</bin>
+<use name="root" />
+<use name="roofit"/>
+<use name="rootmath" />
+<use name="HHKinFit2/HHKinFit2Scenarios" />
 
-<bin name="main" file="main.C">
-  <Flags CXXFLAGS="-g" />
-  <Flags LDFLAGS="-rdynamic" />
-  <flags EDM_PLUGIN="1"/>
-  <use name="HHKinFit2/HHKinFit2" />
-  <use name="root" />
-</bin>
+
+<environment>
+   <bin file="fitSingleEvent2DKinFit.C"/>
+   <bin file="fitSingleEvent1DKinFit.C"/>
+</environment>
