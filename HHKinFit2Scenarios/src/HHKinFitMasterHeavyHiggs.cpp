@@ -768,7 +768,7 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::fit()
       double chi2 = fitObject->getChi2();
       m_map_chi2[m_hypos[i]] = chi2;
       m_map_prob[m_hypos[i]] = TMath::Prob(chi2, 2);
-      m_loopsNeeded = fitObject->m_loopsNeeded;
+      m_loopsNeeded = 0;//fitObject->m_loopsNeeded;
 
       if(chi2 < m_bestChi2)
       {
