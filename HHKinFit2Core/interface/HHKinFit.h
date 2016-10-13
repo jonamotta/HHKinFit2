@@ -20,6 +20,7 @@ class HHKinFit {
   void setPrintLevel(int printlevel=0);
 
   void fit();
+  double minfunction(const double *xx);
   double getChi2(bool respectLimits=true) const;
   double getL(bool respectLimits=true) const;
   std::vector<HHFitObjectE*> getListOfFitObjects() const;
@@ -37,8 +38,8 @@ class HHKinFit {
 
   void printChi2() const;
 
-  int m_loopsNeeded;
  private:
+  int m_loopsNeeded;
   std::vector<HHFitObjectE*> m_fitobjects;
   std::vector<HHFitConstraint*> m_constraints;
 
