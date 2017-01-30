@@ -4,14 +4,14 @@
 #include "TLorentzVector.h"
 #include "TVector2.h"
 #include "TMatrixD.h"
-#include "HHKinFit2/HHKinFit2Scenarios/interface/HHKinFitMasterSingleHiggs.h"
+#include "HHKinFit2/HHKinFit2Scenarios/interface/HHKinFitMasterSingleHiggsSoftLimits.h"
 
 #include "TGraph.h" 
 #include "TFile.h" 
 
 #include <chrono>
 
-using HHKinFit2::HHKinFitMasterSingleHiggs;
+using HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits;
 
 int main(int argc, char* argv[])
 {
@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
     met_cov[1][0]= met_cov[0][1];
     met_cov[1][1]= 359.15655;
 
-    HHKinFitMasterSingleHiggs singlehiggsfit(tauvis1,tauvis2,met,met_cov);
+    HHKinFitMasterSingleHiggsSoftLimits singlehiggsfit(tauvis1,tauvis2,met,met_cov);
   
     singlehiggsfit.addHypo(125);
     auto start = std::chrono::high_resolution_clock::now();
