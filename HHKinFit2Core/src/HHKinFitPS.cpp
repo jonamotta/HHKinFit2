@@ -18,7 +18,7 @@
 #include <iostream>
 #include <sstream>
 
-HHKinFit2::PS::HHKinFit::HHKinFit()
+HHKinFit2::HHKinFitPS::HHKinFitPS()
 : m_fitobjects(std::vector<HHFitObjectE*>()),
   m_constraints(std::vector<HHFitConstraint*>()),
   m_chi2(99999),
@@ -28,13 +28,13 @@ HHKinFit2::PS::HHKinFit::HHKinFit()
 }
 
 void
-HHKinFit2::PS::HHKinFit::setPrintLevel(int printlevel){
+HHKinFit2::HHKinFitPS::setPrintLevel(int printlevel){
   m_printlevel=printlevel;
 }
 
 ///todo: compare with old kinfit method
 void 
-HHKinFit2::PS::HHKinFit::fit(){
+HHKinFit2::HHKinFitPS::fit(){
   
   m_chi2 = 99999;
   m_convergence = 0;
@@ -250,7 +250,7 @@ HHKinFit2::PS::HHKinFit::fit(){
 }
 
 double
-HHKinFit2::PS::HHKinFit::getChi2(bool respectLimits) const{
+HHKinFit2::HHKinFitPS::getChi2(bool respectLimits) const{
   double chi2=0;
 
   for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();
@@ -266,7 +266,7 @@ HHKinFit2::PS::HHKinFit::getChi2(bool respectLimits) const{
 }
 
 void
-HHKinFit2::PS::HHKinFit::printChi2() const{
+HHKinFit2::HHKinFitPS::printChi2() const{
   double chi2=0;
 
   for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it)
@@ -282,7 +282,7 @@ HHKinFit2::PS::HHKinFit::printChi2() const{
 }
 
 double
-HHKinFit2::PS::HHKinFit::getL(bool respectLimits) const{
+HHKinFit2::HHKinFitPS::getL(bool respectLimits) const{
   double L=1;
 
   for(std::vector<HHFitConstraint*>::const_iterator it = m_constraints.begin();it != m_constraints.end(); ++it)
@@ -296,32 +296,32 @@ HHKinFit2::PS::HHKinFit::getL(bool respectLimits) const{
 
 
 int
-HHKinFit2::PS::HHKinFit::getConvergence() const{
+HHKinFit2::HHKinFitPS::getConvergence() const{
   return(m_convergence);
 }
 
 std::vector<HHKinFit2::HHFitObjectE*>
-HHKinFit2::PS::HHKinFit::getListOfFitObjects() const{
+HHKinFit2::HHKinFitPS::getListOfFitObjects() const{
   return(m_fitobjects);
 }
 
 std::vector<HHKinFit2::HHFitConstraint*>
-HHKinFit2::PS::HHKinFit::getListOfConstraints() const{
+HHKinFit2::HHKinFitPS::getListOfConstraints() const{
   return(m_constraints);
 }
 
 void
-HHKinFit2::PS::HHKinFit::addFitObjectE(HHFitObjectE* fitobject){
+HHKinFit2::HHKinFitPS::addFitObjectE(HHFitObjectE* fitobject){
   m_fitobjects.push_back(fitobject);
 }
 
 void
-HHKinFit2::PS::HHKinFit::addConstraint(HHFitConstraint* constraint){
+HHKinFit2::HHKinFitPS::addConstraint(HHFitConstraint* constraint){
   m_constraints.push_back(constraint);
 }
 
 TGraph*
-HHKinFit2::PS::HHKinFit::getChi2Function(int steps){
+HHKinFit2::HHKinFitPS::getChi2Function(int steps){
   int npoints(m_fitobjects.size()*steps);
   TGraph* gr = new TGraph(npoints);
   gr->SetName("chi2function");
@@ -340,7 +340,7 @@ HHKinFit2::PS::HHKinFit::getChi2Function(int steps){
 }
 
 TGraph2D*
-HHKinFit2::PS::HHKinFit::getChi2Function(int* steps, double* mins, double* maxs)
+HHKinFit2::HHKinFitPS::getChi2Function(int* steps, double* mins, double* maxs)
 {
   TGraph2D* gr=NULL;
 //  TObject* obj;
@@ -414,7 +414,7 @@ HHKinFit2::PS::HHKinFit::getChi2Function(int* steps, double* mins, double* maxs)
 
 
 TGraph*
-HHKinFit2::PS::HHKinFit::getLFunction(int steps){
+HHKinFit2::HHKinFitPS::getLFunction(int steps){
   int npoints(m_fitobjects.size()*steps);
   TGraph* gr = new TGraph(npoints);
   gr->SetName("Lfunction");

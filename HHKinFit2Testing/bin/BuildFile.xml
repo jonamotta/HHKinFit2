@@ -10,4 +10,5 @@
 <environment>
    <bin file="fitSingleEvent2DKinFit.C"/>
    <bin file="fitSingleEvent1DKinFit.C"/>
+   <bin file="fitSingleEvent1DKinFitDESY.C"/>
 </environment>

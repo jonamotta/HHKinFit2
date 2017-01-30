@@ -98,7 +98,14 @@ HHKinFit2::HHFitObjectE::setUpperFitLimitE(double minv, HHLorentzVector const& o
   {
     std::cout << e.what() << std::endl;
     std::stringstream msg;
-    msg << "Cannot set upper limit. Energy of second particle would be invalid/negative.";
+    msg << "Cannot set upper limit. Energy of second particle would be invalid/negative." << std::endl;
+    msg << "constrainEtoMinv(minv,other4vectorMin).E(): constrainEtoMinv("<<minv
+        <<"(E="<<other4vectorMin.E()
+        <<",px="<<other4vectorMin.Px()
+        <<",py="<<other4vectorMin.Py()
+        <<",pz="<< other4vectorMin.Pz()
+        <<",m="<<other4vectorMin.M()
+        <<")).E()";
     throw(HHLimitSettingException(msg.str()));
   }
 }

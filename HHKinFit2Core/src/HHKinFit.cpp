@@ -35,14 +35,14 @@ HHKinFit2::HHKinFit::setPrintLevel(int printlevel){
   m_printlevel=printlevel;
 }
 
-///todo: compare with old kinfit method
 void 
 HHKinFit2::HHKinFit::fit(){
   m_chi2 = 99999;
   m_convergence = -10;
   const int np = m_fitobjects.size();
 
-  ROOT::Math::Minimizer* min = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
+  ROOT::Math::Minimizer* min = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Fumili2");
+  //ROOT::Math::Minimizer* min = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
   min->SetMaxFunctionCalls(1000000);
   min->SetMaxIterations(100000);
   min->SetTolerance(0.0001);
@@ -52,7 +52,8 @@ HHKinFit2::HHKinFit::fit(){
  
   // Set the free variables to be minimized!
   for (int i=0; i<np; i++){
-    min->SetVariable(0,Form("E%d",i),m_fitobjects[i]->getInitStart(), m_fitobjects[i]->getInitStepWidth());
+    //min->SetVariable(0,Form("E%d",i),m_fitobjects[i]->getInitStart(), m_fitobjects[i]->getInitStepWidth());
+    min->SetLimitedVariable(i,Form("E%d",i),m_fitobjects[i]->getInitStart(), m_fitobjects[i]->getInitStepWidth(), m_fitobjects[i]->getLowerFitLimitE(), m_fitobjects[i]->getUpperFitLimitE());
   }
  
   m_convergence = min->Minimize(); 

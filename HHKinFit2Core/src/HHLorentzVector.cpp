@@ -8,6 +8,10 @@ HHKinFit2::HHLorentzVector::HHLorentzVector(double x, double y, double z, double
   : TLorentzVector(x,y,z,t){
 }
 
+HHKinFit2::HHLorentzVector::HHLorentzVector(HHLorentzVector const& v)
+  : TLorentzVector(v.X(),v.Y(),v.Z(),v.T()){
+}
+
 HHKinFit2::HHLorentzVector::HHLorentzVector()
   : TLorentzVector(){
 }

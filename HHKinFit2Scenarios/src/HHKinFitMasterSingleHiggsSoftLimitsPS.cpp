@@ -1,5 +1,5 @@
-#include "HHKinFit2/HHKinFit2Scenarios/interface/HHKinFitMasterSingleHiggsSoftLimits.h"
-#include "HHKinFit2/HHKinFit2Core/interface/HHKinFit.h"
+#include "HHKinFit2/HHKinFit2Scenarios/interface/HHKinFitMasterSingleHiggsSoftLimitsPS.h"
+#include "HHKinFit2/HHKinFit2Core/interface/HHKinFitPS.h"
 #include "HHKinFit2/HHKinFit2Core/interface/HHFitObjectEConstM.h"
 #include "HHKinFit2/HHKinFit2Core/interface/HHFitObjectEConstBeta.h"
 #include "HHKinFit2/HHKinFit2Core/interface/HHFitObjectMET.h"
@@ -23,7 +23,7 @@
 #include <cstdlib>
 #include <iterator>
 
-void HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::fit()
+void HHKinFit2::HHKinFitMasterSingleHiggsSoftLimitsPS::fit()
 {
   for(unsigned int i = 0; i < m_hypos.size(); ++i)
     { 
@@ -40,6 +40,13 @@ void HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::fit()
   
       int mh = m_hypos[i];
 
+      // try{
+      //   //tau1Fit->setFitLimitsE(tau1Fit->getInitial4Vector(),mh,tau2Fit->getInitial4Vector());
+      //   //tau2Fit->setFitLimitsE(tau2Fit->getInitial4Vector(),mh,tau1Fit->getInitial4Vector());
+      //   tau1Fit->setLowerFitLimitE(tau1Fit->getInitial4Vector().M());
+      //   tau2Fit->setLowerFitLimitE(tau2Fit->getInitial4Vector().M());
+      // }
+
       try{
         //tau1Fit->setFitLimitsE(tau1Fit->getInitial4Vector(),mh,tau2Fit->getInitial4Vector());
         //tau2Fit->setFitLimitsE(tau2Fit->getInitial4Vector(),mh,tau1Fit->getInitial4Vector());
@@ -48,7 +55,7 @@ void HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::fit()
 
         HHLorentzVector mintau2Fit(tau2Fit->getInitial4Vector());
         mintau2Fit.SetEkeepM(mintau2Fit.M()*1.001);
-
+ 
         tau1Fit->setLowerFitLimitE(tau1Fit->getInitial4Vector().M());
         tau1Fit->setUpperFitLimitE(mh,mintau2Fit);
         tau2Fit->setLowerFitLimitE(tau2Fit->getInitial4Vector().M());
@@ -75,14 +82,13 @@ void HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::fit()
       HHFitConstraint* c_softlimit2 = new HHFitConstraintSoftBoundary(tau2Fit,0.1);
 
       //fit
-      HHKinFit2::HHKinFit* fitObject = new HHKinFit2::HHKinFit();
+      //      HHKinFit2::HHKinFit* fitObject = new HHKinFit2::HHKinFit();
+      HHKinFitPS* fitObject = new HHKinFitPS();
 
-      //tau1Fit->setInitStart((tau1Fit->getUpperFitLimitE()+tau1Fit->getLowerFitLimitE())/2);
+      tau1Fit->setInitStart((tau1Fit->getUpperFitLimitE()+tau1Fit->getLowerFitLimitE())/2);
       tau1Fit->setInitPrecision(0.1);
-      //tau1Fit->setInitStepWidth(0.1*(tau1Fit->getUpperFitLimitE() - tau1Fit->getLowerFitLimitE()));
+      tau1Fit->setInitStepWidth(0.1*(tau1Fit->getUpperFitLimitE() - tau1Fit->getLowerFitLimitE()));
       tau1Fit->setInitDirection(1.0);
-      tau1Fit->setInitStart(tau1Fit->getInitial4Vector().E());
-      tau1Fit->setInitStepWidth(1.0);
 
       fitObject->addFitObjectE(tau1Fit);
 
@@ -91,8 +97,8 @@ void HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::fit()
       fitObject->addConstraint(c_softlimit1);
       fitObject->addConstraint(c_softlimit2);
 
-      //tau1Fit->resetLimits();
-      //tau2Fit->resetLimits();
+      tau1Fit->resetLimits();
+      tau2Fit->resetLimits();
       
       fitObject->fit();
 
@@ -127,13 +133,13 @@ void HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::fit()
     }
 }
 
-void HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::addHypo(HHFitHypothesisSingleHiggs hypo)
+void HHKinFit2::HHKinFitMasterSingleHiggsSoftLimitsPS::addHypo(HHFitHypothesisSingleHiggs hypo)
 {
   m_hypos.push_back(hypo);
 }
 
 
-HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::HHKinFitMasterSingleHiggsSoftLimits(
+HHKinFit2::HHKinFitMasterSingleHiggsSoftLimitsPS::HHKinFitMasterSingleHiggsSoftLimitsPS(
                                                                 TLorentzVector const& tauvis1,
                                                                 TLorentzVector const& tauvis2,
                                                                 TVector2 const& met, 
@@ -184,30 +190,30 @@ HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::HHKinFitMasterSingleHiggsSoftLim
   //  }
 }
 
-HHKinFit2::HHFitHypothesisSingleHiggs HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::getBestHypothesis(){
+HHKinFit2::HHFitHypothesisSingleHiggs HHKinFit2::HHKinFitMasterSingleHiggsSoftLimitsPS::getBestHypothesis(){
   return(m_bestHypo);
 }
 
-double HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::getBestChi2(){
+double HHKinFit2::HHKinFitMasterSingleHiggsSoftLimitsPS::getBestChi2(){
   return(m_chi2_best);
 }
 
-double HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::getChi2(HHFitHypothesisSingleHiggs hypo){
+double HHKinFit2::HHKinFitMasterSingleHiggsSoftLimitsPS::getChi2(HHFitHypothesisSingleHiggs hypo){
   return(m_map_chi2[hypo]);
 }
 
-double HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::getFitProb(HHFitHypothesisSingleHiggs hypo){
+double HHKinFit2::HHKinFitMasterSingleHiggsSoftLimitsPS::getFitProb(HHFitHypothesisSingleHiggs hypo){
   return(m_map_prob[hypo]);
 }
 
-int HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::getConvergence(HHFitHypothesisSingleHiggs hypo){
+int HHKinFit2::HHKinFitMasterSingleHiggsSoftLimitsPS::getConvergence(HHFitHypothesisSingleHiggs hypo){
   return(m_map_convergence[hypo]);
 }
 
-TLorentzVector HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::getFittedTau1(HHFitHypothesisSingleHiggs hypo){
+TLorentzVector HHKinFit2::HHKinFitMasterSingleHiggsSoftLimitsPS::getFittedTau1(HHFitHypothesisSingleHiggs hypo){
   return(m_map_fittedTau1[hypo]);
 }
 
-TLorentzVector HHKinFit2::HHKinFitMasterSingleHiggsSoftLimits::getFittedTau2(HHFitHypothesisSingleHiggs hypo){
+TLorentzVector HHKinFit2::HHKinFitMasterSingleHiggsSoftLimitsPS::getFittedTau2(HHFitHypothesisSingleHiggs hypo){
   return(m_map_fittedTau2[hypo]);
 }

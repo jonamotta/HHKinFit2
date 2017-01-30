@@ -13,10 +13,9 @@
 #include "HHKinFit2/HHKinFit2Core/interface/HHFitConstraint.h"
 
 namespace HHKinFit2{
-  namespace PS{
-class HHKinFit {
+class HHKinFitPS {
  public:
-  HHKinFit();
+  HHKinFitPS();
 
   void setPrintLevel(int printlevel=0);
 
@@ -48,6 +47,5 @@ class HHKinFit {
   int m_printlevel;
   int m_maxloops;
 };
-}
 }
 #endif /* HHKinFit_ */
