@@ -43,16 +43,16 @@
 #include <iterator>
 #include <sstream>
 
-namespace {
-    double roundToNdigits(double x, int n = 3)
-    {
-        if(x == 0.)
-            return 0.;
-        const int p = std::min<int>(n, n - std::ceil(std::log10(std::abs(x))));
-        const double scale = std::pow(10., p);
-        return std::floor(x * scale + 0.5) / scale;
-    }
-}
+//namespace {
+//    double roundToNdigits(double x, int n = 3)
+//    {
+//        if(x == 0.)
+//            return 0.;
+//        const int p = std::min<int>(n, n - std::ceil(std::log10(std::abs(x))));
+//        const double scale = std::pow(10., p);
+//        return std::floor(x * scale + 0.5) / scale;
+//    }
+//}
 
 HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(TLorentzVector const& bjet1, 
                                                               TLorentzVector const& bjet2, 
@@ -66,15 +66,16 @@ HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(TLorentzVector con
                                                               TLorentzVector const&  heavyhiggsgen)
   :m_MET_COV(TMatrixD(4,4)), m_bjet1_COV(TMatrixD(4,4)), m_bjet2_COV(TMatrixD(4,4))
 {
-  m_bjet1 = HHLorentzVector(roundToNdigits(bjet1.Px()), roundToNdigits(bjet1.Py()),
-			    roundToNdigits(bjet1.Pz()), roundToNdigits(bjet1.E()));
-  m_bjet2 = HHLorentzVector(roundToNdigits(bjet2.Px()), roundToNdigits(bjet2.Py()),
-			    roundToNdigits(bjet2.Pz()), roundToNdigits(bjet2.E()));
-  m_tauvis1 = HHLorentzVector(roundToNdigits(tauvis1.Px()), roundToNdigits(tauvis1.Py()),
-			      roundToNdigits(tauvis1.Pz()), roundToNdigits(tauvis1.E()));
-  m_tauvis2 = HHLorentzVector(roundToNdigits(tauvis2.Px()), roundToNdigits(tauvis2.Py()),
-			      roundToNdigits(tauvis2.Pz()), roundToNdigits(tauvis2.E()));
-  
+  m_bjet1 = HHLorentzVector(bjet1.Px(), bjet1.Py(), bjet1.Pz(), bjet1.E());
+  m_bjet2 = HHLorentzVector(bjet2.Px(), bjet2.Py(), bjet2.Pz(), bjet2.E());
+  m_tauvis1 = HHLorentzVector(tauvis1.Px(), tauvis1.Py(), tauvis1.Pz(), tauvis1.E());
+  m_tauvis2 = HHLorentzVector(tauvis2.Px(), tauvis2.Py(), tauvis2.Pz(), tauvis2.E());
+
+  //m_bjet1 = HHLorentzVector(roundToNdigits(bjet1.Px()), roundToNdigits(bjet1.Py()), roundToNdigits(bjet1.Pz()), roundToNdigits(bjet1.E()));
+  //m_bjet2 = HHLorentzVector(roundToNdigits(bjet2.Px()), roundToNdigits(bjet2.Py()), roundToNdigits(bjet2.Pz()), roundToNdigits(bjet2.E()));
+  //m_tauvis1 = HHLorentzVector(roundToNdigits(tauvis1.Px()), roundToNdigits(tauvis1.Py()), roundToNdigits(tauvis1.Pz()), roundToNdigits(tauvis1.E()));
+  //m_tauvis2 = HHLorentzVector(roundToNdigits(tauvis2.Px()), roundToNdigits(tauvis2.Py()), roundToNdigits(tauvis2.Pz()), roundToNdigits(tauvis2.E()));
+
   m_tauvis1.SetMkeepE(1.77682);
   m_tauvis2.SetMkeepE(1.77682);
 
@@ -82,16 +83,22 @@ HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(TLorentzVector con
   m_loopsNeeded = 0;
   m_useAdveancedBJetChi2 = false;
 
-  m_MET = TVector2(roundToNdigits(met.Px()), roundToNdigits(met.Py()));
+  //m_MET = TVector2(roundToNdigits(met.Px()), roundToNdigits(met.Py()));
+  m_MET = TVector2(met.Px(), met.Py());
   
-  m_MET_COV(0,0) = roundToNdigits(met_cov(0,0));
-  m_MET_COV(1,0) = roundToNdigits(met_cov(1,0));
-  m_MET_COV(0,1) = roundToNdigits(met_cov(0,1));
-  m_MET_COV(1,1) = roundToNdigits(met_cov(1,1));
+  //m_MET_COV(0,0) = roundToNdigits(met_cov(0,0));
+  //m_MET_COV(1,0) = roundToNdigits(met_cov(1,0));
+  //m_MET_COV(0,1) = roundToNdigits(met_cov(0,1));
+  //m_MET_COV(1,1) = roundToNdigits(met_cov(1,1));
+  m_MET_COV(0,0) = met_cov(0,0);
+  m_MET_COV(1,0) = met_cov(1,0);
+  m_MET_COV(0,1) = met_cov(0,1);
+  m_MET_COV(1,1) = met_cov(1,1);
 
   if(sigmaEbjet1 >= 0.0)
   {
-    m_sigma_bjet1 = roundToNdigits(sigmaEbjet1);
+    //m_sigma_bjet1 = roundToNdigits(sigmaEbjet1);
+    m_sigma_bjet1 = sigmaEbjet1;
   }
   else
   {
@@ -100,7 +107,8 @@ HHKinFit2::HHKinFitMasterHeavyHiggs::HHKinFitMasterHeavyHiggs(TLorentzVector con
   
   if(sigmaEbjet2 >= 0.0)
   {
-    m_sigma_bjet2 = roundToNdigits(sigmaEbjet2);
+    //m_sigma_bjet2 = roundToNdigits(sigmaEbjet2);
+    m_sigma_bjet2 = sigmaEbjet2;
   }
   else
   {
