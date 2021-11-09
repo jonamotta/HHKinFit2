@@ -1,7 +1,7 @@
 #ifndef HHInvMConstraintException_
 #define HHInvMConstraintException_
 
-#include "exceptions/HHEnergyRangeException.h"
+#include "HHEnergyRangeException.h"
 
 #include <iostream>
 #include <stdexcept>

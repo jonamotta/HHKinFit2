@@ -1,7 +1,7 @@
 #ifndef HHLimitSettingException_
 #define HHLimitSettingException_
 
-#include "exceptions/HHEnergyRangeException.h"
+#include "HHEnergyRangeException.h"
 
 #include <iostream>
 #include <stdexcept>
