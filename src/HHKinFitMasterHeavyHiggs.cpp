@@ -305,6 +305,7 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::fit()
       m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
       m_bestChi2 = -pow(10,10);
       m_map_convergence[m_hypos[i]] = -1;
+      throw;
       continue;
     }
 
@@ -326,6 +327,7 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::fit()
       m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
       m_bestChi2 = -pow(10,10);
       m_map_convergence[m_hypos[i]] = -2;
+      throw;
       continue;
     }
     
@@ -441,6 +443,7 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::fit()
       {
 	m_map_convergence[m_hypos[i]] = -1;
       }
+      throw;
       continue;
     }
     catch(HHKinFit2::HHEnergyRangeException const& e){
@@ -450,6 +453,7 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::fit()
       m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
       m_bestChi2 = -pow(10,10);
       m_map_convergence[m_hypos[i]] = 0;
+      throw;
       continue;
     }
 
@@ -489,6 +493,7 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::fit()
       {
 	m_map_convergence[m_hypos[i]] = -1;
       }
+      throw;
       continue;
     }
     catch(HHKinFit2::HHEnergyRangeException const& e){
@@ -498,6 +503,7 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::fit()
       m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
       m_bestChi2 = -pow(10,10);
       m_map_convergence[m_hypos[i]] = 0;
+      throw;
       continue;
     }
 
@@ -534,6 +540,7 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::fit()
       {
 	m_map_convergence[m_hypos[i]] = -1;
       }
+      throw;
       continue;
     }
     catch(HHKinFit2::HHEnergyRangeException const& e){
@@ -543,6 +550,7 @@ void HHKinFit2::HHKinFitMasterHeavyHiggs::fit()
       m_bestHypo = HHFitHypothesisHeavyHiggs(-1,-1);
       m_bestChi2 = -pow(10,10);
       m_map_convergence[m_hypos[i]] = 0;
+      throw;
       continue;
     }
 
