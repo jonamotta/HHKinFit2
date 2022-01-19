@@ -1,5 +1,6 @@
 <use name="root" />
 <use name="rootmath" />
+<use name="rootgraphics" />
 <use name="PhysicsTools/FWLite" />
 
 <export>
